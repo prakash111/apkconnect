@@ -106,13 +106,13 @@ class ApiClient(private val session: SessionManager) {
                     if (json.optString("status") == "success") {
                         callback.onSuccess(json)
                     } else {
-                        val msg = json.optString("message", "Request failed with status: ${json.optString("status")}")
+                        val msg = json.optString("message", "Request failed: ${json.optString("status")}")
                         callback.onError(msg)
                     }
                 }
             } catch (e: Exception) {
                 mainHandler.post {
-                    callback.onError(e.message ?: "Network error occurred.")
+                    callback.onError(e.message ?: "Network error.")
                 }
             }
         }
@@ -126,11 +126,11 @@ class ApiClient(private val session: SessionManager) {
         callback: ApiCallback<JSONObject>
     ) {
         executor.execute {
-            val boundary = "===APKTOOL===" + System.currentTimeMillis() + "==="
-            val lineEnd = "\r\n"
-            val twoHyphens = "--"
-
             try {
+                val boundary = "===APKTOOLAI_BOUNDARY_" + System.currentTimeMillis() + "==="
+                val lineEnd = "\r\n"
+                val twoHyphens = "--"
+
                 val url = URL(getIndexPath())
                 val conn = url.openConnection() as HttpURLConnection
                 conn.requestMethod = "POST"
@@ -142,11 +142,11 @@ class ApiClient(private val session: SessionManager) {
                 conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
                 conn.setRequestProperty("X-Requested-With", "XMLHttpRequest")
 
-                val mergedText = HashMap(textParams)
-                mergedText["action"] = action
-
                 val outputStream = conn.outputStream
                 val writer = PrintWriter(OutputStreamWriter(outputStream, "UTF-8"), true)
+
+                val mergedText = HashMap(textParams)
+                mergedText["action"] = action
 
                 // Write text parameters
                 for ((key, value) in mergedText) {
@@ -249,46 +249,40 @@ class ApiClient(private val session: SessionManager) {
                     throw IOException("Server responded with HTTP $responseCode")
                 }
 
-                val total = conn.contentLengthLong
-                val tempFile = File(destFile.parentFile, destFile.name + ".part")
-                destFile.parentFile?.mkdirs()
+                val contentLength = conn.contentLength.toLong()
+                val totalLength = if (contentLength > 0) contentLength else expectedSize
+                var downloadedBytes = 0L
 
                 val digest = MessageDigest.getInstance("SHA-256")
-                var readBytes = 0L
+                val isStream = conn.inputStream
+                destFile.parentFile?.mkdirs()
+                val os = FileOutputStream(destFile)
 
-                conn.inputStream.use { input ->
-                    FileOutputStream(tempFile).use { output ->
-                        val buffer = ByteArray(8192)
-                        var n: Int
-                        while (input.read(buffer).also { n = it } != -1) {
-                            output.write(buffer, 0, n)
-                            digest.update(buffer, 0, n)
-                            readBytes += n
-                            if (total > 0) {
-                                val pct = ((readBytes * 100) / total).toInt()
-                                mainHandler.post {
-                                    progressCallback.onProgress(pct, "Downloading APK ($pct%)...")
-                                }
-                            }
+                val buffer = ByteArray(8192)
+                var bytesRead: Int
+                while (isStream.read(buffer).also { bytesRead = it } != -1) {
+                    os.write(buffer, 0, bytesRead)
+                    digest.update(buffer, 0, bytesRead)
+                    downloadedBytes += bytesRead
+                    if (totalLength > 0) {
+                        val pct = ((downloadedBytes * 100) / totalLength).toInt()
+                        mainHandler.post {
+                            progressCallback.onProgress(pct, "Downloading update ($pct%)...")
                         }
                     }
                 }
+                os.flush()
+                os.close()
+                isStream.close()
                 conn.disconnect()
 
-                if (expectedSize > 0 && readBytes != expectedSize) {
-                    tempFile.delete()
-                    throw SecurityException("APK size mismatch (Expected: $expectedSize, Got: $readBytes)")
-                }
-
-                val actualHash = digest.digest().joinToString("") { "%02x".format(it) }
-                if (!expectedSha256.isNullOrBlank() && !actualHash.equals(expectedSha256, ignoreCase = true)) {
-                    tempFile.delete()
-                    throw SecurityException("APK SHA-256 verification failed.")
-                }
-
-                if (destFile.exists()) destFile.delete()
-                if (!tempFile.renameTo(destFile)) {
-                    throw IOException("Could not finalize downloaded APK.")
+                // Validate sha256 checksum if provided
+                if (!expectedSha256.isNullOrBlank()) {
+                    val calcSha256 = digest.digest().joinToString("") { "%02x".format(it) }
+                    if (!calcSha256.equals(expectedSha256.trim(), ignoreCase = true)) {
+                        destFile.delete()
+                        throw IOException("SHA-256 verification failed! Expected: $expectedSha256, Found: $calcSha256")
+                    }
                 }
 
                 mainHandler.post {
@@ -296,7 +290,7 @@ class ApiClient(private val session: SessionManager) {
                 }
             } catch (e: Exception) {
                 mainHandler.post {
-                    callback.onError(e.message ?: "Download failed.")
+                    callback.onError(e.message ?: "APK download failed.")
                 }
             }
         }
@@ -307,30 +301,30 @@ class ApiClient(private val session: SessionManager) {
     // -------------------------------------------------------------
 
     fun login(usernameOrEmail: String, password: String, callback: ApiCallback<User>) {
-        executePost("login", mapOf("login" to usernameOrEmail, "password" to password), object : ApiCallback<JSONObject> {
+        executePost("login", mapOf("username_or_email" to usernameOrEmail, "password" to password), object : ApiCallback<JSONObject> {
             override fun onSuccess(result: JSONObject) {
-                val userJson = result.optJSONObject("user")
-                val user = if (userJson != null) {
-                    User(
-                        id = userJson.optInt("id", 0),
-                        username = userJson.optString("username", usernameOrEmail),
-                        email = userJson.optString("email", ""),
-                        userType = userJson.optString("user_type", "user"),
-                        emailVerified = userJson.optInt("email_verified", 1),
-                        decompileLimit = userJson.optInt("decompile_limit", 1),
-                        decompileUsage = userJson.optInt("decompile_usage", 0),
-                        compileLimit = userJson.optInt("compile_limit", 1),
-                        compileUsage = userJson.optInt("compile_usage", 0),
-                        generateKeyLimit = userJson.optInt("generate_key_limit", 1),
-                        generateKeyUsage = userJson.optInt("generate_key_usage", 0),
-                        signApkLimit = userJson.optInt("sign_apk_limit", 1),
-                        signApkUsage = userJson.optInt("sign_apk_usage", 0)
+                val u = result.optJSONObject("user")
+                if (u != null) {
+                    val user = User(
+                        id = u.optInt("id", 0),
+                        username = u.optString("username", ""),
+                        email = u.optString("email", ""),
+                        userType = u.optString("user_type", "user"),
+                        emailVerified = u.optInt("email_verified", 0),
+                        decompileLimit = u.optInt("decompile_limit", 1),
+                        decompileUsage = u.optInt("decompile_usage", 0),
+                        compileLimit = u.optInt("compile_limit", 1),
+                        compileUsage = u.optInt("compile_usage", 0),
+                        generateKeyLimit = u.optInt("generate_key_limit", 1),
+                        generateKeyUsage = u.optInt("generate_key_usage", 0),
+                        signApkLimit = u.optInt("sign_apk_limit", 1),
+                        signApkUsage = u.optInt("sign_apk_usage", 0)
                     )
+                    session.currentUser = user
+                    callback.onSuccess(user)
                 } else {
-                    User(id = 0, username = usernameOrEmail, email = "", userType = "user")
+                    callback.onError("User data missing in login response.")
                 }
-                session.currentUser = user
-                callback.onSuccess(user)
             }
 
             override fun onError(errorMessage: String) {
@@ -342,7 +336,7 @@ class ApiClient(private val session: SessionManager) {
     fun register(email: String, username: String, password: String, callback: ApiCallback<String>) {
         executePost("register", mapOf("email" to email, "username" to username, "password" to password), object : ApiCallback<JSONObject> {
             override fun onSuccess(result: JSONObject) {
-                callback.onSuccess(result.optString("message", "Registration successful!"))
+                callback.onSuccess(result.optString("message", "Registration successful."))
             }
 
             override fun onError(errorMessage: String) {
@@ -354,7 +348,7 @@ class ApiClient(private val session: SessionManager) {
     fun requestPasswordReset(email: String, callback: ApiCallback<String>) {
         executePost("request_password_reset", mapOf("email" to email), object : ApiCallback<JSONObject> {
             override fun onSuccess(result: JSONObject) {
-                callback.onSuccess(result.optString("message", "Reset link dispatched."))
+                callback.onSuccess(result.optString("message", "Password reset instructions sent."))
             }
 
             override fun onError(errorMessage: String) {
@@ -364,7 +358,7 @@ class ApiClient(private val session: SessionManager) {
     }
 
     fun resetPassword(token: String, newPass: String, callback: ApiCallback<String>) {
-        executePost("reset_password", mapOf("token" to token, "password" to newPass), object : ApiCallback<JSONObject> {
+        executePost("reset_password", mapOf("token" to token, "new_password" to newPass), object : ApiCallback<JSONObject> {
             override fun onSuccess(result: JSONObject) {
                 callback.onSuccess(result.optString("message", "Password reset successfully."))
             }
@@ -390,24 +384,28 @@ class ApiClient(private val session: SessionManager) {
     fun getUserInfo(callback: ApiCallback<User>) {
         executePost("get_user_info", emptyMap(), object : ApiCallback<JSONObject> {
             override fun onSuccess(result: JSONObject) {
-                val u = result.optJSONObject("user") ?: JSONObject()
-                val user = User(
-                    id = u.optInt("id", 0),
-                    username = u.optString("username", ""),
-                    email = u.optString("email", ""),
-                    userType = u.optString("user_type", "user"),
-                    emailVerified = u.optInt("email_verified", 0),
-                    decompileLimit = u.optInt("decompile_limit", 1),
-                    decompileUsage = u.optInt("decompile_usage", 0),
-                    compileLimit = u.optInt("compile_limit", 1),
-                    compileUsage = u.optInt("compile_usage", 0),
-                    generateKeyLimit = u.optInt("generate_key_limit", 1),
-                    generateKeyUsage = u.optInt("generate_key_usage", 0),
-                    signApkLimit = u.optInt("sign_apk_limit", 1),
-                    signApkUsage = u.optInt("sign_apk_usage", 0)
-                )
-                session.currentUser = user
-                callback.onSuccess(user)
+                val u = result.optJSONObject("user")
+                if (u != null) {
+                    val user = User(
+                        id = u.optInt("id", 0),
+                        username = u.optString("username", ""),
+                        email = u.optString("email", ""),
+                        userType = u.optString("user_type", "user"),
+                        emailVerified = u.optInt("email_verified", 0),
+                        decompileLimit = u.optInt("decompile_limit", 1),
+                        decompileUsage = u.optInt("decompile_usage", 0),
+                        compileLimit = u.optInt("compile_limit", 1),
+                        compileUsage = u.optInt("compile_usage", 0),
+                        generateKeyLimit = u.optInt("generate_key_limit", 1),
+                        generateKeyUsage = u.optInt("generate_key_usage", 0),
+                        signApkLimit = u.optInt("sign_apk_limit", 1),
+                        signApkUsage = u.optInt("sign_apk_usage", 0)
+                    )
+                    session.currentUser = user
+                    callback.onSuccess(user)
+                } else {
+                    callback.onError("User profile unavailable.")
+                }
             }
 
             override fun onError(errorMessage: String) {
@@ -419,19 +417,22 @@ class ApiClient(private val session: SessionManager) {
     fun getLimits(callback: ApiCallback<UserLimits>) {
         executePost("get_limits", emptyMap(), object : ApiCallback<JSONObject> {
             override fun onSuccess(result: JSONObject) {
-                val l = result.optJSONObject("limits") ?: JSONObject()
-                val limits = UserLimits(
-                    decompileLimit = l.optInt("decompile_limit", 1),
-                    decompileUsage = l.optInt("decompile_usage", 0),
-                    compileLimit = l.optInt("compile_limit", 1),
-                    compileUsage = l.optInt("compile_usage", 0),
-                    generateKeyLimit = l.optInt("generate_key_limit", 1),
-                    generateKeyUsage = l.optInt("generate_key_usage", 0),
-                    signApkLimit = l.optInt("sign_apk_limit", 1),
-                    signApkUsage = l.optInt("sign_apk_usage", 0),
-                    maxUploadBytes = l.optLong("max_upload_bytes", 100 * 1024 * 1024L)
-                )
-                callback.onSuccess(limits)
+                val lim = result.optJSONObject("limits")
+                if (lim != null) {
+                    val limits = UserLimits(
+                        decompileLimit = lim.optInt("decompile_limit", 1),
+                        decompileUsage = lim.optInt("decompile_usage", 0),
+                        compileLimit = lim.optInt("compile_limit", 1),
+                        compileUsage = lim.optInt("compile_usage", 0),
+                        generateKeyLimit = lim.optInt("generate_key_limit", 1),
+                        generateKeyUsage = lim.optInt("generate_key_usage", 0),
+                        signApkLimit = lim.optInt("sign_apk_limit", 1),
+                        signApkUsage = lim.optInt("sign_apk_usage", 0)
+                    )
+                    callback.onSuccess(limits)
+                } else {
+                    callback.onError("Usage limits missing.")
+                }
             }
 
             override fun onError(errorMessage: String) {
@@ -441,7 +442,7 @@ class ApiClient(private val session: SessionManager) {
     }
 
     // -------------------------------------------------------------
-    // Project & Workflow Endpoints
+    // Projects & Workspaces Endpoints
     // -------------------------------------------------------------
 
     fun getProjects(callback: ApiCallback<List<ProjectItem>>) {
@@ -450,25 +451,22 @@ class ApiClient(private val session: SessionManager) {
                 val list = ArrayList<ProjectItem>()
                 val arr = result.optJSONArray("projects") ?: JSONArray()
                 for (i in 0 until arr.length()) {
-                    val obj = arr.optJSONObject(i) ?: continue
+                    val o = arr.optJSONObject(i) ?: continue
                     list.add(
                         ProjectItem(
-                            id = obj.optInt("id", 0),
-                            projectId = obj.optString("project_id", ""),
-                            projectName = obj.optString("project_name", ""),
-                            sourceApk = obj.optString("source_apk", null),
-                            projectPath = obj.optString("project_path", null),
-                            projectRoot = obj.optString("project_root", null),
-                            unsignedApk = obj.optString("unsigned_apk", null),
-                            signedApk = obj.optString("signed_apk", null),
-                            keystorePath = obj.optString("keystore_path", null),
-                            keystoreAlias = obj.optString("keystore_alias", null),
-                            logoPreviewName = obj.optString("logo_preview_name", null),
-                            logoPreviewPath = obj.optString("logo_preview_path", null),
-                            logoVersion = obj.optLong("logo_version", 0),
-                            crashReportToken = obj.optString("crash_report_token", null),
-                            createdAt = obj.optString("created_at", null),
-                            updatedAt = obj.optString("updated_at", null)
+                            projectId = o.optString("project_id", ""),
+                            userId = o.optInt("user_id", 0),
+                            apkName = o.optString("apk_name", ""),
+                            apkSize = o.optLong("apk_size", 0),
+                            packageName = o.optString("package_name", ""),
+                            versionCode = o.optString("version_code", ""),
+                            versionName = o.optString("version_name", ""),
+                            minSdk = o.optString("min_sdk", ""),
+                            targetSdk = o.optString("target_sdk", ""),
+                            status = o.optString("status", ""),
+                            lastStep = o.optString("last_step", ""),
+                            createdAt = o.optString("created_at", ""),
+                            updatedAt = o.optString("updated_at", "")
                         )
                     )
                 }
@@ -506,13 +504,13 @@ class ApiClient(private val session: SessionManager) {
         })
     }
 
-    fun deleteProject(projectId: String, callback: ApiCallback<String>) {
+    fun deleteProject(projectId: String, callback: ApiCallback<JSONObject>) {
         executePost("delete_project_ajax", mapOf("project_id" to projectId), object : ApiCallback<JSONObject> {
             override fun onSuccess(result: JSONObject) {
                 if (session.currentProjectId == projectId) {
                     session.currentProjectId = null
                 }
-                callback.onSuccess(result.optString("message", "Project deleted."))
+                callback.onSuccess(result)
             }
 
             override fun onError(errorMessage: String) {
@@ -598,8 +596,23 @@ class ApiClient(private val session: SessionManager) {
     // Resources, Code Editor & AI Studios
     // -------------------------------------------------------------
 
-    fun loadStrings(locale: String, callback: ApiCallback<JSONObject>) {
-        executePost("workflow_load_strings_ajax", mapOf("workflow_locale" to locale), callback)
+    fun loadStrings(locale: String, callback: ApiCallback<Map<String, String>>) {
+        executePost("workflow_load_strings_ajax", mapOf("workflow_locale" to locale), object : ApiCallback<JSONObject> {
+            override fun onSuccess(result: JSONObject) {
+                val map = HashMap<String, String>()
+                val s = result.optJSONObject("strings") ?: result
+                val keys = s.keys()
+                while (keys.hasNext()) {
+                    val k = keys.next()
+                    map[k] = s.optString(k, "")
+                }
+                callback.onSuccess(map)
+            }
+
+            override fun onError(errorMessage: String) {
+                callback.onError(errorMessage)
+            }
+        })
     }
 
     fun autosaveStrings(locale: String, appName: String, stringsMap: Map<String, String>, callback: ApiCallback<JSONObject>) {
@@ -779,16 +792,8 @@ class ApiClient(private val session: SessionManager) {
         })
     }
 
-    fun adbConnect(host: String, callback: ApiCallback<String>) {
-        executePost("adb_connect_ajax", mapOf("adb_host" to host), object : ApiCallback<JSONObject> {
-            override fun onSuccess(result: JSONObject) {
-                callback.onSuccess(result.optString("message", "Connected."))
-            }
-
-            override fun onError(errorMessage: String) {
-                callback.onError(errorMessage)
-            }
-        })
+    fun adbConnect(host: String, callback: ApiCallback<JSONObject>) {
+        executePost("adb_connect_ajax", mapOf("adb_host" to host), callback)
     }
 
     fun adbDisconnect(host: String, callback: ApiCallback<String>) {
@@ -848,15 +853,15 @@ class ApiClient(private val session: SessionManager) {
         executePost("workflow_enable_cloud_logging_ajax", emptyMap(), callback)
     }
 
-    fun getCloudLogs(callback: ApiCallback<List<String>>) {
+    fun getCloudLogs(callback: ApiCallback<String>) {
         executePost("workflow_get_cloud_logs_ajax", emptyMap(), object : ApiCallback<JSONObject> {
             override fun onSuccess(result: JSONObject) {
-                val list = ArrayList<String>()
                 val arr = result.optJSONArray("lines") ?: JSONArray()
+                val sb = StringBuilder()
                 for (i in 0 until arr.length()) {
-                    list.add(arr.optString(i))
+                    sb.append(arr.optString(i)).append("\n")
                 }
-                callback.onSuccess(list)
+                callback.onSuccess(sb.toString().trimEnd())
             }
 
             override fun onError(errorMessage: String) {
@@ -865,16 +870,8 @@ class ApiClient(private val session: SessionManager) {
         })
     }
 
-    fun clearCloudLogs(callback: ApiCallback<String>) {
-        executePost("workflow_clear_cloud_logs_ajax", emptyMap(), object : ApiCallback<JSONObject> {
-            override fun onSuccess(result: JSONObject) {
-                callback.onSuccess(result.optString("message", "Logs cleared."))
-            }
-
-            override fun onError(errorMessage: String) {
-                callback.onError(errorMessage)
-            }
-        })
+    fun clearCloudLogs(callback: ApiCallback<JSONObject>) {
+        executePost("workflow_clear_cloud_logs_ajax", emptyMap(), callback)
     }
 
     // -------------------------------------------------------------
@@ -1331,22 +1328,6 @@ class ApiClient(private val session: SessionManager) {
         })
     }
 
-    fun submitContactInquiry(name: String, email: String, subject: String, message: String, callback: ApiCallback<String>) {
-        executePost(
-            "submit_contact_inquiry",
-            mapOf("name" to name, "email" to email, "subject" to subject, "message" to message),
-            object : ApiCallback<JSONObject> {
-                override fun onSuccess(result: JSONObject) {
-                    callback.onSuccess(result.optString("message", "Inquiry submitted."))
-                }
-
-                override fun onError(errorMessage: String) {
-                    callback.onError(errorMessage)
-                }
-            }
-        )
-    }
-
     // -------------------------------------------------------------
     // Device Companion Polling Endpoints
     // -------------------------------------------------------------
@@ -1410,5 +1391,238 @@ class ApiClient(private val session: SessionManager) {
                 }
             }
         }
+    }
+
+    // -------------------------------------------------------------
+    // Convenience Overloads & Aliases
+    // -------------------------------------------------------------
+
+    fun selectProject(projectId: String, callback: ApiCallback<JSONObject>) {
+        switchProject(projectId, callback)
+    }
+
+    fun uploadAndDecompile(apkFile: File, progressCallback: ProgressCallback, callback: ApiCallback<JSONObject>) {
+        uploadAndDecompileApk(apkFile, progressCallback, callback)
+    }
+
+    fun getFiles(dirPath: String, callback: ApiCallback<List<ProjectFile>>) {
+        getDirectory(dirPath, object : ApiCallback<Pair<String, List<ProjectFile>>> {
+            override fun onSuccess(result: Pair<String, List<ProjectFile>>) {
+                callback.onSuccess(result.second)
+            }
+
+            override fun onError(errorMessage: String) {
+                callback.onError(errorMessage)
+            }
+        })
+    }
+
+    fun getFileContent(filePath: String, callback: ApiCallback<JSONObject>) {
+        openEditorFile(filePath, 0, callback)
+    }
+
+    fun saveFileContent(filePath: String, content: String, callback: ApiCallback<JSONObject>) {
+        saveEditorFile(filePath, content, 0, 0, callback)
+    }
+
+    fun aiReview(filePath: String, content: String, callback: ApiCallback<JSONObject>) {
+        aiReviewEditor(filePath, content, callback)
+    }
+
+    fun hexSearch(filePath: String, query: String, callback: ApiCallback<List<HexResult>>) {
+        searchHex(filePath, query, callback)
+    }
+
+    fun hexPatch(filePath: String, offset: Long, patch: String, callback: ApiCallback<JSONObject>) {
+        saveEditorFile(filePath, patch, offset, patch.length.toLong(), callback)
+    }
+
+    fun saveStrings(locale: String, stringsMap: Map<String, String>, callback: ApiCallback<JSONObject>) {
+        autosaveStrings(locale, stringsMap["app_name"] ?: "", stringsMap, callback)
+    }
+
+    fun generateIcon(prompt: String, callback: ApiCallback<JSONObject>) {
+        generateAiIcon(prompt, callback)
+    }
+
+    fun aiFixAll(callback: ApiCallback<JSONObject>) {
+        aiApplyFix(callback)
+    }
+
+    fun globalFind(query: String, callback: ApiCallback<JSONObject>) {
+        findProject(query, callback)
+    }
+
+    fun globalReplace(find: String, replace: String, callback: ApiCallback<JSONObject>) {
+        findReplaceProject(find, replace, callback)
+    }
+
+    fun downloadSignedApk(callback: ApiCallback<File>) {
+        val pid = session.currentProjectId ?: ""
+        val url = getIndexPath() + (if (getIndexPath().contains("?")) "&" else "?") + "download_signed=1&project_id=" + URLEncoder.encode(pid, "UTF-8")
+        val dest = File.createTempFile("signed_apk_", ".apk")
+        downloadApk(url, null, 0, dest, object : ProgressCallback {
+            override fun onProgress(percentage: Int, message: String) {}
+        }, callback)
+    }
+
+    fun getAdbDevices(callback: ApiCallback<List<AdbDevice>>) {
+        adbListDevices(callback)
+    }
+
+    fun getAdbLogcat(filter: String, callback: ApiCallback<String>) {
+        adbReadLogcat("", filter, object : ApiCallback<List<String>> {
+            override fun onSuccess(result: List<String>) {
+                callback.onSuccess(result.joinToString("\n"))
+            }
+
+            override fun onError(errorMessage: String) {
+                callback.onError(errorMessage)
+            }
+        })
+    }
+
+    fun saveGeminiKey(key: String, callback: ApiCallback<String>) = saveApiKey("gemini", key, callback)
+    fun deleteGeminiKey(callback: ApiCallback<String>) = deleteApiKey("gemini", callback)
+    fun saveOpenAiKey(key: String, callback: ApiCallback<String>) = saveApiKey("openai", key, callback)
+    fun deleteOpenAiKey(callback: ApiCallback<String>) = deleteApiKey("openai", callback)
+
+    fun saveCustomModels(gt: String, gi: String, ot: String, oi: String, callback: ApiCallback<String>) {
+        saveUserAiModels(
+            mapOf(
+                "gemini_text_model" to gt,
+                "gemini_image_model" to gi,
+                "openai_text_model" to ot,
+                "openai_image_model" to oi
+            ),
+            callback
+        )
+    }
+
+    fun getAdminUsers(callback: ApiCallback<List<User>>) = getUsers(callback)
+    fun getAdminInquiries(callback: ApiCallback<List<ContactInquiry>>) = getContactInquiries(callback)
+
+    fun adminCreateUser(e: String, u: String, p: String, d: Int, c: Int, k: Int, s: Int, callback: ApiCallback<JSONObject>) {
+        createUser(
+            mapOf(
+                "email" to e,
+                "username" to u,
+                "password" to p,
+                "decompile_limit" to d.toString(),
+                "compile_limit" to c.toString(),
+                "generate_key_limit" to k.toString(),
+                "sign_apk_limit" to s.toString()
+            ),
+            object : ApiCallback<String> {
+                override fun onSuccess(result: String) {
+                    callback.onSuccess(JSONObject().put("status", "success").put("message", result))
+                }
+
+                override fun onError(errorMessage: String) {
+                    callback.onError(errorMessage)
+                }
+            }
+        )
+    }
+
+    fun adminSaveBlog(id: Int, t: String, c: String, r: String, tg: String, ex: String, ct: String, callback: ApiCallback<JSONObject>) {
+        saveAdminBlog(
+            mapOf(
+                "id" to id.toString(),
+                "title" to t,
+                "category" to c,
+                "read_time" to r,
+                "tags" to tg,
+                "excerpt" to ex,
+                "content" to ct
+            ),
+            object : ApiCallback<String> {
+                override fun onSuccess(result: String) {
+                    callback.onSuccess(JSONObject().put("status", "success").put("message", result))
+                }
+
+                override fun onError(errorMessage: String) {
+                    callback.onError(errorMessage)
+                }
+            }
+        )
+    }
+
+    fun adminSaveFaq(id: Int, q: String, c: String, a: String, callback: ApiCallback<JSONObject>) {
+        saveAdminFaq(
+            mapOf(
+                "id" to id.toString(),
+                "question" to q,
+                "category" to c,
+                "answer" to a
+            ),
+            object : ApiCallback<String> {
+                override fun onSuccess(result: String) {
+                    callback.onSuccess(JSONObject().put("status", "success").put("message", result))
+                }
+
+                override fun onError(errorMessage: String) {
+                    callback.onError(errorMessage)
+                }
+            }
+        )
+    }
+
+    fun saveBackupSettings(owner: String, repo: String, branch: String, token: String, callback: ApiCallback<JSONObject>) {
+        saveAdminBackupSettings(
+            mapOf(
+                "github_repo_owner" to owner,
+                "github_repo_name" to repo,
+                "github_branch" to branch,
+                "github_token" to token
+            ),
+            object : ApiCallback<String> {
+                override fun onSuccess(result: String) {
+                    callback.onSuccess(JSONObject().put("status", "success").put("message", result))
+                }
+
+                override fun onError(errorMessage: String) {
+                    callback.onError(errorMessage)
+                }
+            }
+        )
+    }
+
+    fun runBackup(callback: ApiCallback<JSONObject>) {
+        runAdminManualBackup(object : ApiCallback<String> {
+            override fun onSuccess(result: String) {
+                callback.onSuccess(JSONObject().put("status", "success").put("message", result))
+            }
+
+            override fun onError(errorMessage: String) {
+                callback.onError(errorMessage)
+            }
+        })
+    }
+
+    fun getPublicFaqs(callback: ApiCallback<List<FaqItem>>) = getFaqs(callback)
+
+    fun submitContactInquiry(name: String, email: String, subject: String, message: String, callback: ApiCallback<JSONObject>) {
+        executePost(
+            "submit_contact_inquiry",
+            mapOf("name" to name, "email" to email, "subject" to subject, "message" to message),
+            callback
+        )
+    }
+
+    fun checkBuildUpdate(callback: ApiCallback<Boolean>) {
+        val tok = session.pairingToken ?: ""
+        checkDeviceUpdate(
+            tok,
+            object : ApiCallback<JSONObject> {
+                override fun onSuccess(result: JSONObject) {
+                    callback.onSuccess(result.optBoolean("has_update", false))
+                }
+
+                override fun onError(errorMessage: String) {
+                    callback.onError(errorMessage)
+                }
+            }
+        )
     }
 }
