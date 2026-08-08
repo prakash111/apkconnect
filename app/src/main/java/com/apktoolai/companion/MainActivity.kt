@@ -10,6 +10,7 @@ import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.view.GravityCompat
@@ -19,6 +20,7 @@ import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import org.json.JSONObject
 import java.io.File
+import java.io.FileOutputStream
 
 class MainActivity : AppCompatActivity() {
 
@@ -38,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var globalProgressBar: ProgressBar
 
     // Navigation Drawer
+    private lateinit var navWorkspaceHeader: TextView
     private lateinit var navDashboard: TextView
     private lateinit var navProjects: TextView
     private lateinit var navEditor: TextView
@@ -50,6 +53,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navContact: TextView
     private lateinit var navAdminSectionTitle: TextView
     private lateinit var navAdmin: TextView
+    private lateinit var sidebarFooterUser: LinearLayout
     private lateinit var txtSidebarUserAvatar: TextView
     private lateinit var txtSidebarUsername: TextView
     private lateinit var btnSidebarLogout: Button
@@ -88,10 +92,13 @@ class MainActivity : AppCompatActivity() {
     // Editor Elements
     private lateinit var btnEditorGoUp: ImageButton
     private lateinit var txtEditorBreadcrumb: TextView
+    private lateinit var btnEditorReload: Button
     private lateinit var btnEditorSaveFile: Button
     private lateinit var layoutEditorItems: LinearLayout
     private lateinit var editCodeContent: EditText
     private var currentEditorFilePath: String? = null
+    private var originalEditorContent: String = ""
+    private var isEditorDirty: Boolean = false
     private var currentEditorDir: String = ""
 
     // Search Elements
@@ -140,11 +147,24 @@ class MainActivity : AppCompatActivity() {
     private var currentActiveTab: String = "dashboard"
     private var activeProjectName: String? = null
 
+    // File pickers
     private val qrScanLauncher = registerForActivityResult(ScanContract()) { result ->
         val contents = result.contents
         if (contents != null) {
             editPairingKeyInput.setText(contents)
             handlePairingToken(contents)
+        }
+    }
+
+    private val firebaseFilePicker = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        if (uri != null) {
+            handleFirebaseJsonUpload(uri)
+        }
+    }
+
+    private val apkFilePicker = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        if (uri != null) {
+            handleApkUpload(uri)
         }
     }
 
@@ -166,6 +186,26 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START)
+            return
+        }
+        if (!session.isLoggedIn && !session.isPaired) {
+            finishAffinity()
+            return
+        }
+        if (currentActiveTab != "dashboard") {
+            if (isEditorDirty) {
+                confirmLeaveUnsaved { switchTab("dashboard") }
+            } else {
+                switchTab("dashboard")
+            }
+            return
+        }
+        super.onBackPressed()
+    }
+
     private fun initViews() {
         drawerLayout = findViewById(R.id.drawerLayout)
         btnMenuToggle = findViewById(R.id.btnMenuToggle)
@@ -178,6 +218,7 @@ class MainActivity : AppCompatActivity() {
         globalProgressBar = findViewById(R.id.globalProgressBar)
 
         // Nav
+        navWorkspaceHeader = findViewById(R.id.navWorkspaceHeader)
         navDashboard = findViewById(R.id.navDashboard)
         navProjects = findViewById(R.id.navProjects)
         navEditor = findViewById(R.id.navEditor)
@@ -190,6 +231,7 @@ class MainActivity : AppCompatActivity() {
         navContact = findViewById(R.id.navContact)
         navAdminSectionTitle = findViewById(R.id.navAdminSectionTitle)
         navAdmin = findViewById(R.id.navAdmin)
+        sidebarFooterUser = findViewById(R.id.sidebarFooterUser)
         txtSidebarUserAvatar = findViewById(R.id.txtSidebarUserAvatar)
         txtSidebarUsername = findViewById(R.id.txtSidebarUsername)
         btnSidebarLogout = findViewById(R.id.btnSidebarLogout)
@@ -228,6 +270,7 @@ class MainActivity : AppCompatActivity() {
         // Editor
         btnEditorGoUp = findViewById(R.id.btnEditorGoUp)
         txtEditorBreadcrumb = findViewById(R.id.txtEditorBreadcrumb)
+        btnEditorReload = findViewById(R.id.btnEditorReload)
         btnEditorSaveFile = findViewById(R.id.btnEditorSaveFile)
         layoutEditorItems = findViewById(R.id.layoutEditorItems)
         editCodeContent = findViewById(R.id.editCodeContent)
@@ -305,8 +348,15 @@ class MainActivity : AppCompatActivity() {
         btnDashBuildApk.setOnClickListener { switchTab("build") }
         btnViewAllProjects.setOnClickListener { switchTab("projects") }
 
+        btnUploadNewApkProject.setOnClickListener { apkFilePicker.launch("application/vnd.android.package-archive") }
+
         btnEditorGoUp.setOnClickListener { goUpDirectory() }
+        btnEditorReload.setOnClickListener { reloadActiveEditorFile() }
         btnEditorSaveFile.setOnClickListener { saveActiveEditorFile() }
+
+        editCodeContent.setOnFocusChangeListener { _, _ ->
+            checkEditorDirty()
+        }
 
         btnExecuteSearch.setOnClickListener { executeSearch() }
         btnExecuteReplace.setOnClickListener { executeReplace() }
@@ -317,6 +367,7 @@ class MainActivity : AppCompatActivity() {
         btnDownloadSignedApk.setOnClickListener { installDownloadedApk() }
 
         btnSubmitContact.setOnClickListener { submitContactInquiry() }
+        btnAdminCreateUser.setOnClickListener { showCreateUserDialog() }
 
         btnScanQr.setOnClickListener { launchQrScanner() }
         btnOpenLoginDialog.setOnClickListener { showAuthDialog() }
@@ -328,10 +379,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     // -------------------------------------------------------------
-    // Tab Navigation
+    // Tab Navigation & Auth Visibility
     // -------------------------------------------------------------
 
     private fun switchTab(tab: String) {
+        if (isEditorDirty && currentActiveTab == "editor" && tab != "editor") {
+            confirmLeaveUnsaved { performSwitchTab(tab) }
+            return
+        }
+        performSwitchTab(tab)
+    }
+
+    private fun performSwitchTab(tab: String) {
         currentActiveTab = tab
         drawerLayout.closeDrawer(GravityCompat.START)
 
@@ -407,6 +466,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showAuthView() {
+        currentActiveTab = "auth"
+        drawerLayout.closeDrawer(GravityCompat.START)
+
         viewDashboard.visibility = View.GONE
         viewProjects.visibility = View.GONE
         viewEditor.visibility = View.GONE
@@ -422,21 +484,50 @@ class MainActivity : AppCompatActivity() {
         viewAuth.visibility = View.VISIBLE
         txtTopbarTitle.text = "APK Tool Studio"
         txtTopbarProjectPill.text = "Sign in to connect"
+        btnQuickSaveFile.visibility = View.GONE
+
+        // Hide authenticated sidebar navigation items
+        navWorkspaceHeader.visibility = View.GONE
+        navDashboard.visibility = View.GONE
+        navProjects.visibility = View.GONE
+        navEditor.visibility = View.GONE
+        navSearch.visibility = View.GONE
+        navStrings.visibility = View.GONE
+        navKeystores.visibility = View.GONE
+        navBuild.visibility = View.GONE
+        navAdminSectionTitle.visibility = View.GONE
+        navAdmin.visibility = View.GONE
+        sidebarFooterUser.visibility = View.GONE
+    }
+
+    private fun showAuthenticatedSidebar() {
+        navWorkspaceHeader.visibility = View.VISIBLE
+        navDashboard.visibility = View.VISIBLE
+        navProjects.visibility = View.VISIBLE
+        navEditor.visibility = View.VISIBLE
+        navSearch.visibility = View.VISIBLE
+        navStrings.visibility = View.VISIBLE
+        navKeystores.visibility = View.VISIBLE
+        navBuild.visibility = View.VISIBLE
+        sidebarFooterUser.visibility = View.VISIBLE
+
+        val user = session.currentUser
+        val isAdmin = user?.isAdmin == true
+        navAdminSectionTitle.visibility = if (isAdmin) View.VISIBLE else View.GONE
+        navAdmin.visibility = if (isAdmin) View.VISIBLE else View.GONE
     }
 
     // -------------------------------------------------------------
-    // Data Loading & Handlers
+    // Data Loading & State Management
     // -------------------------------------------------------------
 
     private fun refreshAllData() {
+        showAuthenticatedSidebar()
+
         val user = session.currentUser
         val username = user?.username ?: session.projectName ?: "Developer"
         txtSidebarUsername.text = username
         txtSidebarUserAvatar.text = username.take(1).uppercase()
-
-        val isAdmin = user?.isAdmin == true
-        navAdminSectionTitle.visibility = if (isAdmin) View.VISIBLE else View.GONE
-        navAdmin.visibility = if (isAdmin) View.VISIBLE else View.GONE
 
         api.getWorkflowState(object : ApiClient.ApiCallback<JSONObject> {
             override fun onSuccess(result: JSONObject) {
@@ -494,10 +585,12 @@ class MainActivity : AppCompatActivity() {
                 setBusy(false)
                 layoutProjectsList.removeAllViews()
                 if (result.isEmpty()) {
-                    val empty = TextView(this@MainActivity)
-                    empty.text = "No decompiled projects found. Upload an APK to get started."
-                    empty.setPadding(16, 32, 16, 32)
-                    empty.setTextColor(getColor(R.color.text_muted))
+                    val empty = TextView(this@MainActivity).apply {
+                        text = "No decompiled projects found. Tap '+ Upload APK' above to upload and decompile."
+                        setPadding(16, 32, 16, 32)
+                        textSize = 13f
+                        setTextColor(getColor(R.color.text_muted))
+                    }
                     layoutProjectsList.addView(empty)
                 } else {
                     result.forEach { proj ->
@@ -595,10 +688,11 @@ class MainActivity : AppCompatActivity() {
                 val files = result.second
 
                 if (files.isEmpty()) {
-                    val empty = TextView(this@MainActivity)
-                    empty.text = "Empty folder"
-                    empty.textSize = 12f
-                    empty.setTextColor(getColor(R.color.text_muted))
+                    val empty = TextView(this@MainActivity).apply {
+                        text = "Empty directory"
+                        textSize = 12f
+                        setTextColor(getColor(R.color.text_muted))
+                    }
                     layoutEditorItems.addView(empty)
                 } else {
                     files.forEach { file ->
@@ -611,7 +705,11 @@ class MainActivity : AppCompatActivity() {
                                 if (file.isDir) {
                                     loadEditorDirectory(file.path)
                                 } else {
-                                    openFileInEditor(file.path)
+                                    if (isEditorDirty) {
+                                        confirmLeaveUnsaved { openFileInEditor(file.path) }
+                                    } else {
+                                        openFileInEditor(file.path)
+                                    }
                                 }
                             }
                         }
@@ -621,7 +719,7 @@ class MainActivity : AppCompatActivity() {
             }
             override fun onError(errorMessage: String) {
                 setBusy(false)
-                toast("Error loading folder: $errorMessage")
+                toast("Error loading directory: $errorMessage")
             }
         })
     }
@@ -639,7 +737,10 @@ class MainActivity : AppCompatActivity() {
             override fun onSuccess(result: EditorFile) {
                 setBusy(false)
                 currentEditorFilePath = result.path
+                originalEditorContent = result.content
                 editCodeContent.setText(result.content)
+                isEditorDirty = false
+                btnEditorSaveFile.isEnabled = true
                 txtTopbarTitle.text = "Editing: ${result.path.substringAfterLast('/')}"
                 toast("Loaded ${result.path}")
             }
@@ -650,10 +751,34 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    private fun reloadActiveEditorFile() {
+        val path = currentEditorFilePath ?: return
+        openFileInEditor(path)
+    }
+
+    private fun checkEditorDirty(): Boolean {
+        val path = currentEditorFilePath ?: return false
+        val currentText = editCodeContent.text.toString()
+        isEditorDirty = (currentText != originalEditorContent)
+        return isEditorDirty
+    }
+
+    private fun confirmLeaveUnsaved(onConfirmed: () -> Unit) {
+        AlertDialog.Builder(this)
+            .setTitle("Unsaved Changes")
+            .setMessage("You have unsaved changes in the current file. Do you want to discard them?")
+            .setPositiveButton("Discard") { _, _ ->
+                isEditorDirty = false
+                onConfirmed()
+            }
+            .setNegativeButton("Keep Editing", null)
+            .show()
+    }
+
     private fun saveActiveEditorFile() {
         val path = currentEditorFilePath
         if (path == null) {
-            toast("No file open in editor to save.")
+            toast("No file open to save.")
             return
         }
         val content = editCodeContent.text.toString()
@@ -661,13 +786,72 @@ class MainActivity : AppCompatActivity() {
         api.saveEditorFile(path, content, object : ApiClient.ApiCallback<String> {
             override fun onSuccess(result: String) {
                 setBusy(false)
-                toast("Saved $path successfully.")
+                originalEditorContent = content
+                isEditorDirty = false
+                toast("Saved $path successfully!")
             }
             override fun onError(errorMessage: String) {
                 setBusy(false)
-                toast("Failed to save: $errorMessage")
+                toast("Failed to save file: $errorMessage")
             }
         })
+    }
+
+    // -------------------------------------------------------------
+    // Google Services JSON Upload & APK Upload
+    // -------------------------------------------------------------
+
+    private fun handleFirebaseJsonUpload(uri: Uri) {
+        try {
+            val inputStream = contentResolver.openInputStream(uri) ?: return
+            val tempFile = File(cacheDir, "google-services.json")
+            FileOutputStream(tempFile).use { out ->
+                inputStream.copyTo(out)
+            }
+            setBusy(true)
+            api.applyFirebaseJson(tempFile, object : ApiClient.ApiCallback<JSONObject> {
+                override fun onSuccess(result: JSONObject) {
+                    setBusy(false)
+                    toast("google-services.json applied to project successfully!")
+                    refreshAllData()
+                }
+                override fun onError(errorMessage: String) {
+                    setBusy(false)
+                    toast("Firebase upload error: $errorMessage")
+                }
+            })
+        } catch (e: Exception) {
+            toast("Error reading JSON file: ${e.message}")
+        }
+    }
+
+    private fun handleApkUpload(uri: Uri) {
+        try {
+            val inputStream = contentResolver.openInputStream(uri) ?: return
+            val tempFile = File(cacheDir, "uploaded_app.apk")
+            FileOutputStream(tempFile).use { out ->
+                inputStream.copyTo(out)
+            }
+            setBusy(true)
+            api.uploadAndDecompileApk(tempFile, object : ApiClient.ProgressCallback {
+                override fun onProgress(percentage: Int, message: String) {
+                    txtTopbarTitle.text = message
+                }
+            }, object : ApiClient.ApiCallback<JSONObject> {
+                override fun onSuccess(result: JSONObject) {
+                    setBusy(false)
+                    toast("APK uploaded and decompiled successfully!")
+                    refreshAllData()
+                    switchTab("dashboard")
+                }
+                override fun onError(errorMessage: String) {
+                    setBusy(false)
+                    toast("Decompile failed: $errorMessage")
+                }
+            })
+        } catch (e: Exception) {
+            toast("Failed to upload APK: ${e.message}")
+        }
     }
 
     // -------------------------------------------------------------
@@ -688,10 +872,12 @@ class MainActivity : AppCompatActivity() {
                 txtSearchResultsHeader.text = "Matching Locations (${result.files.size})"
 
                 if (result.files.isEmpty()) {
-                    val empty = TextView(this@MainActivity)
-                    empty.text = "No occurrences found for \"$query\""
-                    empty.setPadding(8, 16, 8, 16)
-                    empty.setTextColor(getColor(R.color.text_muted))
+                    val empty = TextView(this@MainActivity).apply {
+                        text = "No occurrences found for \"$query\""
+                        setPadding(8, 16, 8, 16)
+                        textSize = 12f
+                        setTextColor(getColor(R.color.text_muted))
+                    }
                     layoutSearchResultsList.addView(empty)
                 } else {
                     result.files.forEach { match: FindMatch ->
@@ -799,6 +985,8 @@ class MainActivity : AppCompatActivity() {
                     val valInput = EditText(this@MainActivity).apply {
                         setText(item.value)
                         textSize = 12f
+                        setTextColor(getColor(R.color.text_primary))
+                        setTextColorHint(getColor(R.color.text_muted))
                         setBackgroundResource(R.drawable.bg_input_field)
                         setPadding(8, 6, 8, 6)
                         layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.6f)
@@ -845,10 +1033,12 @@ class MainActivity : AppCompatActivity() {
                 setBusy(false)
                 layoutKeystoresList.removeAllViews()
                 if (result.isEmpty()) {
-                    val empty = TextView(this@MainActivity)
-                    empty.text = "No keystores created yet. Click '+ New Key' to generate one."
-                    empty.setPadding(16, 24, 16, 24)
-                    empty.setTextColor(getColor(R.color.text_muted))
+                    val empty = TextView(this@MainActivity).apply {
+                        text = "No keystores created yet. Tap '+ New Key' above to generate an RSA 2048-bit key."
+                        setPadding(16, 24, 16, 24)
+                        textSize = 13f
+                        setTextColor(getColor(R.color.text_muted))
+                    }
                     layoutKeystoresList.addView(empty)
                 } else {
                     result.forEach { ks ->
@@ -928,7 +1118,7 @@ class MainActivity : AppCompatActivity() {
                     api.createKeystore(alias, pass, object : ApiClient.ApiCallback<String> {
                         override fun onSuccess(result: String) {
                             setBusy(false)
-                            toast("Keystore generated successfully.")
+                            toast("Keystore generated successfully!")
                             loadKeystoresList()
                         }
                         override fun onError(errorMessage: String) {
@@ -973,7 +1163,9 @@ class MainActivity : AppCompatActivity() {
         val destFile = File(cacheDir, "recompiled_signed.apk")
         setBusy(true)
         api.downloadApk(urlStr, destFile, object : ApiClient.ProgressCallback {
-            override fun onProgress(percentage: Int, message: String) {}
+            override fun onProgress(percentage: Int, message: String) {
+                txtTopbarTitle.text = message
+            }
         }, object : ApiClient.ApiCallback<File> {
             override fun onSuccess(result: File) {
                 setBusy(false)
@@ -1017,6 +1209,7 @@ class MainActivity : AppCompatActivity() {
                         )
                         p.setMargins(0, 0, 0, 10)
                         layoutParams = p
+                        setOnClickListener { showBlogDetailDialog(b) }
                     }
 
                     val cat = TextView(this@MainActivity).apply {
@@ -1051,6 +1244,48 @@ class MainActivity : AppCompatActivity() {
                 toast(errorMessage)
             }
         })
+    }
+
+    private fun showBlogDetailDialog(blog: BlogItem) {
+        val dialogView = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(20, 20, 20, 20)
+            setBackgroundColor(getColor(R.color.bg_card))
+        }
+
+        val title = TextView(this).apply {
+            text = blog.title
+            textSize = 18f
+            setTypeface(null, android.graphics.Typeface.BOLD)
+            setTextColor(getColor(R.color.text_primary))
+            setPadding(0, 0, 0, 8)
+        }
+
+        val meta = TextView(this).apply {
+            text = "${blog.category} • ${blog.readTime}"
+            textSize = 12f
+            setTextColor(getColor(R.color.primary))
+            setPadding(0, 0, 0, 12)
+        }
+
+        val scroll = ScrollView(this).apply {
+            val contentText = TextView(this@MainActivity).apply {
+                text = if (blog.content.isNotEmpty()) blog.content else blog.excerpt
+                textSize = 13f
+                setTextColor(getColor(R.color.text_secondary))
+                setLineSpacing(4f, 1.2f)
+            }
+            addView(contentText)
+        }
+
+        dialogView.addView(title)
+        dialogView.addView(meta)
+        dialogView.addView(scroll)
+
+        AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setPositiveButton("Close", null)
+            .show()
     }
 
     private fun loadFaqsList() {
@@ -1181,6 +1416,44 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    private fun showCreateUserDialog() {
+        val view = LayoutInflater.from(this).inflate(R.layout.dialog_create_user, null)
+        val editEmail = view.findViewById<EditText>(R.id.editNewUserEmail)
+        val editUsername = view.findViewById<EditText>(R.id.editNewUserUsername)
+        val editPassword = view.findViewById<EditText>(R.id.editNewUserPassword)
+
+        AlertDialog.Builder(this)
+            .setTitle("Provision User Account")
+            .setView(view)
+            .setPositiveButton("Create User") { _, _ ->
+                val email = editEmail.text.toString().trim()
+                val user = editUsername.text.toString().trim()
+                val pass = editPassword.text.toString().trim()
+                if (email.isNotEmpty() && user.isNotEmpty() && pass.isNotEmpty()) {
+                    setBusy(true)
+                    api.executePost("admin_create_user_ajax", mapOf(
+                        "user_email" to email,
+                        "user_name" to user,
+                        "user_password" to pass
+                    ), object : ApiClient.ApiCallback<JSONObject> {
+                        override fun onSuccess(result: JSONObject) {
+                            setBusy(false)
+                            toast("User $user provisioned successfully!")
+                            loadAdminUsersList()
+                        }
+                        override fun onError(errorMessage: String) {
+                            setBusy(false)
+                            toast("Provisioning error: $errorMessage")
+                        }
+                    })
+                } else {
+                    toast("All fields are required.")
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
     // -------------------------------------------------------------
     // Auth & Pairing
     // -------------------------------------------------------------
@@ -1249,6 +1522,10 @@ class MainActivity : AppCompatActivity() {
     private fun handleLogout() {
         session.logout()
         activeProjectName = null
+        currentEditorFilePath = null
+        originalEditorContent = ""
+        isEditorDirty = false
+
         showAuthView()
         toast("Signed out successfully.")
     }

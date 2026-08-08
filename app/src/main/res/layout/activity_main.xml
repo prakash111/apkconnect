@@ -58,7 +58,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="No Project Open"
-                    android:textColor="@color/text_muted"
+                    android:textColor="@color/text_secondary"
                     android:textSize="11sp"
                     android:maxLines="1"
                     android:ellipsize="end" />
@@ -152,7 +152,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Scan QR code, enter pairing key, or login with your studio account."
-                        android:textColor="@color/text_muted"
+                        android:textColor="@color/text_secondary"
                         android:textSize="13sp"
                         android:layout_marginBottom="16dp" />
 
@@ -194,6 +194,8 @@
                         android:layout_height="70dp"
                         android:background="@drawable/bg_input_field"
                         android:hint="Paste base64 pairing token here..."
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_muted"
                         android:textSize="13sp"
                         android:gravity="top|start"
                         android:padding="10dp"
@@ -235,7 +237,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Quotas, active project status, and quick launch tools."
-                        android:textColor="@color/text_muted"
+                        android:textColor="@color/text_secondary"
                         android:textSize="12sp"
                         android:layout_marginBottom="14dp" />
 
@@ -254,7 +256,7 @@
                             android:padding="12dp"
                             android:background="@drawable/bg_dashboard_card"
                             android:layout_marginEnd="6dp">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="DECOMPILES" android:textSize="10sp" android:textColor="@color/text_muted" android:textStyle="bold" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="DECOMPILES" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" />
                             <TextView android:id="@+id/txtStatDecompiles" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 / 0" android:textSize="16sp" android:textStyle="bold" android:textColor="@color/primary" />
                         </LinearLayout>
 
@@ -266,7 +268,7 @@
                             android:padding="12dp"
                             android:background="@drawable/bg_dashboard_card"
                             android:layout_marginStart="6dp">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="COMPILES" android:textSize="10sp" android:textColor="@color/text_muted" android:textStyle="bold" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="COMPILES" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" />
                             <TextView android:id="@+id/txtStatCompiles" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 / 0" android:textSize="16sp" android:textStyle="bold" android:textColor="@color/success" />
                         </LinearLayout>
                     </LinearLayout>
@@ -285,7 +287,7 @@
                             android:padding="12dp"
                             android:background="@drawable/bg_dashboard_card"
                             android:layout_marginEnd="6dp">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="KEYSTORES" android:textSize="10sp" android:textColor="@color/text_muted" android:textStyle="bold" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="KEYSTORES" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" />
                             <TextView android:id="@+id/txtStatKeystores" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 / 0" android:textSize="16sp" android:textStyle="bold" android:textColor="@color/warning" />
                         </LinearLayout>
 
@@ -297,7 +299,7 @@
                             android:padding="12dp"
                             android:background="@drawable/bg_dashboard_card"
                             android:layout_marginStart="6dp">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="SIGNINGS" android:textSize="10sp" android:textColor="@color/text_muted" android:textStyle="bold" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="SIGNINGS" android:textSize="10sp" android:textColor="@color/text_secondary" android:textStyle="bold" />
                             <TextView android:id="@+id/txtStatSignings" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 / 0" android:textSize="16sp" android:textStyle="bold" android:textColor="@color/danger" />
                         </LinearLayout>
                     </LinearLayout>
@@ -477,7 +479,7 @@
                 <!-- Explorer & Breadcrumbs Bar -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="42dp"
+                    android:layout_height="44dp"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:paddingHorizontal="12dp"
@@ -485,11 +487,11 @@
 
                     <ImageButton
                         android:id="@+id/btnEditorGoUp"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
                         android:background="@drawable/bg_icon_button"
                         android:src="@android:drawable/ic_menu_revert"
-                        android:tint="@color/text_secondary"
+                        android:tint="@color/text_primary"
                         android:contentDescription="Parent Directory" />
 
                     <TextView
@@ -498,12 +500,22 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Root /"
-                        android:textColor="@color/text_secondary"
+                        android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:fontFamily="monospace"
                         android:layout_marginStart="8dp"
                         android:maxLines="1"
                         android:ellipsize="start" />
+
+                    <Button
+                        android:id="@+id/btnEditorReload"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="32dp"
+                        android:text="Reload"
+                        android:textSize="11sp"
+                        android:textColor="@color/text_secondary"
+                        android:layout_marginEnd="4dp" />
 
                     <Button
                         android:id="@+id/btnEditorSaveFile"
@@ -564,7 +576,7 @@
                         android:padding="12dp"
                         android:inputType="textMultiLine|textNoSuggestions"
                         android:hint="Select a file above to edit code..."
-                        android:textColorHint="#64748B" />
+                        android:textColorHint="#94A3B8" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -593,7 +605,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Search strings, class names, XML tags, and Smali bytecode across all project files."
-                        android:textColor="@color/text_muted"
+                        android:textColor="@color/text_secondary"
                         android:textSize="12sp"
                         android:layout_marginBottom="12dp" />
 
@@ -603,6 +615,8 @@
                         android:layout_height="44dp"
                         android:background="@drawable/bg_input_field"
                         android:hint="Search query / string..."
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_muted"
                         android:textSize="13sp"
                         android:paddingHorizontal="12dp"
                         android:layout_marginBottom="8dp" />
@@ -613,6 +627,8 @@
                         android:layout_height="44dp"
                         android:background="@drawable/bg_input_field"
                         android:hint="Replace with (optional)..."
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_muted"
                         android:textSize="13sp"
                         android:paddingHorizontal="12dp"
                         android:layout_marginBottom="10dp" />
@@ -693,7 +709,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Modify the app title in AndroidManifest.xml and resource strings.xml."
-                        android:textColor="@color/text_muted"
+                        android:textColor="@color/text_secondary"
                         android:textSize="12sp"
                         android:layout_marginBottom="12dp" />
 
@@ -711,7 +727,7 @@
                             android:layout_height="wrap_content"
                             android:text="Application Title (Launcher Label)"
                             android:textStyle="bold"
-                            android:textColor="@color/text_secondary"
+                            android:textColor="@color/text_primary"
                             android:textSize="12sp"
                             android:layout_marginBottom="4dp" />
 
@@ -721,6 +737,8 @@
                             android:layout_height="44dp"
                             android:background="@drawable/bg_input_field"
                             android:hint="e.g. My Custom App"
+                            android:textColor="@color/text_primary"
+                            android:textColorHint="@color/text_muted"
                             android:textSize="13sp"
                             android:paddingHorizontal="12dp"
                             android:layout_marginBottom="10dp" />
@@ -828,7 +846,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Rebuild bytecode, assemble resources, and sign with V2/V3 schemes."
-                        android:textColor="@color/text_muted"
+                        android:textColor="@color/text_secondary"
                         android:textSize="12sp"
                         android:layout_marginBottom="14dp" />
 
@@ -909,7 +927,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Guides on Smali reverse engineering, APK patching, and security."
-                        android:textColor="@color/text_muted"
+                        android:textColor="@color/text_secondary"
                         android:textSize="12sp"
                         android:layout_marginBottom="12dp" />
 
@@ -946,7 +964,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Common questions about decompiling, smali editing, keystores, and signing."
-                        android:textColor="@color/text_muted"
+                        android:textColor="@color/text_secondary"
                         android:textSize="12sp"
                         android:layout_marginBottom="12dp" />
 
@@ -983,7 +1001,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Send a message directly to our engineering support team."
-                        android:textColor="@color/text_muted"
+                        android:textColor="@color/text_secondary"
                         android:textSize="12sp"
                         android:layout_marginBottom="14dp" />
 
@@ -993,6 +1011,8 @@
                         android:layout_height="44dp"
                         android:background="@drawable/bg_input_field"
                         android:hint="Your Name"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_muted"
                         android:textSize="13sp"
                         android:paddingHorizontal="12dp"
                         android:layout_marginBottom="8dp" />
@@ -1004,6 +1024,8 @@
                         android:background="@drawable/bg_input_field"
                         android:hint="Email Address"
                         android:inputType="textEmailAddress"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_muted"
                         android:textSize="13sp"
                         android:paddingHorizontal="12dp"
                         android:layout_marginBottom="8dp" />
@@ -1014,6 +1036,8 @@
                         android:layout_height="44dp"
                         android:background="@drawable/bg_input_field"
                         android:hint="Inquiry Subject"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_muted"
                         android:textSize="13sp"
                         android:paddingHorizontal="12dp"
                         android:layout_marginBottom="8dp" />
@@ -1024,6 +1048,8 @@
                         android:layout_height="90dp"
                         android:background="@drawable/bg_input_field"
                         android:hint="Message..."
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_muted"
                         android:gravity="top|start"
                         android:textSize="13sp"
                         android:padding="10dp"
@@ -1155,7 +1181,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="WORKSPACE" android:textColor="#64748B" android:textSize="10sp" android:textStyle="bold" android:layout_marginVertical="6dp" />
+                <TextView android:id="@+id/navWorkspaceHeader" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="WORKSPACE" android:textColor="#94A3B8" android:textSize="10sp" android:textStyle="bold" android:layout_marginVertical="6dp" />
                 <TextView android:id="@+id/navDashboard" android:layout_width="match_parent" android:layout_height="38dp" android:text="📊  Dashboard" android:textColor="#E2E8F0" android:gravity="center_vertical" android:paddingHorizontal="10dp" />
                 <TextView android:id="@+id/navProjects" android:layout_width="match_parent" android:layout_height="38dp" android:text="📁  My Projects" android:textColor="#E2E8F0" android:gravity="center_vertical" android:paddingHorizontal="10dp" />
                 <TextView android:id="@+id/navEditor" android:layout_width="match_parent" android:layout_height="38dp" android:text="📝  Code &amp; File Editor" android:textColor="#E2E8F0" android:gravity="center_vertical" android:paddingHorizontal="10dp" />
@@ -1164,7 +1190,7 @@
                 <TextView android:id="@+id/navKeystores" android:layout_width="match_parent" android:layout_height="38dp" android:text="🔑  Keystores &amp; Signing" android:textColor="#E2E8F0" android:gravity="center_vertical" android:paddingHorizontal="10dp" />
                 <TextView android:id="@+id/navBuild" android:layout_width="match_parent" android:layout_height="38dp" android:text="🔨  Recompile &amp; Build" android:textColor="#E2E8F0" android:gravity="center_vertical" android:paddingHorizontal="10dp" />
 
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="COMMUNITY &amp; SUPPORT" android:textColor="#64748B" android:textSize="10sp" android:textStyle="bold" android:layout_marginTop="14dp" android:layout_marginBottom="6dp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="COMMUNITY &amp; SUPPORT" android:textColor="#94A3B8" android:textSize="10sp" android:textStyle="bold" android:layout_marginTop="14dp" android:layout_marginBottom="6dp" />
                 <TextView android:id="@+id/navBlog" android:layout_width="match_parent" android:layout_height="38dp" android:text="📰  Tutorials &amp; Blog" android:textColor="#E2E8F0" android:gravity="center_vertical" android:paddingHorizontal="10dp" />
                 <TextView android:id="@+id/navFaqs" android:layout_width="match_parent" android:layout_height="38dp" android:text="❓  FAQs &amp; Help" android:textColor="#E2E8F0" android:gravity="center_vertical" android:paddingHorizontal="10dp" />
                 <TextView android:id="@+id/navContact" android:layout_width="match_parent" android:layout_height="38dp" android:text="✉️  Contact Support" android:textColor="#E2E8F0" android:gravity="center_vertical" android:paddingHorizontal="10dp" />
@@ -1176,6 +1202,7 @@
 
         <!-- Sidebar Footer / Logout -->
         <LinearLayout
+            android:id="@+id/sidebarFooterUser"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
