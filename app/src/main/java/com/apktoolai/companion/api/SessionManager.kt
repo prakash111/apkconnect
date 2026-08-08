@@ -10,6 +10,15 @@ class SessionManager(context: Context) {
 
     companion object {
         const val DEFAULT_SERVER_URL = "https://apk.zoomnearby.com/"
+
+        @Volatile
+        private var instance: SessionManager? = null
+
+        fun getInstance(context: Context): SessionManager {
+            return instance ?: synchronized(this) {
+                instance ?: SessionManager(context.applicationContext).also { instance = it }
+            }
+        }
     }
 
     var serverUrl: String
@@ -29,6 +38,13 @@ class SessionManager(context: Context) {
     var pairedProjectName: String?
         get() = prefs.getString("paired_project_name", null)
         set(value) = prefs.edit().putString("paired_project_name", value).apply()
+
+    var projectName: String?
+        get() = pairedProjectName
+        set(value) { pairedProjectName = value }
+
+    val isPaired: Boolean get() = !pairingToken.isNullOrEmpty()
+    val isLoggedIn: Boolean get() = currentUser != null
 
     var currentUser: User?
         get() {
@@ -91,11 +107,29 @@ class SessionManager(context: Context) {
 
     fun isAuthenticated(): Boolean = currentUser != null
 
-    fun clearAuth() {
+    fun savePairing(url: String, token: String, name: String) {
+        prefs.edit()
+            .putString("server_url", url)
+            .putString("pairing_token", token)
+            .putString("paired_project_name", name)
+            .apply()
+    }
+
+    fun saveUser(user: User) {
+        currentUser = user
+    }
+
+    fun logout() {
         prefs.edit()
             .remove("current_user_json")
             .remove("current_project_id")
+            .remove("pairing_token")
+            .remove("paired_project_name")
             .apply()
+    }
+
+    fun clearAuth() {
+        logout()
     }
 
     fun clearAll() {

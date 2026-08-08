@@ -3,11 +3,9 @@ package com.apktoolai.companion
 import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.provider.Settings
 import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
@@ -455,10 +453,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateProjectHeader() {
-        if (!activeProjectName.isNullOrEmpty()) {
-            txtTopbarProjectPill.text = "📦 $activeProjectName"
+        val name = activeProjectName
+        if (!name.isNullOrEmpty()) {
+            txtTopbarProjectPill.text = "📦 $name"
             cardActiveProjectBanner.visibility = View.VISIBLE
-            txtActiveProjectTitle.text = activeProjectName
+            txtActiveProjectTitle.text = name
         } else {
             txtTopbarProjectPill.text = "No Project Open"
             cardActiveProjectBanner.visibility = View.GONE
@@ -535,14 +534,15 @@ class MainActivity : AppCompatActivity() {
 
         val title = TextView(this).apply {
             text = proj.projectName
-            textSize = 14sp()
+            textSize = 14f
             setTypeface(null, android.graphics.Typeface.BOLD)
             setTextColor(getColor(R.color.text_primary))
         }
 
         val subtitle = TextView(this).apply {
-            text = "Modified: ${proj.updatedAt.take(10)}"
-            textSize = 11sp()
+            val dateStr = proj.updatedAt.take(10)
+            text = "Modified: $dateStr"
+            textSize = 11f
             setTextColor(getColor(R.color.text_muted))
         }
 
@@ -551,7 +551,7 @@ class MainActivity : AppCompatActivity() {
 
         val btnOpen = Button(this).apply {
             text = "Open Studio"
-            textSize = 11sp()
+            textSize = 11f
             setTextColor(0xFFFFFFFF.toInt())
             setBackgroundColor(getColor(R.color.primary))
             setOnClickListener { openProjectInStudio(proj.projectId, proj.projectName) }
@@ -597,14 +597,14 @@ class MainActivity : AppCompatActivity() {
                 if (files.isEmpty()) {
                     val empty = TextView(this@MainActivity)
                     empty.text = "Empty folder"
-                    empty.textSize = 12sp()
+                    empty.textSize = 12f
                     empty.setTextColor(getColor(R.color.text_muted))
                     layoutEditorItems.addView(empty)
                 } else {
                     files.forEach { file ->
                         val item = TextView(this@MainActivity).apply {
                             text = (if (file.isDir) "📁  " else "📄  ") + file.name
-                            textSize = 12sp()
+                            textSize = 12f
                             setTextColor(getColor(if (file.isDir) R.color.primary else R.color.text_primary))
                             setPadding(8, 8, 8, 8)
                             setOnClickListener {
@@ -635,7 +635,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun openFileInEditor(filePath: String) {
         setBusy(true)
-        api.openEditorFile(filePath, 0, object : ApiClient.ApiCallback<EditorFile> {
+        api.openEditorFile(filePath, 0L, object : ApiClient.ApiCallback<EditorFile> {
             override fun onSuccess(result: EditorFile) {
                 setBusy(false)
                 currentEditorFilePath = result.path
@@ -694,7 +694,7 @@ class MainActivity : AppCompatActivity() {
                     empty.setTextColor(getColor(R.color.text_muted))
                     layoutSearchResultsList.addView(empty)
                 } else {
-                    result.files.forEach { match ->
+                    result.files.forEach { match: FindMatch ->
                         val card = LinearLayout(this@MainActivity).apply {
                             orientation = LinearLayout.VERTICAL
                             setPadding(12, 12, 12, 12)
@@ -713,14 +713,14 @@ class MainActivity : AppCompatActivity() {
 
                         val pathText = TextView(this@MainActivity).apply {
                             text = "📄 ${match.path}"
-                            textSize = 13sp()
+                            textSize = 13f
                             setTypeface(null, android.graphics.Typeface.BOLD)
                             setTextColor(getColor(R.color.primary))
                         }
 
                         val snippet = TextView(this@MainActivity).apply {
                             text = match.snippet
-                            textSize = 11sp()
+                            textSize = 11f
                             setTextColor(getColor(R.color.text_secondary))
                             setPadding(0, 4, 0, 0)
                         }
@@ -779,7 +779,7 @@ class MainActivity : AppCompatActivity() {
                 stringMap.clear()
                 layoutStringsList.removeAllViews()
 
-                result.allStrings.forEach { item ->
+                result.allStrings.forEach { item: StringItem ->
                     stringMap[item.name] = item.value
 
                     val row = LinearLayout(this@MainActivity).apply {
@@ -790,7 +790,7 @@ class MainActivity : AppCompatActivity() {
 
                     val keyLabel = TextView(this@MainActivity).apply {
                         text = item.name
-                        textSize = 12sp()
+                        textSize = 12f
                         setTypeface(null, android.graphics.Typeface.BOLD)
                         setTextColor(getColor(R.color.text_primary))
                         layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.4f)
@@ -798,7 +798,7 @@ class MainActivity : AppCompatActivity() {
 
                     val valInput = EditText(this@MainActivity).apply {
                         setText(item.value)
-                        textSize = 12sp()
+                        textSize = 12f
                         setBackgroundResource(R.drawable.bg_input_field)
                         setPadding(8, 6, 8, 6)
                         layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.6f)
@@ -872,14 +872,15 @@ class MainActivity : AppCompatActivity() {
 
                         val alias = TextView(this@MainActivity).apply {
                             text = "🔑 ${ks.keyAlias}"
-                            textSize = 14sp()
+                            textSize = 14f
                             setTypeface(null, android.graphics.Typeface.BOLD)
                             setTextColor(getColor(R.color.text_primary))
                         }
 
                         val date = TextView(this@MainActivity).apply {
-                            text = "Created: ${ks.createdAt.take(10)}"
-                            textSize = 11sp()
+                            val dt = ks.createdAt.take(10)
+                            text = "Created: $dt"
+                            textSize = 11f
                             setTextColor(getColor(R.color.text_muted))
                         }
 
@@ -888,7 +889,7 @@ class MainActivity : AppCompatActivity() {
 
                         val btnDownload = Button(this@MainActivity).apply {
                             text = "Download"
-                            textSize = 11sp()
+                            textSize = 11f
                             setBackgroundColor(getColor(R.color.primary))
                             setTextColor(0xFFFFFFFF.toInt())
                             setOnClickListener {
@@ -972,9 +973,7 @@ class MainActivity : AppCompatActivity() {
         val destFile = File(cacheDir, "recompiled_signed.apk")
         setBusy(true)
         api.downloadApk(urlStr, destFile, object : ApiClient.ProgressCallback {
-            override fun onProgress(percentage: Int, message: String) {
-                // Progress
-            }
+            override fun onProgress(percentage: Int, message: String) {}
         }, object : ApiClient.ApiCallback<File> {
             override fun onSuccess(result: File) {
                 setBusy(false)
@@ -1007,7 +1006,7 @@ class MainActivity : AppCompatActivity() {
             override fun onSuccess(result: List<BlogItem>) {
                 setBusy(false)
                 layoutBlogsList.removeAllViews()
-                result.forEach { b ->
+                result.forEach { b: BlogItem ->
                     val card = LinearLayout(this@MainActivity).apply {
                         orientation = LinearLayout.VERTICAL
                         setPadding(14, 14, 14, 14)
@@ -1022,14 +1021,14 @@ class MainActivity : AppCompatActivity() {
 
                     val cat = TextView(this@MainActivity).apply {
                         text = b.category.uppercase()
-                        textSize = 10sp()
+                        textSize = 10f
                         setTypeface(null, android.graphics.Typeface.BOLD)
                         setTextColor(getColor(R.color.primary))
                     }
 
                     val title = TextView(this@MainActivity).apply {
                         text = b.title
-                        textSize = 14sp()
+                        textSize = 14f
                         setTypeface(null, android.graphics.Typeface.BOLD)
                         setTextColor(getColor(R.color.text_primary))
                         setPadding(0, 2, 0, 4)
@@ -1037,7 +1036,7 @@ class MainActivity : AppCompatActivity() {
 
                     val excerpt = TextView(this@MainActivity).apply {
                         text = b.excerpt
-                        textSize = 12sp()
+                        textSize = 12f
                         setTextColor(getColor(R.color.text_secondary))
                     }
 
@@ -1075,14 +1074,14 @@ class MainActivity : AppCompatActivity() {
 
                     val q = TextView(this@MainActivity).apply {
                         text = "❓  ${f.question}"
-                        textSize = 13sp()
+                        textSize = 13f
                         setTypeface(null, android.graphics.Typeface.BOLD)
                         setTextColor(getColor(R.color.text_primary))
                     }
 
                     val a = TextView(this@MainActivity).apply {
                         text = f.answer
-                        textSize = 12sp()
+                        textSize = 12f
                         setTextColor(getColor(R.color.text_secondary))
                         setPadding(0, 6, 0, 0)
                     }
@@ -1154,14 +1153,18 @@ class MainActivity : AppCompatActivity() {
 
                     val name = TextView(this@MainActivity).apply {
                         text = "👤 ${u.username} (${u.userType})"
-                        textSize = 14sp()
+                        textSize = 14f
                         setTypeface(null, android.graphics.Typeface.BOLD)
                         setTextColor(getColor(if (u.userType == "admin") R.color.danger else R.color.text_primary))
                     }
 
                     val limits = TextView(this@MainActivity).apply {
-                        text = "Dec: ${u.limits.decompileUsage}/${u.limits.decompileLimit} | Com: ${u.limits.compileUsage}/${u.limits.compileLimit}"
-                        textSize = 11sp()
+                        val decU = u.decompileUsage
+                        val decL = u.decompileLimit
+                        val comU = u.compileUsage
+                        val comL = u.compileLimit
+                        text = "Dec: $decU/$decL | Com: $comU/$comL"
+                        textSize = 11f
                         setTextColor(getColor(R.color.text_secondary))
                         setPadding(0, 4, 0, 0)
                     }
@@ -1261,6 +1264,4 @@ class MainActivity : AppCompatActivity() {
     private fun toast(msg: String) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
-
-    private fun sp(): Float = 1f
 }

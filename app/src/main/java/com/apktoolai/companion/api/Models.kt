@@ -6,8 +6,10 @@ data class User(
     val id: Int = 0,
     val username: String = "",
     val email: String = "",
+    val mobile: String = "",
     val userType: String = "user",
     val emailVerified: Int = 0,
+    val status: String = "active",
     val decompileLimit: Int = 1,
     val decompileUsage: Int = 0,
     val compileLimit: Int = 1,
@@ -18,6 +20,16 @@ data class User(
     val signApkUsage: Int = 0
 ) {
     val isAdmin: Boolean get() = userType.equals("admin", ignoreCase = true)
+    val limits: UserLimits get() = UserLimits(
+        decompileLimit = decompileLimit,
+        decompileUsage = decompileUsage,
+        compileLimit = compileLimit,
+        compileUsage = compileUsage,
+        generateKeyLimit = generateKeyLimit,
+        generateKeyUsage = generateKeyUsage,
+        signApkLimit = signApkLimit,
+        signApkUsage = signApkUsage
+    )
 }
 
 data class UserLimits(
@@ -47,8 +59,8 @@ data class ProjectItem(
     val logoPreviewPath: String? = null,
     val logoVersion: Long = 0,
     val crashReportToken: String? = null,
-    val createdAt: String? = null,
-    val updatedAt: String? = null,
+    val createdAt: String = "",
+    val updatedAt: String = "",
     val apkName: String? = null,
     val apkSize: Long = 0,
     val packageName: String? = null,
@@ -90,9 +102,38 @@ data class ProjectFile(
     val size: Long = 0
 )
 
+data class EditorFile(
+    val path: String = "",
+    val content: String = "",
+    val binary: Boolean = false,
+    val isImage: Boolean = false,
+    val binaryOffset: Long = 0,
+    val binarySize: Long = 0
+)
+
+data class FindMatch(
+    val path: String = "",
+    val matches: Int = 1,
+    val snippet: String = ""
+)
+
+data class FindResult(
+    val files: List<FindMatch> = emptyList()
+)
+
+data class FindReplaceResult(
+    val replacements: Int = 0,
+    val filesChanged: Int = 0
+)
+
 data class StringItem(
     val name: String = "",
     var value: String = ""
+)
+
+data class StringData(
+    val appName: String = "",
+    val allStrings: List<StringItem> = emptyList()
 )
 
 data class KeystoreItem(
@@ -101,6 +142,12 @@ data class KeystoreItem(
     val fileName: String = "",
     val keyAlias: String = "",
     val createdAt: String = ""
+)
+
+data class BuildResult(
+    val success: Boolean = true,
+    val signedApk: String? = null,
+    val message: String? = null
 )
 
 data class ContactInquiry(
@@ -127,6 +174,8 @@ data class BlogPost(
     val views: Int = 0,
     val createdAt: String = ""
 )
+
+typealias BlogItem = BlogPost
 
 data class FaqItem(
     val id: Int = 0,
