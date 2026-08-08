@@ -42,7 +42,7 @@ workflows:
 
         # Keystore (stored in repository root)
         KEYSTORE_FILE: "zoom-app.jks"
-        KEYSTORE_PASSWORD: "123456780"
+        KEYSTORE_PASSWORD: "123456789"
         KEY_ALIAS: "zoom_app"
         KEY_PASSWORD: "123456789"
 
