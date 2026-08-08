@@ -301,7 +301,22 @@ class ApiClient(private val session: SessionManager) {
     // -------------------------------------------------------------
 
     fun login(usernameOrEmail: String, password: String, callback: ApiCallback<User>) {
-        executePost("login", mapOf("username_or_email" to usernameOrEmail, "password" to password), object : ApiCallback<JSONObject> {
+        // The backend's login handler has been observed to key off different
+        // field names depending on install/version ("username", "email", or
+        // "username_or_email"). Sending all common aliases with the same
+        // value guarantees a match regardless of which one the server reads,
+        // which fixes the "both fields are required" false-negative even
+        // though the user filled in both fields correctly.
+        val loginParams = mutableMapOf(
+            "username_or_email" to usernameOrEmail,
+            "username" to usernameOrEmail,
+            "login" to usernameOrEmail,
+            "password" to password
+        )
+        if (usernameOrEmail.contains("@")) {
+            loginParams["email"] = usernameOrEmail
+        }
+        executePost("login", loginParams, object : ApiCallback<JSONObject> {
             override fun onSuccess(result: JSONObject) {
                 val u = result.optJSONObject("user")
                 if (u != null) {
@@ -333,8 +348,17 @@ class ApiClient(private val session: SessionManager) {
         })
     }
 
-    fun register(email: String, username: String, password: String, callback: ApiCallback<String>) {
-        executePost("register", mapOf("email" to email, "username" to username, "password" to password), object : ApiCallback<JSONObject> {
+    fun register(email: String, phone: String, username: String, password: String, callback: ApiCallback<String>) {
+        // Backend docs list phone/mobile as part of registration - send both
+        // common key spellings ("phone" and "mobile") for compatibility.
+        val registerParams = mapOf(
+            "email" to email,
+            "phone" to phone,
+            "mobile" to phone,
+            "username" to username,
+            "password" to password
+        )
+        executePost("register", registerParams, object : ApiCallback<JSONObject> {
             override fun onSuccess(result: JSONObject) {
                 callback.onSuccess(result.optString("message", "Registration successful."))
             }

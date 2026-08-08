@@ -69,6 +69,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnHubGoForgot: Button
 
     private lateinit var editHubRegEmail: EditText
+    private lateinit var editHubRegPhone: EditText
     private lateinit var editHubRegUser: EditText
     private lateinit var editHubRegPass: EditText
     private lateinit var btnHubSubmitRegister: Button
@@ -406,6 +407,7 @@ class MainActivity : AppCompatActivity() {
         btnHubGoForgot = findViewById(R.id.btnHubGoForgot)
 
         editHubRegEmail = findViewById(R.id.editHubRegEmail)
+        editHubRegPhone = findViewById(R.id.editHubRegPhone)
         editHubRegUser = findViewById(R.id.editHubRegUser)
         editHubRegPass = findViewById(R.id.editHubRegPass)
         btnHubSubmitRegister = findViewById(R.id.btnHubSubmitRegister)
@@ -759,17 +761,34 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleHubLogin() {
+        editHubLoginUser.error = null
+        editHubLoginPass.error = null
+
         val u = editHubLoginUser.text.toString().trim()
         val p = editHubLoginPass.text.toString().trim()
-        if (u.isEmpty() || p.isEmpty()) {
+
+        var hasError = false
+        if (u.isEmpty()) {
+            editHubLoginUser.error = "Enter your username or email"
+            hasError = true
+        }
+        if (p.isEmpty()) {
+            editHubLoginPass.error = "Enter your password"
+            hasError = true
+        }
+        if (hasError) {
             toast("Please enter your username and password.")
             return
         }
 
+        btnHubSubmitLogin.isEnabled = false
+        btnHubSubmitLogin.text = "Signing in..."
         setBusy(true, "Signing in to Studio...")
         api.login(u, p, object : ApiClient.ApiCallback<User> {
             override fun onSuccess(result: User) {
                 setBusy(false, "")
+                btnHubSubmitLogin.isEnabled = true
+                btnHubSubmitLogin.text = "Sign In & Unlock Studio"
                 updateUiForAuthState()
                 toast("Welcome, ${result.username}!")
                 switchTab("dashboard")
@@ -778,24 +797,43 @@ class MainActivity : AppCompatActivity() {
 
             override fun onError(errorMessage: String) {
                 setBusy(false, "")
+                btnHubSubmitLogin.isEnabled = true
+                btnHubSubmitLogin.text = "Sign In & Unlock Studio"
                 toast("Login failed: $errorMessage")
             }
         })
     }
 
     private fun handleHubRegister() {
+        editHubRegEmail.error = null
+        editHubRegPhone.error = null
+        editHubRegUser.error = null
+        editHubRegPass.error = null
+
         val e = editHubRegEmail.text.toString().trim()
+        val ph = editHubRegPhone.text.toString().trim()
         val u = editHubRegUser.text.toString().trim()
         val p = editHubRegPass.text.toString().trim()
-        if (e.isEmpty() || u.isEmpty() || p.isEmpty()) {
+
+        var hasError = false
+        if (e.isEmpty()) { editHubRegEmail.error = "Email is required"; hasError = true }
+        if (ph.isEmpty()) { editHubRegPhone.error = "Mobile number is required"; hasError = true }
+        if (u.isEmpty()) { editHubRegUser.error = "Username is required"; hasError = true }
+        if (p.isEmpty()) { editHubRegPass.error = "Password is required"; hasError = true }
+        else if (p.length < 6) { editHubRegPass.error = "Use at least 6 characters"; hasError = true }
+        if (hasError) {
             toast("Please fill all registration fields.")
             return
         }
 
+        btnHubSubmitRegister.isEnabled = false
+        btnHubSubmitRegister.text = "Creating account..."
         setBusy(true, "Creating account...")
-        api.register(e, u, p, object : ApiClient.ApiCallback<String> {
+        api.register(e, ph, u, p, object : ApiClient.ApiCallback<String> {
             override fun onSuccess(result: String) {
                 setBusy(false, "")
+                btnHubSubmitRegister.isEnabled = true
+                btnHubSubmitRegister.text = "Register & Create Account"
                 toast(result)
                 switchAuthHubTab("signin")
                 editHubLoginUser.setText(u)
@@ -804,28 +842,38 @@ class MainActivity : AppCompatActivity() {
 
             override fun onError(errorMessage: String) {
                 setBusy(false, "")
+                btnHubSubmitRegister.isEnabled = true
+                btnHubSubmitRegister.text = "Register & Create Account"
                 toast("Registration error: $errorMessage")
             }
         })
     }
 
     private fun handleHubForgot() {
+        editHubForgotEmail.error = null
         val e = editHubForgotEmail.text.toString().trim()
         if (e.isEmpty()) {
+            editHubForgotEmail.error = "Enter your registered email"
             toast("Please enter your email address.")
             return
         }
 
+        btnHubSubmitForgot.isEnabled = false
+        btnHubSubmitForgot.text = "Sending..."
         setBusy(true, "Requesting password reset...")
         api.requestPasswordReset(e, object : ApiClient.ApiCallback<String> {
             override fun onSuccess(result: String) {
                 setBusy(false, "")
+                btnHubSubmitForgot.isEnabled = true
+                btnHubSubmitForgot.text = "Send Password Reset Link"
                 toast(result)
                 switchAuthHubTab("signin")
             }
 
             override fun onError(errorMessage: String) {
                 setBusy(false, "")
+                btnHubSubmitForgot.isEnabled = true
+                btnHubSubmitForgot.text = "Send Password Reset Link"
                 toast(errorMessage)
             }
         })
