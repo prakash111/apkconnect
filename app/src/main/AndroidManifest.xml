@@ -27,15 +27,14 @@
             </intent-filter>
         </activity>
 
-        <!-- The zxing-android-embedded library merges its own CaptureActivity
-             into the manifest with no screenOrientation set, so it just
-             follows the sensor - on many phones that means the scanner opens
-             sideways (landscape) the moment they hold the phone normally
-             while the rest of the app stays portrait-locked. This override
-             (tools:node="replace" so our attributes win instead of merging
-             on top of the library's) forces the scanner to portrait too, and
-             disables the "flip to landscape" affordance entirely so it can't
-             happen mid-scan either. -->
+        <!-- Portrait Capture Activity for seamless QR Code scanning without orientation flipping -->
+        <activity
+            android:name=".PortraitCaptureActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/zxing_CaptureTheme"
+            android:windowSoftInputMode="stateAlwaysHidden"
+            android:exported="false" />
+
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
@@ -43,9 +42,7 @@
             android:windowSoftInputMode="stateAlwaysHidden"
             tools:node="replace" />
 
-        <!-- Needed so we can hand a downloaded APK file to the system installer
-             as a content:// Uri (required on Android 7+ - plain file:// Uris are
-             blocked by StrictMode for other apps to read). -->
+        <!-- File Provider for downloaded APK installation -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -57,3 +54,4 @@
         </provider>
     </application>
 </manifest>
+

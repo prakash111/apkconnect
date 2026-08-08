@@ -16,8 +16,8 @@
         android:background="@drawable/bg_gradient_header"
         android:paddingHorizontal="16dp"
         android:paddingTop="12dp"
-        android:paddingBottom="14dp"
-        android:elevation="4dp">
+        android:paddingBottom="12dp"
+        android:elevation="6dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -27,16 +27,16 @@
 
             <!-- App Logo Icon -->
             <FrameLayout
-                android:layout_width="38dp"
-                android:layout_height="38dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:background="@drawable/bg_btn_primary"
-                android:layout_marginEnd="10dp">
+                android:layout_marginEnd="12dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="📱"
+                    android:text="⚡"
                     android:textSize="20sp" />
             </FrameLayout>
 
@@ -52,7 +52,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/app_name"
                     android:textColor="#FFFFFF"
-                    android:textSize="18sp"
+                    android:textSize="17sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -75,18 +75,21 @@
                 android:text="🌐 Host"
                 android:textColor="#CBD5E1"
                 android:textSize="11sp"
-                android:paddingHorizontal="8dp" />
+                android:paddingHorizontal="6dp" />
 
             <!-- Scan QR Button -->
             <Button
                 android:id="@+id/btnTopScanQr"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
                 android:text="📷 QR"
-                android:textColor="#60A5FA"
+                android:backgroundTint="@color/surface_dark_border"
+                android:textColor="#38BDF8"
                 android:textSize="11sp"
-                android:paddingHorizontal="8dp" />
+                android:paddingHorizontal="8dp"
+                android:layout_marginStart="4dp"
+                app:cornerRadius="8dp" />
 
             <!-- User Auth / Profile Button -->
             <Button
@@ -98,7 +101,8 @@
                 android:backgroundTint="@color/primary"
                 android:textColor="#FFFFFF"
                 android:textSize="11sp"
-                android:paddingHorizontal="12dp"
+                android:paddingHorizontal="10dp"
+                android:layout_marginStart="4dp"
                 app:cornerRadius="8dp" />
         </LinearLayout>
 
@@ -198,155 +202,722 @@
         android:layout_height="4dp"
         android:max="100"
         android:progress="0"
-        android:progressTint="@color/primary"
         android:visibility="gone" />
 
-    <!-- Navigation Studio Tabs (Horizontal Scroll) -->
-    <HorizontalScrollView
+    <!-- ============================================================= -->
+    <!-- AUTHENTICATION & ONBOARDING HUB (SHOWN WHEN NOT LOGGED IN)     -->
+    <!-- ============================================================= -->
+    <ScrollView
+        android:id="@+id/panelAuthHub"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/bg_card"
-        android:paddingVertical="6dp"
-        android:paddingHorizontal="8dp"
-        android:scrollbars="none"
-        android:elevation="2dp">
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:background="@color/bg_body"
+        android:visibility="gone">
 
         <LinearLayout
-            android:id="@+id/tabContainer"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Hero Welcome Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_rounded"
+                android:padding="18dp"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🔐"
+                        android:textSize="22sp"
+                        android:layout_marginEnd="10dp" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Account Authentication Required"
+                            android:textColor="@color/text_primary"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Sign in or scan pairing QR code to unlock studio features"
+                            android:textColor="@color/text_muted"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="To decompile APKs, edit smali/resources, sign packages, and stream live ADB/cloud crash logs, you must be logged into your account."
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="2dp"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Segmented Auth Switcher -->
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/tabAuthSignIn"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:text="Sign In"
+                            android:textSize="11sp"
+                            android:backgroundTint="@color/primary"
+                            android:textColor="#FFFFFF"
+                            android:layout_marginEnd="6dp"
+                            app:cornerRadius="8dp" />
+
+                        <Button
+                            android:id="@+id/tabAuthRegister"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:text="Create Account"
+                            android:textSize="11sp"
+                            android:backgroundTint="@color/surface_dark_border"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginEnd="6dp"
+                            app:cornerRadius="8dp" />
+
+                        <Button
+                            android:id="@+id/tabAuthForgot"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:text="Forgot Pass"
+                            android:textSize="11sp"
+                            android:backgroundTint="@color/surface_dark_border"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginEnd="6dp"
+                            app:cornerRadius="8dp" />
+
+                        <Button
+                            android:id="@+id/tabAuthQr"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:text="📷 Scan QR Login"
+                            android:textSize="11sp"
+                            android:backgroundTint="@color/surface_dark_border"
+                            android:textColor="#38BDF8"
+                            android:layout_marginEnd="6dp"
+                            app:cornerRadius="8dp" />
+
+                        <Button
+                            android:id="@+id/tabAuthSupport"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:text="💬 FAQs &amp; Help"
+                            android:textSize="11sp"
+                            android:backgroundTint="@color/surface_dark_border"
+                            android:textColor="@color/text_secondary"
+                            app:cornerRadius="8dp" />
+                    </LinearLayout>
+                </HorizontalScrollView>
+            </LinearLayout>
+
+            <!-- CARD 1: SIGN IN FORM -->
+            <LinearLayout
+                android:id="@+id/cardAuthSignIn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_rounded"
+                android:padding="18dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sign In to Your Studio Account"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Enter your registered username or email address and password"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:layout_marginBottom="14dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Username or Email"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    android:layout_marginBottom="4dp" />
+
+                <EditText
+                    android:id="@+id/editHubLoginUser"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_input_field"
+                    android:hint="e.g. admin or developer@domain.com"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_disabled"
+                    android:inputType="text"
+                    android:textSize="13sp"
+                    android:paddingHorizontal="12dp"
+                    android:layout_marginBottom="10dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Password"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    android:layout_marginBottom="4dp" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:layout_marginBottom="16dp">
+
+                    <EditText
+                        android:id="@+id/editHubLoginPass"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_input_field"
+                        android:hint="Enter password"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_disabled"
+                        android:inputType="textPassword"
+                        android:textSize="13sp"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="46dp" />
+
+                    <ImageButton
+                        android:id="@+id/btnHubTogglePass"
+                        android:layout_width="40dp"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:background="@android:color/transparent"
+                        android:src="@android:drawable/ic_menu_view"
+                        android:contentDescription="Toggle Password" />
+                </RelativeLayout>
+
+                <Button
+                    android:id="@+id/btnHubSubmitLogin"
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="46dp"
+                    android:text="Sign In &amp; Unlock Studio"
+                    android:backgroundTint="@color/primary"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="10dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="14dp">
+
+                    <Button
+                        android:id="@+id/btnHubGoRegister"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Create Account"
+                        android:textColor="@color/primary_light"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" • "
+                        android:textColor="@color/text_muted" />
+
+                    <Button
+                        android:id="@+id/btnHubGoForgot"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Forgot Password?"
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- CARD 2: REGISTER FORM -->
+            <LinearLayout
+                android:id="@+id/cardAuthRegister"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_rounded"
+                android:padding="18dp"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Create New Account"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Register to manage your APK projects and cloud debug sessions"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:layout_marginBottom="14dp" />
+
+                <EditText
+                    android:id="@+id/editHubRegEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_input_field"
+                    android:hint="Email Address"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_disabled"
+                    android:inputType="textEmailAddress"
+                    android:textSize="13sp"
+                    android:paddingHorizontal="12dp"
+                    android:layout_marginBottom="10dp" />
+
+                <EditText
+                    android:id="@+id/editHubRegUser"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_input_field"
+                    android:hint="Desired Username"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_disabled"
+                    android:inputType="text"
+                    android:textSize="13sp"
+                    android:paddingHorizontal="12dp"
+                    android:layout_marginBottom="10dp" />
+
+                <EditText
+                    android:id="@+id/editHubRegPass"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_input_field"
+                    android:hint="Password (min 6 characters)"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_disabled"
+                    android:inputType="textPassword"
+                    android:textSize="13sp"
+                    android:paddingHorizontal="12dp"
+                    android:layout_marginBottom="14dp" />
+
+                <Button
+                    android:id="@+id/btnHubSubmitRegister"
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="46dp"
+                    android:text="Register &amp; Create Account"
+                    android:backgroundTint="@color/success"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="10dp" />
+
+                <Button
+                    android:id="@+id/btnHubGoLogin"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Already have an account? Sign In"
+                    android:textColor="@color/primary_light"
+                    android:textSize="11sp"
+                    android:layout_marginTop="8dp" />
+            </LinearLayout>
+
+            <!-- CARD 3: FORGOT PASSWORD FORM -->
+            <LinearLayout
+                android:id="@+id/cardAuthForgot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_rounded"
+                android:padding="18dp"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Reset Account Password"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Enter your registered email and we will send a password reset link."
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:layout_marginBottom="14dp" />
+
+                <EditText
+                    android:id="@+id/editHubForgotEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_input_field"
+                    android:hint="Your Email Address"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_disabled"
+                    android:inputType="textEmailAddress"
+                    android:textSize="13sp"
+                    android:paddingHorizontal="12dp"
+                    android:layout_marginBottom="14dp" />
+
+                <Button
+                    android:id="@+id/btnHubSubmitForgot"
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="46dp"
+                    android:text="Send Password Reset Link"
+                    android:backgroundTint="@color/warning"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="10dp" />
+
+                <Button
+                    android:id="@+id/btnHubBackLogin"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Back to Sign In"
+                    android:textColor="@color/primary_light"
+                    android:textSize="11sp"
+                    android:layout_marginTop="8dp" />
+            </LinearLayout>
+
+            <!-- CARD 4: INSTANT QR SCAN & TOKEN PAIRING -->
+            <LinearLayout
+                android:id="@+id/cardAuthQr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_rounded"
+                android:padding="18dp"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📷 Instant QR Code Pairing"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Point your camera at the QR code displayed on the web dashboard to instantly connect your device."
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:layout_marginBottom="14dp" />
+
+                <Button
+                    android:id="@+id/btnHubLaunchScanQr"
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="📷 Open Camera QR Scanner"
+                    android:backgroundTint="@color/accent_dark"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="14dp"
+                    app:cornerRadius="10dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Or Paste Pairing Code Manually:"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    android:layout_marginBottom="4dp" />
+
+                <EditText
+                    android:id="@+id/editHubManualToken"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_input_field"
+                    android:hint="Paste base64 code or URL..."
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_disabled"
+                    android:inputType="text"
+                    android:textSize="12sp"
+                    android:paddingHorizontal="12dp"
+                    android:layout_marginBottom="10dp" />
+
+                <Button
+                    android:id="@+id/btnHubSubmitToken"
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text="Connect via Pairing Code"
+                    android:backgroundTint="@color/surface_dark_border"
+                    android:textColor="#38BDF8"
+                    android:textSize="12sp"
+                    app:cornerRadius="8dp" />
+            </LinearLayout>
+
+            <!-- CARD 5: PUBLIC FAQS & SUPPORT INQUIRY -->
+            <LinearLayout
+                android:id="@+id/cardAuthSupport"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_rounded"
+                android:padding="18dp"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="💬 Public Documentation &amp; Support"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Browse help questions or send an inquiry to the technical support team."
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:layout_marginBottom="12dp" />
+
+                <LinearLayout
+                    android:id="@+id/hubFaqsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="12dp" />
+            </LinearLayout>
+
+            <!-- FEATURES SHOWCASE (LOCK PREVIEW) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_alt"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🌟 Studio Features Included:"
+                    android:textColor="@color/text_primary"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="• Multi-Project APK Decompilation &amp; Smali Reconstruction\n• Real-Time Smali, Java, XML &amp; Hex Bytecode Editor\n• AI Smali Logic Review &amp; Intelligent Auto-Fix\n• RSA-2048 Keystore Generator &amp; Fast APK Signer\n• Cloud Debugger with 2s Auto-Polling Crash Stream\n• Wireless ADB Connect &amp; Live Logcat Filtering"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- ============================================================= -->
+    <!-- STUDIO NAVIGATION TABS (SHOWN WHEN LOGGED IN)                  -->
+    <!-- ============================================================= -->
+    <HorizontalScrollView
+        android:id="@+id/studioNavScroll"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:background="@color/surface_dark"
+        android:scrollbars="none"
+        android:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="8dp">
 
             <Button
                 android:id="@+id/tabBtnDashboard"
-                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
-                android:layout_height="36dp"
+                android:layout_height="34dp"
                 android:text="📊 Dashboard"
-                android:textSize="12sp"
-                android:layout_marginEnd="6dp"
+                android:textColor="@color/text_inverse"
+                android:textSize="11sp"
                 android:backgroundTint="@color/primary"
-                android:textColor="#FFFFFF"
-                app:cornerRadius="18dp" />
+                android:paddingHorizontal="10dp"
+                android:layout_marginEnd="4dp"
+                app:cornerRadius="6dp" />
 
             <Button
                 android:id="@+id/tabBtnProjects"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
-                android:layout_height="36dp"
+                android:layout_height="34dp"
                 android:text="📁 Projects"
-                android:textSize="12sp"
-                android:layout_marginEnd="6dp"
                 android:textColor="@color/text_secondary"
-                app:strokeColor="@color/border_light"
-                app:cornerRadius="18dp" />
+                android:textSize="11sp"
+                android:paddingHorizontal="10dp"
+                android:layout_marginEnd="4dp"
+                app:cornerRadius="6dp" />
 
             <Button
                 android:id="@+id/tabBtnEditor"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:text="💻 Code &amp; Hex"
-                android:textSize="12sp"
-                android:layout_marginEnd="6dp"
+                android:layout_height="34dp"
+                android:text="📝 Editor &amp; Hex"
                 android:textColor="@color/text_secondary"
-                app:strokeColor="@color/border_light"
-                app:cornerRadius="18dp" />
+                android:textSize="11sp"
+                android:paddingHorizontal="10dp"
+                android:layout_marginEnd="4dp"
+                app:cornerRadius="6dp" />
 
             <Button
                 android:id="@+id/tabBtnCustomizer"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
-                android:layout_height="36dp"
+                android:layout_height="34dp"
                 android:text="🎨 Resources &amp; AI"
-                android:textSize="12sp"
-                android:layout_marginEnd="6dp"
                 android:textColor="@color/text_secondary"
-                app:strokeColor="@color/border_light"
-                app:cornerRadius="18dp" />
+                android:textSize="11sp"
+                android:paddingHorizontal="10dp"
+                android:layout_marginEnd="4dp"
+                app:cornerRadius="6dp" />
 
             <Button
                 android:id="@+id/tabBtnBuild"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
-                android:layout_height="36dp"
+                android:layout_height="34dp"
                 android:text="🔨 Build &amp; Sign"
-                android:textSize="12sp"
-                android:layout_marginEnd="6dp"
                 android:textColor="@color/text_secondary"
-                app:strokeColor="@color/border_light"
-                app:cornerRadius="18dp" />
+                android:textSize="11sp"
+                android:paddingHorizontal="10dp"
+                android:layout_marginEnd="4dp"
+                app:cornerRadius="6dp" />
 
             <Button
                 android:id="@+id/tabBtnDebugger"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:text="📱 ADB &amp; Logs"
-                android:textSize="12sp"
-                android:layout_marginEnd="6dp"
+                android:layout_height="34dp"
+                android:text="⚡ ADB &amp; Logs"
                 android:textColor="@color/text_secondary"
-                app:strokeColor="@color/border_light"
-                app:cornerRadius="18dp" />
+                android:textSize="11sp"
+                android:paddingHorizontal="10dp"
+                android:layout_marginEnd="4dp"
+                app:cornerRadius="6dp" />
 
             <Button
                 android:id="@+id/tabBtnAiSettings"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:text="🤖 AI Settings"
-                android:textSize="12sp"
-                android:layout_marginEnd="6dp"
+                android:layout_height="34dp"
+                android:text="🤖 AI Config"
                 android:textColor="@color/text_secondary"
-                app:strokeColor="@color/border_light"
-                app:cornerRadius="18dp" />
+                android:textSize="11sp"
+                android:paddingHorizontal="10dp"
+                android:layout_marginEnd="4dp"
+                app:cornerRadius="6dp" />
 
             <Button
                 android:id="@+id/tabBtnAdmin"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:text="🛡️ Admin Panel"
-                android:textSize="12sp"
-                android:layout_marginEnd="6dp"
-                android:textColor="@color/danger"
-                app:strokeColor="@color/border_light"
-                app:cornerRadius="18dp"
-                android:visibility="gone" />
+                android:layout_height="34dp"
+                android:text="👑 Admin"
+                android:textColor="@color/text_secondary"
+                android:textSize="11sp"
+                android:paddingHorizontal="10dp"
+                android:layout_marginEnd="4dp"
+                android:visibility="gone"
+                app:cornerRadius="6dp" />
 
             <Button
                 android:id="@+id/tabBtnCommunity"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:text="📚 Blogs &amp; Help"
-                android:textSize="12sp"
+                android:layout_height="34dp"
+                android:text="💬 Support"
                 android:textColor="@color/text_secondary"
-                app:strokeColor="@color/border_light"
-                app:cornerRadius="18dp" />
+                android:textSize="11sp"
+                android:paddingHorizontal="10dp"
+                app:cornerRadius="6dp" />
         </LinearLayout>
     </HorizontalScrollView>
 
-    <!-- Main Content Frame (Studio Panels Container) -->
+    <!-- ============================================================= -->
+    <!-- STUDIO PANELS CONTAINER                                        -->
+    <!-- ============================================================= -->
     <FrameLayout
-        android:id="@+id/contentFrame"
+        android:id="@+id/studioPanelsContainer"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="match_parent">
 
         <!-- 1. DASHBOARD PANEL -->
         <ScrollView
             android:id="@+id/panelDashboard"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="14dp">
+            android:fillViewport="true"
+            android:padding="16dp"
+            android:visibility="visible">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Welcome / Plan Overview Card -->
+                <!-- Welcome Card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -368,259 +939,231 @@
                         android:id="@+id/txtDashUserEmail"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Mobile engineering &amp; Smali bytecode studio"
+                        android:text="Connected to cloud studio account"
                         android:textColor="@color/text_muted"
-                        android:textSize="12sp"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginBottom="12dp" />
-
-                    <!-- Limits Grid -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <!-- Decompile Limit -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:background="@drawable/bg_input_field"
-                            android:padding="10dp"
-                            android:layout_marginEnd="6dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Decompile"
-                                android:textColor="@color/text_secondary"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/txtMeterDecompile"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0 / 1"
-                                android:textColor="@color/primary"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-
-                        <!-- Compile Limit -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:background="@drawable/bg_input_field"
-                            android:padding="10dp"
-                            android:layout_marginEnd="6dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Compile"
-                                android:textColor="@color/text_secondary"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/txtMeterCompile"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0 / 1"
-                                android:textColor="@color/success"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-
-                        <!-- Keygen Limit -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:background="@drawable/bg_input_field"
-                            android:padding="10dp"
-                            android:layout_marginEnd="6dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Keygen"
-                                android:textColor="@color/text_secondary"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/txtMeterKeygen"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0 / 1"
-                                android:textColor="@color/warning"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-
-                        <!-- Signing Limit -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:background="@drawable/bg_input_field"
-                            android:padding="10dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Sign APK"
-                                android:textColor="@color/text_secondary"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/txtMeterSign"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0 / 1"
-                                android:textColor="@color/danger"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-                    </LinearLayout>
+                        android:textSize="11sp"
+                        android:layout_marginTop="2dp" />
                 </LinearLayout>
 
-                <!-- Quick Action Tiles -->
-                <TextView
-                    android:layout_width="wrap_content"
+                <!-- Quota Meters (2x2 Grid) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Quick Actions"
-                    android:textColor="@color/text_primary"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="10dp">
+
+                    <!-- Decompile Meter -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:background="@drawable/bg_card_rounded"
+                        android:padding="12dp"
+                        android:layout_marginEnd="6dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Decompiles"
+                            android:textColor="@color/text_muted"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:id="@+id/txtMeterDecompile"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 / 10"
+                            android:textColor="@color/primary_light"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Compile Meter -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:background="@drawable/bg_card_rounded"
+                        android:padding="12dp"
+                        android:layout_marginStart="6dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Compiles"
+                            android:textColor="@color/text_muted"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:id="@+id/txtMeterCompile"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 / 10"
+                            android:textColor="@color/accent"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginBottom="8dp">
+                    android:layout_marginBottom="14dp">
+
+                    <!-- Keygen Meter -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:background="@drawable/bg_card_rounded"
+                        android:padding="12dp"
+                        android:layout_marginEnd="6dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="RSA Keystores"
+                            android:textColor="@color/text_muted"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:id="@+id/txtMeterKeygen"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 / 10"
+                            android:textColor="@color/warning"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Sign Meter -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:background="@drawable/bg_card_rounded"
+                        android:padding="12dp"
+                        android:layout_marginStart="6dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="APK Signatures"
+                            android:textColor="@color/text_muted"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:id="@+id/txtMeterSign"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 / 10"
+                            android:textColor="@color/success"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Quick Action Buttons -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="14dp">
 
                     <Button
                         android:id="@+id/btnQuickUploadDecompile"
                         style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="40dp"
                         android:layout_weight="1"
-                        android:text="📦 Upload APK"
+                        android:text="Upload APK"
+                        android:textSize="11sp"
                         android:backgroundTint="@color/primary"
                         android:textColor="#FFFFFF"
-                        android:textSize="12sp"
-                        android:layout_marginEnd="6dp"
-                        app:cornerRadius="10dp" />
+                        android:layout_marginEnd="4dp"
+                        app:cornerRadius="8dp" />
 
                     <Button
                         android:id="@+id/btnQuickBuildApk"
                         style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="40dp"
                         android:layout_weight="1"
-                        android:text="🔨 Build APK"
-                        android:backgroundTint="@color/success"
+                        android:text="Build APK"
+                        android:textSize="11sp"
+                        android:backgroundTint="@color/accent_dark"
                         android:textColor="#FFFFFF"
-                        android:textSize="12sp"
-                        app:cornerRadius="10dp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="14dp">
+                        android:layout_marginEnd="4dp"
+                        app:cornerRadius="8dp" />
 
                     <Button
                         android:id="@+id/btnQuickSignApk"
                         style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="40dp"
                         android:layout_weight="1"
-                        android:text="🔑 Sign APK"
-                        android:backgroundTint="@color/warning"
+                        android:text="Sign APK"
+                        android:textSize="11sp"
+                        android:backgroundTint="@color/success"
                         android:textColor="#FFFFFF"
-                        android:textSize="12sp"
-                        android:layout_marginEnd="6dp"
-                        app:cornerRadius="10dp" />
+                        android:layout_marginEnd="4dp"
+                        app:cornerRadius="8dp" />
 
                     <Button
                         android:id="@+id/btnQuickAiFix"
                         style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="40dp"
                         android:layout_weight="1"
-                        android:text="🤖 AI Code Fix"
-                        android:backgroundTint="@color/info"
+                        android:text="AI Review"
+                        android:textSize="11sp"
+                        android:backgroundTint="@color/purple_ai"
                         android:textColor="#FFFFFF"
-                        android:textSize="12sp"
-                        app:cornerRadius="10dp" />
+                        app:cornerRadius="8dp" />
                 </LinearLayout>
 
-                <!-- Active Project Card Summary -->
+                <!-- Active Project Overview Card -->
                 <LinearLayout
                     android:id="@+id/cardActiveProjectOverview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
+                    android:background="@drawable/bg_card_elevated"
                     android:padding="16dp"
-                    android:layout_marginBottom="14dp">
+                    android:layout_marginBottom="14dp"
+                    android:visibility="gone">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="10dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Current Active Project"
-                            android:textColor="@color/text_primary"
-                            android:textStyle="bold"
-                            android:textSize="14sp" />
-
-                        <Button
-                            android:id="@+id/btnDashCloseProject"
-                            style="@style/Widget.MaterialComponents.Button.TextButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="32dp"
-                            android:text="Close"
-                            android:textColor="@color/danger"
-                            android:textSize="11sp" />
-                    </LinearLayout>
+                        android:text="Active Studio Project"
+                        android:textColor="@color/accent"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/txtDashProjectName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="No project loaded"
-                        android:textColor="@color/primary"
-                        android:textSize="16sp"
+                        android:text="project-name"
+                        android:textColor="@color/text_primary"
+                        android:textSize="15sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/txtDashProjectPath"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Upload or select a project below to start decompiling and editing."
+                        android:text="/uploads/workflow-projects/..."
                         android:textColor="@color/text_muted"
-                        android:textSize="11sp"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginBottom="12dp" />
+                        android:textSize="10sp"
+                        android:fontFamily="monospace"
+                        android:layout_marginBottom="10dp" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -629,28 +1172,45 @@
 
                         <Button
                             android:id="@+id/btnDashExploreFiles"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                             android:layout_width="0dp"
                             android:layout_height="36dp"
                             android:layout_weight="1"
                             android:text="Explore Files"
-                            android:textSize="11sp"
-                            android:layout_marginEnd="6dp"
-                            app:cornerRadius="8dp" />
+                            android:textSize="10sp"
+                            android:backgroundTint="@color/primary"
+                            android:textColor="#FFFFFF"
+                            android:layout_marginEnd="4dp"
+                            app:cornerRadius="6dp" />
 
                         <Button
                             android:id="@+id/btnDashEditStrings"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                             android:layout_width="0dp"
                             android:layout_height="36dp"
                             android:layout_weight="1"
                             android:text="Edit Strings"
-                            android:textSize="11sp"
-                            app:cornerRadius="8dp" />
+                            android:textSize="10sp"
+                            android:backgroundTint="@color/surface_dark_border"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginEnd="4dp"
+                            app:cornerRadius="6dp" />
+
+                        <Button
+                            android:id="@+id/btnDashCloseProject"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="36dp"
+                            android:layout_weight="1"
+                            android:text="Close"
+                            android:textSize="10sp"
+                            android:backgroundTint="@color/danger_container"
+                            android:textColor="@color/danger"
+                            app:cornerRadius="6dp" />
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Recent Projects List Header -->
+                <!-- Recent Projects Header & Container -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -662,7 +1222,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="User Projects (Shared MySQL Database)"
+                        android:text="Your Projects"
                         android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -673,11 +1233,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="32dp"
                         android:text="🔄 Refresh"
-                        android:textColor="@color/primary"
+                        android:textColor="@color/primary_light"
                         android:textSize="11sp" />
                 </LinearLayout>
 
-                <!-- Projects RecyclerView Container -->
                 <LinearLayout
                     android:id="@+id/dashProjectsListContainer"
                     android:layout_width="match_parent"
@@ -686,12 +1245,13 @@
             </LinearLayout>
         </ScrollView>
 
-        <!-- 2. PROJECTS & DECOMPILE PANEL -->
+        <!-- 2. PROJECTS & UPLOAD PANEL -->
         <ScrollView
             android:id="@+id/panelProjects"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="14dp"
+            android:fillViewport="true"
+            android:padding="16dp"
             android:visibility="gone">
 
             <LinearLayout
@@ -699,7 +1259,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Upload & Decompile Card -->
+                <!-- Upload Card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -711,54 +1271,35 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Upload &amp; Decompile APK"
+                        android:text="Upload APK to Decompile"
                         android:textColor="@color/text_primary"
-                        android:textSize="16sp"
+                        android:textSize="15sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Select an APK file from your phone storage to upload to the server and auto-decompile with Apktool."
+                        android:text="Select any APK from storage to decompile smali, manifest, resources, and assets."
                         android:textColor="@color/text_muted"
-                        android:textSize="12sp"
-                        android:layout_marginTop="2dp"
+                        android:textSize="11sp"
                         android:layout_marginBottom="12dp" />
 
-                    <!-- File Pick Box -->
                     <LinearLayout
                         android:id="@+id/boxPickApkFile"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
+                        android:layout_height="70dp"
                         android:background="@drawable/bg_input_field"
-                        android:padding="20dp"
                         android:gravity="center"
-                        android:clickable="true"
-                        android:focusable="true">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="📥"
-                            android:textSize="32sp" />
+                        android:orientation="vertical"
+                        android:layout_marginBottom="12dp">
 
                         <TextView
                             android:id="@+id/txtSelectedApkName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Tap to select .apk from storage"
-                            android:textColor="@color/primary"
-                            android:textStyle="bold"
-                            android:textSize="13sp"
-                            android:layout_marginTop="6dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Supports APK &amp; AAB binaries up to server limit"
-                            android:textColor="@color/text_muted"
-                            android:textSize="10sp" />
+                            android:text="Tap to select APK file from device..."
+                            android:textColor="@color/text_secondary"
+                            android:textSize="12sp" />
                     </LinearLayout>
 
                     <Button
@@ -766,55 +1307,51 @@
                         style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                         android:layout_width="match_parent"
                         android:layout_height="44dp"
-                        android:text="Upload &amp; Start Decompile"
+                        android:text="Upload &amp; Decompile APK"
                         android:backgroundTint="@color/primary"
                         android:textColor="#FFFFFF"
-                        android:layout_marginTop="12dp"
-                        app:cornerRadius="10dp" />
-
-                    <!-- Decompile Progress / Log Box -->
-                    <LinearLayout
-                        android:id="@+id/boxDecompileLogs"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginTop="12dp"
-                        android:visibility="gone">
-
-                        <TextView
-                            android:id="@+id/txtDecompileStatus"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Decompiling..."
-                            android:textColor="@color/primary"
-                            android:textStyle="bold"
-                            android:textSize="12sp"
-                            android:layout_marginBottom="4dp" />
-
-                        <ScrollView
-                            android:layout_width="match_parent"
-                            android:layout_height="140dp"
-                            android:background="@drawable/bg_card_dark"
-                            android:padding="8dp">
-
-                            <TextView
-                                android:id="@+id/txtDecompileLogOutput"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:textColor="#E2E8F0"
-                                android:textSize="10sp"
-                                android:fontFamily="monospace" />
-                        </ScrollView>
-                    </LinearLayout>
+                        app:cornerRadius="8dp" />
                 </LinearLayout>
 
-                <!-- Project List Section -->
+                <!-- Decompile Logs Card -->
+                <LinearLayout
+                    android:id="@+id/boxDecompileLogs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_card_rounded"
+                    android:padding="14dp"
+                    android:layout_marginBottom="14dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/txtDecompileStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Decompilation In Progress..."
+                        android:textColor="@color/warning"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:id="@+id/txtDecompileLogOutput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/code_bg"
+                        android:textColor="#38BDF8"
+                        android:fontFamily="monospace"
+                        android:textSize="11sp"
+                        android:padding="10dp" />
+                </LinearLayout>
+
+                <!-- Projects List Container -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="All Projects"
                     android:textColor="@color/text_primary"
-                    android:textSize="15sp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="8dp" />
 
@@ -826,284 +1363,270 @@
             </LinearLayout>
         </ScrollView>
 
-        <!-- 3. CODE & HEX EDITOR PANEL -->
+        <!-- 3. FILE EDITOR & HEX PANEL -->
         <LinearLayout
             android:id="@+id/panelEditor"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:padding="10dp"
+            android:padding="12dp"
             android:visibility="gone">
 
-            <!-- File Explorer Breadcrumb & Actions Header -->
+            <!-- Directory Toolbar -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:background="@drawable/bg_card_rounded"
-                android:padding="8dp"
+                android:padding="10dp"
                 android:layout_marginBottom="8dp">
+
+                <Button
+                    android:id="@+id/btnFileUpDir"
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="34dp"
+                    android:text="⬆ Up"
+                    android:backgroundTint="@color/surface_dark_border"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    app:cornerRadius="6dp" />
 
                 <TextView
                     android:id="@+id/txtFileBreadcrumb"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="📂 / (root)"
+                    android:text="/"
                     android:textColor="@color/text_primary"
                     android:textSize="12sp"
-                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:paddingHorizontal="8dp"
                     android:singleLine="true"
                     android:ellipsize="start" />
-
-                <Button
-                    android:id="@+id/btnFileUpDir"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="32dp"
-                    android:text="⬆ Up"
-                    android:textSize="11sp"
-                    android:textColor="@color/primary" />
 
                 <Button
                     android:id="@+id/btnRefreshDir"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="32dp"
+                    android:layout_height="34dp"
                     android:text="🔄"
-                    android:textSize="11sp" />
+                    android:textColor="@color/primary_light"
+                    android:textSize="12sp" />
             </LinearLayout>
 
-            <!-- Directory Files List / Code Editor Toggle Container -->
-            <LinearLayout
+            <!-- Directory Items ScrollView -->
+            <ScrollView
+                android:id="@+id/scrollDirectoryBrowser"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:background="@drawable/bg_card_rounded"
+                android:padding="8dp">
 
-                <!-- File Explorer List (when browsing files) -->
-                <ScrollView
-                    android:id="@+id/scrollDirectoryBrowser"
+                <LinearLayout
+                    android:id="@+id/directoryItemsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </ScrollView>
+
+            <!-- Code Editor View (When file is open) -->
+            <LinearLayout
+                android:id="@+id/boxCodeEditorView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_rounded"
+                android:padding="10dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="6dp">
+
+                    <TextView
+                        android:id="@+id/txtEditorOpenFileName"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="file.smali"
+                        android:textColor="@color/accent"
+                        android:textSize="12sp"
+                        android:fontFamily="monospace"
+                        android:singleLine="true"
+                        android:ellipsize="middle" />
+
+                    <Button
+                        android:id="@+id/btnEditorAiReview"
+                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:text="🤖 AI Fix"
+                        android:textSize="9sp"
+                        android:backgroundTint="@color/purple_ai"
+                        android:textColor="#FFFFFF"
+                        android:layout_marginEnd="4dp"
+                        app:cornerRadius="6dp" />
+
+                    <Button
+                        android:id="@+id/btnEditorSave"
+                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:text="💾 Save"
+                        android:textSize="9sp"
+                        android:backgroundTint="@color/success"
+                        android:textColor="#FFFFFF"
+                        android:layout_marginEnd="4dp"
+                        app:cornerRadius="6dp" />
+
+                    <Button
+                        android:id="@+id/btnEditorReplaceFile"
+                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:text="Replace"
+                        android:textSize="9sp"
+                        android:backgroundTint="@color/surface_dark_border"
+                        android:textColor="@color/text_secondary"
+                        android:layout_marginEnd="4dp"
+                        app:cornerRadius="6dp" />
+
+                    <Button
+                        android:id="@+id/btnEditorClose"
+                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:text="✖"
+                        android:textSize="9sp"
+                        android:backgroundTint="@color/danger_container"
+                        android:textColor="@color/danger"
+                        app:cornerRadius="6dp" />
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/editCodeContent"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="8dp">
+                    android:background="@color/code_bg"
+                    android:textColor="#F8FAFC"
+                    android:fontFamily="monospace"
+                    android:textSize="11sp"
+                    android:gravity="top|start"
+                    android:padding="10dp"
+                    android:inputType="textMultiLine|textNoSuggestions" />
+            </LinearLayout>
+
+            <!-- Hex Editor View -->
+            <LinearLayout
+                android:id="@+id/boxHexEditorView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_rounded"
+                android:padding="10dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="6dp">
+
+                    <EditText
+                        android:id="@+id/editHexSearchQuery"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_input_field"
+                        android:hint="Hex bytes or ASCII string..."
+                        android:textColor="@color/text_primary"
+                        android:textSize="11sp"
+                        android:paddingHorizontal="8dp"
+                        android:layout_marginEnd="4dp" />
+
+                    <Button
+                        android:id="@+id/btnHexSearch"
+                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:text="Search"
+                        android:textSize="10sp"
+                        android:backgroundTint="@color/primary"
+                        android:textColor="#FFFFFF"
+                        android:layout_marginEnd="4dp"
+                        app:cornerRadius="6dp" />
+
+                    <Button
+                        android:id="@+id/btnHexClose"
+                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:text="Close"
+                        android:textSize="10sp"
+                        android:backgroundTint="@color/surface_dark_border"
+                        android:textColor="@color/text_secondary"
+                        app:cornerRadius="6dp" />
+                </LinearLayout>
+
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginBottom="6dp">
 
                     <LinearLayout
-                        android:id="@+id/directoryItemsContainer"
+                        android:id="@+id/hexResultsContainer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical" />
                 </ScrollView>
 
-                <!-- Code Editor View (when file is opened) -->
                 <LinearLayout
-                    android:id="@+id/boxCodeEditorView"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_dark"
-                    android:visibility="gone">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
-                    <!-- Code Editor Toolbar -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:background="#1E293B"
-                        android:padding="6dp">
-
-                        <TextView
-                            android:id="@+id/txtEditorOpenFileName"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="smali/MainActivity.smali"
-                            android:textColor="#38BDF8"
-                            android:textSize="12sp"
-                            android:fontFamily="monospace"
-                            android:textStyle="bold"
-                            android:singleLine="true"
-                            android:ellipsize="start" />
-
-                        <Button
-                            android:id="@+id/btnEditorSave"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="32dp"
-                            android:text="💾 Save"
-                            android:textSize="11sp"
-                            android:backgroundTint="@color/primary"
-                            android:textColor="#FFFFFF"
-                            android:paddingHorizontal="10dp"
-                            android:layout_marginEnd="4dp"
-                            app:cornerRadius="6dp" />
-
-                        <Button
-                            android:id="@+id/btnEditorAiReview"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="32dp"
-                            android:text="🤖 AI Fix"
-                            android:textSize="11sp"
-                            android:backgroundTint="@color/info"
-                            android:textColor="#FFFFFF"
-                            android:paddingHorizontal="8dp"
-                            android:layout_marginEnd="4dp"
-                            app:cornerRadius="6dp" />
-
-                        <Button
-                            android:id="@+id/btnEditorReplaceFile"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="32dp"
-                            android:text="🔄 Replace"
-                            android:textSize="11sp"
-                            android:backgroundTint="#475569"
-                            android:textColor="#FFFFFF"
-                            android:paddingHorizontal="8dp"
-                            android:layout_marginEnd="4dp"
-                            app:cornerRadius="6dp" />
-
-                        <Button
-                            android:id="@+id/btnEditorClose"
-                            style="@style/Widget.MaterialComponents.Button.TextButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="32dp"
-                            android:text="✕"
-                            android:textColor="#EF4444"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-
-                    <!-- Text / Smali Code Input Field -->
                     <EditText
-                        android:id="@+id/editCodeContent"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
+                        android:id="@+id/editHexPatchBytes"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
                         android:layout_weight="1"
-                        android:background="@null"
-                        android:textColor="#F8FAFC"
-                        android:textSize="12sp"
-                        android:fontFamily="monospace"
-                        android:gravity="top|start"
-                        android:padding="10dp"
-                        android:scrollbars="vertical|horizontal"
-                        android:inputType="textMultiLine|textNoSuggestions" />
-                </LinearLayout>
+                        android:background="@drawable/bg_input_field"
+                        android:hint="Replacement hex bytes..."
+                        android:textColor="@color/text_primary"
+                        android:textSize="11sp"
+                        android:paddingHorizontal="8dp"
+                        android:layout_marginEnd="4dp" />
 
-                <!-- Visual Hex Editor View (for binary .so / ELF / DEX) -->
-                <LinearLayout
-                    android:id="@+id/boxHexEditorView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:background="#090D16"
-                    android:visibility="gone">
-
-                    <!-- Hex Toolbar & Search -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:background="#0F172A"
-                        android:padding="6dp"
-                        android:gravity="center_vertical">
-
-                        <EditText
-                            android:id="@+id/editHexSearchQuery"
-                            android:layout_width="0dp"
-                            android:layout_height="34dp"
-                            android:layout_weight="1"
-                            android:background="@drawable/bg_card_dark"
-                            android:hint="Search Hex or text (e.g. 7F 45 4C 46)"
-                            android:textColor="#F8FAFC"
-                            android:textColorHint="#64748B"
-                            android:textSize="11sp"
-                            android:fontFamily="monospace"
-                            android:paddingHorizontal="8dp" />
-
-                        <Button
-                            android:id="@+id/btnHexSearch"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="34dp"
-                            android:text="🔍 Search"
-                            android:textSize="11sp"
-                            android:backgroundTint="@color/primary"
-                            android:textColor="#FFFFFF"
-                            android:layout_marginStart="4dp"
-                            app:cornerRadius="6dp" />
-
-                        <Button
-                            android:id="@+id/btnHexClose"
-                            style="@style/Widget.MaterialComponents.Button.TextButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="34dp"
-                            android:text="✕"
-                            android:textColor="#EF4444"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-
-                    <!-- Hex Results & Data Inspector -->
-                    <ScrollView
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:padding="8dp">
-
-                        <LinearLayout
-                            android:id="@+id/hexResultsContainer"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical" />
-                    </ScrollView>
-
-                    <!-- Binary Patch Input Box -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:background="#0F172A"
-                        android:padding="6dp"
-                        android:gravity="center_vertical">
-
-                        <EditText
-                            android:id="@+id/editHexPatchBytes"
-                            android:layout_width="0dp"
-                            android:layout_height="34dp"
-                            android:layout_weight="1"
-                            android:background="@drawable/bg_card_dark"
-                            android:hint="Patch Hex (e.g. 90 90 90 90)"
-                            android:textColor="#FEF08A"
-                            android:textColorHint="#64748B"
-                            android:textSize="11sp"
-                            android:fontFamily="monospace"
-                            android:paddingHorizontal="8dp" />
-
-                        <Button
-                            android:id="@+id/btnHexApplyPatch"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="34dp"
-                            android:text="Apply Patch"
-                            android:textSize="11sp"
-                            android:backgroundTint="@color/warning"
-                            android:textColor="#FFFFFF"
-                            android:layout_marginStart="4dp"
-                            app:cornerRadius="6dp" />
-                    </LinearLayout>
+                    <Button
+                        android:id="@+id/btnHexApplyPatch"
+                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:text="Patch"
+                        android:textSize="10sp"
+                        android:backgroundTint="@color/success"
+                        android:textColor="#FFFFFF"
+                        app:cornerRadius="6dp" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 
-        <!-- 4. RESOURCES & AI STUDIO PANEL -->
+        <!-- 4. RESOURCES & AI CUSTOMIZER PANEL -->
         <ScrollView
             android:id="@+id/panelCustomizer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="14dp"
+            android:fillViewport="true"
+            android:padding="16dp"
             android:visibility="gone">
 
             <LinearLayout
@@ -1111,7 +1634,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Strings & App Name Translator Card -->
+                <!-- Strings Editor Card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -1123,18 +1646,17 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Strings &amp; App Name Editor"
+                        android:text="Application Strings &amp; Localization"
                         android:textColor="@color/text_primary"
-                        android:textSize="16sp"
+                        android:textSize="15sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Translate strings, change App Name, and auto-sync changes to strings.xml and AndroidManifest.xml."
+                        android:text="Edit app_name and localized string keys directly in res/values/strings.xml."
                         android:textColor="@color/text_muted"
-                        android:textSize="12sp"
-                        android:layout_marginTop="2dp"
+                        android:textSize="11sp"
                         android:layout_marginBottom="12dp" />
 
                     <EditText
@@ -1142,10 +1664,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="42dp"
                         android:background="@drawable/bg_input_field"
-                        android:hint="Application Display Name (e.g. My Modded App)"
+                        android:hint="New App Display Name"
+                        android:textColor="@color/text_primary"
                         android:textSize="13sp"
                         android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="8dp" />
+                        android:layout_marginBottom="10dp" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -1161,6 +1684,7 @@
                             android:background="@drawable/bg_input_field"
                             android:text="values"
                             android:hint="Locale (e.g. values, values-es)"
+                            android:textColor="@color/text_primary"
                             android:textSize="12sp"
                             android:paddingHorizontal="10dp"
                             android:layout_marginEnd="6dp" />
@@ -1171,11 +1695,11 @@
                             android:layout_width="wrap_content"
                             android:layout_height="40dp"
                             android:text="Load"
-                            android:textSize="12sp"
-                            android:backgroundTint="@color/primary"
-                            android:textColor="#FFFFFF"
+                            android:backgroundTint="@color/surface_dark_border"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="11sp"
                             android:layout_marginEnd="4dp"
-                            app:cornerRadius="8dp" />
+                            app:cornerRadius="6dp" />
 
                         <Button
                             android:id="@+id/btnSaveStrings"
@@ -1183,13 +1707,12 @@
                             android:layout_width="wrap_content"
                             android:layout_height="40dp"
                             android:text="Save"
-                            android:textSize="12sp"
                             android:backgroundTint="@color/success"
                             android:textColor="#FFFFFF"
-                            app:cornerRadius="8dp" />
+                            android:textSize="11sp"
+                            app:cornerRadius="6dp" />
                     </LinearLayout>
 
-                    <!-- Strings key-value table container -->
                     <LinearLayout
                         android:id="@+id/stringsTableContainer"
                         android:layout_width="match_parent"
@@ -1197,7 +1720,7 @@
                         android:orientation="vertical" />
                 </LinearLayout>
 
-                <!-- Firebase / Google Services Auto-Injector -->
+                <!-- Assets & Logo Injection Card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -1209,7 +1732,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Firebase &amp; Google Services Auto-Injector"
+                        android:text="Firebase &amp; Logo Generator"
                         android:textColor="@color/text_primary"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -1217,68 +1740,50 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Upload google-services.json to automatically inject App ID, API keys, and client parameters into resources."
+                        android:text="Inject google-services.json or upload/AI-generate high resolution app icons."
                         android:textColor="@color/text_muted"
-                        android:textSize="12sp"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginBottom="10dp" />
+                        android:textSize="11sp"
+                        android:layout_marginBottom="12dp" />
 
-                    <Button
-                        android:id="@+id/btnUploadFirebaseJson"
-                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:text="📄 Select google-services.json"
-                        android:backgroundTint="#334155"
-                        android:textColor="#FFFFFF"
-                        android:textSize="12sp"
-                        app:cornerRadius="8dp" />
-                </LinearLayout>
-
-                <!-- Logo & Icon Customizer & AI Icon Generator -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Launcher Icon &amp; Logo Studio"
-                        android:textColor="@color/text_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="10dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Replace app icon with an image from gallery or generate a brand new logo using AI prompt."
-                        android:textColor="@color/text_muted"
-                        android:textSize="12sp"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginBottom="10dp" />
+                        <Button
+                            android:id="@+id/btnUploadFirebaseJson"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:text="Inject Firebase JSON"
+                            android:backgroundTint="@color/warning_dark"
+                            android:textColor="#FFFFFF"
+                            android:textSize="10sp"
+                            android:layout_marginEnd="6dp"
+                            app:cornerRadius="8dp" />
 
-                    <Button
-                        android:id="@+id/btnPickLogoImage"
-                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:text="🖼️ Upload Image from Gallery"
-                        android:backgroundTint="@color/primary"
-                        android:textColor="#FFFFFF"
-                        android:textSize="12sp"
-                        android:layout_marginBottom="10dp"
-                        app:cornerRadius="8dp" />
+                        <Button
+                            android:id="@+id/btnPickLogoImage"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:text="Pick Logo Image"
+                            android:backgroundTint="@color/primary"
+                            android:textColor="#FFFFFF"
+                            android:textSize="10sp"
+                            app:cornerRadius="8dp" />
+                    </LinearLayout>
 
                     <EditText
                         android:id="@+id/editAiIconPrompt"
                         android:layout_width="match_parent"
                         android:layout_height="42dp"
                         android:background="@drawable/bg_input_field"
-                        android:hint="AI Prompt (e.g. minimalist neon rocket logo)"
+                        android:hint="AI Logo Prompt (e.g. Modern Cyberpunk Falcon)"
+                        android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:paddingHorizontal="10dp"
                         android:layout_marginBottom="8dp" />
@@ -1288,10 +1793,10 @@
                         style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
-                        android:text="✨ Generate &amp; Apply AI Icon"
-                        android:backgroundTint="@color/info"
+                        android:text="🤖 Generate &amp; Scale Icons"
+                        android:backgroundTint="@color/purple_ai"
                         android:textColor="#FFFFFF"
-                        android:textSize="12sp"
+                        android:textSize="11sp"
                         app:cornerRadius="8dp" />
                 </LinearLayout>
 
@@ -1301,13 +1806,12 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
+                    android:padding="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Global Project Search &amp; Replace"
+                        android:text="Global Project Find &amp; Replace"
                         android:textColor="@color/text_primary"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -1315,28 +1819,29 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Scan Smali, XML, and JSON files across the entire decompiled project."
+                        android:text="Recursively search and replace strings across all smali, XML, and Java files."
                         android:textColor="@color/text_muted"
-                        android:textSize="12sp"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginBottom="10dp" />
+                        android:textSize="11sp"
+                        android:layout_marginBottom="12dp" />
 
                     <EditText
                         android:id="@+id/editGlobalFindText"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:background="@drawable/bg_input_field"
-                        android:hint="Find text pattern..."
+                        android:hint="Target string to find..."
+                        android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="6dp" />
+                        android:layout_marginBottom="8dp" />
 
                     <EditText
                         android:id="@+id/editGlobalReplaceText"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:background="@drawable/bg_input_field"
-                        android:hint="Replace with..."
+                        android:hint="Replacement string..."
+                        android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:paddingHorizontal="10dp"
                         android:layout_marginBottom="10dp" />
@@ -1350,12 +1855,12 @@
                             android:id="@+id/btnGlobalFindOnly"
                             style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                             android:layout_width="0dp"
-                            android:layout_height="38dp"
+                            android:layout_height="40dp"
                             android:layout_weight="1"
-                            android:text="Find Only"
-                            android:textSize="11sp"
-                            android:backgroundTint="@color/primary"
-                            android:textColor="#FFFFFF"
+                            android:text="Find Occurrences"
+                            android:backgroundTint="@color/surface_dark_border"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="10sp"
                             android:layout_marginEnd="6dp"
                             app:cornerRadius="8dp" />
 
@@ -1363,24 +1868,25 @@
                             android:id="@+id/btnGlobalFindReplace"
                             style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                             android:layout_width="0dp"
-                            android:layout_height="38dp"
+                            android:layout_height="40dp"
                             android:layout_weight="1"
-                            android:text="Find &amp; Replace"
-                            android:textSize="11sp"
-                            android:backgroundTint="@color/warning"
+                            android:text="Replace All"
+                            android:backgroundTint="@color/danger"
                             android:textColor="#FFFFFF"
+                            android:textSize="10sp"
                             app:cornerRadius="8dp" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
 
-        <!-- 5. BUILD, SIGN & INSTALL PANEL -->
+        <!-- 5. BUILD & SIGN PANEL -->
         <ScrollView
             android:id="@+id/panelBuild"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="14dp"
+            android:fillViewport="true"
+            android:padding="16dp"
             android:visibility="gone">
 
             <LinearLayout
@@ -1400,18 +1906,17 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="1. Recompile Unsigned APK"
+                        android:text="Recompile Android Package (APK)"
                         android:textColor="@color/text_primary"
-                        android:textSize="16sp"
+                        android:textSize="15sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Rebuild modified Smali code and resources back into an APK binary via apktool."
+                        android:text="Compiles decompiled smali sources and resources into an unsigned binary."
                         android:textColor="@color/text_muted"
-                        android:textSize="12sp"
-                        android:layout_marginTop="2dp"
+                        android:textSize="11sp"
                         android:layout_marginBottom="12dp" />
 
                     <Button
@@ -1419,47 +1924,44 @@
                         style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                         android:layout_width="match_parent"
                         android:layout_height="44dp"
-                        android:text="🔨 Build Unsigned APK"
+                        android:text="🔨 Trigger Full Rebuild"
                         android:backgroundTint="@color/primary"
                         android:textColor="#FFFFFF"
-                        app:cornerRadius="10dp" />
-
-                    <!-- Build Log Box -->
-                    <LinearLayout
-                        android:id="@+id/boxBuildLogs"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginTop="10dp"
-                        android:visibility="gone">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Apktool Build Output:"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="11sp"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="4dp" />
-
-                        <ScrollView
-                            android:layout_width="match_parent"
-                            android:layout_height="140dp"
-                            android:background="@drawable/bg_card_dark"
-                            android:padding="8dp">
-
-                            <TextView
-                                android:id="@+id/txtBuildLogOutput"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:textColor="#E2E8F0"
-                                android:textSize="10sp"
-                                android:fontFamily="monospace" />
-                        </ScrollView>
-                    </LinearLayout>
+                        app:cornerRadius="8dp" />
                 </LinearLayout>
 
-                <!-- Keystores & Signing Card -->
+                <!-- Build Logs Box -->
+                <LinearLayout
+                    android:id="@+id/boxBuildLogs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_card_rounded"
+                    android:padding="14dp"
+                    android:layout_marginBottom="14dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Compiler Output"
+                        android:textColor="@color/accent"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="6dp" />
+
+                    <TextView
+                        android:id="@+id/txtBuildLogOutput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/code_bg"
+                        android:textColor="#4ADE80"
+                        android:fontFamily="monospace"
+                        android:textSize="11sp"
+                        android:padding="10dp" />
+                </LinearLayout>
+
+                <!-- Keystore & Sign Card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -1471,46 +1973,47 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="2. Keystore Manager &amp; V2/V3 Signer"
+                        android:text="Keystore Management &amp; APK Signer"
                         android:textColor="@color/text_primary"
-                        android:textSize="16sp"
+                        android:textSize="15sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Select an existing keystore or generate a new RSA 2048-bit JKS keystore to cryptographically sign the APK."
+                        android:text="Select a JKS key on the server, enter password, and sign with jarsigner."
                         android:textColor="@color/text_muted"
-                        android:textSize="12sp"
-                        android:layout_marginTop="2dp"
+                        android:textSize="11sp"
                         android:layout_marginBottom="12dp" />
 
                     <Button
                         android:id="@+id/btnOpenCreateKeystoreDialog"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:text="➕ Generate New Keystore (keytool)"
-                        android:textSize="12sp"
+                        android:layout_height="38dp"
+                        android:text="🔑 Generate RSA 2048-bit Keystore"
+                        android:backgroundTint="@color/surface_dark_border"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="11sp"
                         android:layout_marginBottom="10dp"
                         app:cornerRadius="8dp" />
 
-                    <!-- Stored Keystores Container -->
                     <LinearLayout
                         android:id="@+id/keystoresListContainer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:layout_marginBottom="12dp" />
+                        android:layout_marginBottom="10dp" />
 
                     <EditText
                         android:id="@+id/editSignPassword"
                         android:layout_width="match_parent"
                         android:layout_height="42dp"
                         android:background="@drawable/bg_input_field"
-                        android:hint="Keystore Password for Signing"
+                        android:hint="Keystore Password"
                         android:inputType="textPassword"
-                        android:textSize="13sp"
+                        android:textColor="@color/text_primary"
+                        android:textSize="12sp"
                         android:paddingHorizontal="10dp"
                         android:layout_marginBottom="10dp" />
 
@@ -1519,149 +2022,24 @@
                         style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                         android:layout_width="match_parent"
                         android:layout_height="44dp"
-                        android:text="🔑 Sign APK (Zipalign &amp; Apksigner)"
+                        android:text="✍ Sign APK"
                         android:backgroundTint="@color/success"
                         android:textColor="#FFFFFF"
-                        app:cornerRadius="10dp" />
+                        app:cornerRadius="8dp" />
                 </LinearLayout>
 
-                <!-- Direct Download & Install Card -->
+                <!-- Direct Install Card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
+                    android:padding="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="3. Install Built APK to this Device"
-                        android:textColor="@color/text_primary"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Download the signed APK directly with SHA-256 integrity verification and hand off to Android package installer."
-                        android:textColor="@color/text_muted"
-                        android:textSize="12sp"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginBottom="12dp" />
-
-                    <Button
-                        android:id="@+id/btnDirectInstallApk"
-                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:text="📲 Download &amp; Install Signed APK"
-                        android:backgroundTint="@color/accent"
-                        android:textColor="#FFFFFF"
-                        app:cornerRadius="10dp" />
-                </LinearLayout>
-            </LinearLayout>
-        </ScrollView>
-
-        <!-- 6. ADB & DEBUGGER PANEL -->
-        <ScrollView
-            android:id="@+id/panelDebugger"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="14dp"
-            android:visibility="gone">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <!-- Cloud Device Logs (Realtime Stream) -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Realtime Cloud Device Logs"
-                            android:textColor="@color/text_primary"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <Button
-                            android:id="@+id/btnToggleCloudLogsStream"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="32dp"
-                            android:text="Start Stream"
-                            android:textSize="11sp"
-                            android:backgroundTint="@color/primary"
-                            android:textColor="#FFFFFF"
-                            android:layout_marginEnd="4dp"
-                            app:cornerRadius="6dp" />
-
-                        <Button
-                            android:id="@+id/btnClearCloudLogs"
-                            style="@style/Widget.MaterialComponents.Button.TextButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="32dp"
-                            android:text="Clear"
-                            android:textColor="@color/danger"
-                            android:textSize="11sp" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Pulls live app crash, network, and debug logs reported to the backend - no ADB or root required."
-                        android:textColor="@color/text_muted"
-                        android:textSize="11sp"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginBottom="8dp" />
-
-                    <ScrollView
-                        android:layout_width="match_parent"
-                        android:layout_height="180dp"
-                        android:background="@drawable/bg_card_dark"
-                        android:padding="8dp">
-
-                        <TextView
-                            android:id="@+id/txtCloudLogsStream"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="No logs received yet."
-                            android:textColor="#D1D5DB"
-                            android:textSize="11sp"
-                            android:fontFamily="monospace" />
-                    </ScrollView>
-                </LinearLayout>
-
-                <!-- Wireless ADB Connection & Logcat -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Wireless ADB Device Manager"
+                        android:text="Download &amp; Install on Device"
                         android:textColor="@color/text_primary"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -1669,51 +2047,47 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Connect to an Android device over TCP/IP, install builds over ADB, and inspect live Logcat."
+                        android:text="Directly install the signed APK onto this device via FileProvider."
                         android:textColor="@color/text_muted"
                         android:textSize="11sp"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginBottom="10dp" />
+                        android:layout_marginBottom="12dp" />
 
-                    <LinearLayout
+                    <Button
+                        android:id="@+id/btnDirectInstallApk"
+                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="8dp">
+                        android:layout_height="44dp"
+                        android:text="📲 Download &amp; Install APK"
+                        android:backgroundTint="@color/accent_dark"
+                        android:textColor="#FFFFFF"
+                        app:cornerRadius="8dp" />
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
 
-                        <EditText
-                            android:id="@+id/editAdbHostIp"
-                            android:layout_width="0dp"
-                            android:layout_height="40dp"
-                            android:layout_weight="1"
-                            android:background="@drawable/bg_input_field"
-                            android:hint="192.168.1.100:5555"
-                            android:textSize="12sp"
-                            android:fontFamily="monospace"
-                            android:paddingHorizontal="10dp"
-                            android:layout_marginEnd="6dp" />
+        <!-- 6. DEBUGGER & ADB LOGS PANEL -->
+        <ScrollView
+            android:id="@+id/panelDebugger"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:padding="16dp"
+            android:visibility="gone">
 
-                        <Button
-                            android:id="@+id/btnAdbConnect"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="40dp"
-                            android:text="Connect"
-                            android:textSize="12sp"
-                            android:backgroundTint="@color/primary"
-                            android:textColor="#FFFFFF"
-                            app:cornerRadius="8dp" />
-                    </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-                    <!-- Connected ADB Devices List Container -->
-                    <LinearLayout
-                        android:id="@+id/adbDevicesContainer"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginBottom="10dp" />
+                <!-- Cloud Logs Card -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_card_rounded"
+                    android:padding="16dp"
+                    android:layout_marginBottom="14dp">
 
-                    <!-- Logcat Viewer -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -1725,45 +2099,149 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Device Logcat:"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="11sp"
+                            android:text="Cloud Crash &amp; Debug Logs"
+                            android:textColor="@color/text_primary"
+                            android:textSize="15sp"
                             android:textStyle="bold" />
 
                         <Button
-                            android:id="@+id/btnAdbReadLogcat"
-                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:id="@+id/btnToggleCloudLogsStream"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                             android:layout_width="wrap_content"
                             android:layout_height="32dp"
-                            android:text="Poll Logcat"
-                            android:textSize="11sp"
-                            android:textColor="@color/primary" />
+                            android:text="Start Stream"
+                            android:textSize="10sp"
+                            android:backgroundTint="@color/primary"
+                            android:textColor="#FFFFFF"
+                            android:layout_marginEnd="4dp"
+                            app:cornerRadius="6dp" />
+
+                        <Button
+                            android:id="@+id/btnClearCloudLogs"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:text="Clear"
+                            android:textSize="10sp"
+                            android:backgroundTint="@color/surface_dark_border"
+                            android:textColor="@color/text_secondary"
+                            app:cornerRadius="6dp" />
                     </LinearLayout>
 
-                    <ScrollView
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Auto-polls every 2s for crash dumps, stack traces, and HTTP traffic."
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp"
+                        android:layout_marginBottom="10dp" />
+
+                    <TextView
+                        android:id="@+id/txtCloudLogsStream"
+                        android:layout_width="match_parent"
+                        android:layout_height="180dp"
+                        android:background="@color/code_bg"
+                        android:textColor="#38BDF8"
+                        android:fontFamily="monospace"
+                        android:textSize="11sp"
+                        android:padding="10dp"
+                        android:scrollbars="vertical" />
+                </LinearLayout>
+
+                <!-- ADB Remote Connect Card -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_card_rounded"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Wireless ADB Debugger"
+                        android:textColor="@color/text_primary"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Connect to an Android device over Wi-Fi (IP:Port) to read real-time logcat."
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp"
+                        android:layout_marginBottom="12dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="10dp">
+
+                        <EditText
+                            android:id="@+id/editAdbHostIp"
+                            android:layout_width="0dp"
+                            android:layout_height="42dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_input_field"
+                            android:hint="192.168.1.100:5555"
+                            android:textColor="@color/text_primary"
+                            android:textSize="12sp"
+                            android:paddingHorizontal="10dp"
+                            android:layout_marginEnd="6dp" />
+
+                        <Button
+                            android:id="@+id/btnAdbConnect"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="42dp"
+                            android:text="Connect ADB"
+                            android:backgroundTint="@color/primary"
+                            android:textColor="#FFFFFF"
+                            android:textSize="11sp"
+                            app:cornerRadius="8dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/adbDevicesContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="10dp" />
+
+                    <Button
+                        android:id="@+id/btnAdbReadLogcat"
+                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="38dp"
+                        android:text="Read Logcat (All Levels)"
+                        android:backgroundTint="@color/surface_dark_border"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="11sp"
+                        android:layout_marginBottom="10dp"
+                        app:cornerRadius="8dp" />
+
+                    <TextView
+                        android:id="@+id/txtAdbLogcatOutput"
                         android:layout_width="match_parent"
                         android:layout_height="160dp"
-                        android:background="@drawable/bg_card_dark"
-                        android:padding="8dp">
-
-                        <TextView
-                            android:id="@+id/txtAdbLogcatOutput"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textColor="#E2E8F0"
-                            android:textSize="10sp"
-                            android:fontFamily="monospace" />
-                    </ScrollView>
+                        android:background="@color/code_bg"
+                        android:textColor="#4ADE80"
+                        android:fontFamily="monospace"
+                        android:textSize="11sp"
+                        android:padding="10dp"
+                        android:scrollbars="vertical" />
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
 
-        <!-- 7. AI CONFIGURATION PANEL -->
+        <!-- 7. AI CONFIG PANEL -->
         <ScrollView
             android:id="@+id/panelAiSettings"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="14dp"
+            android:fillViewport="true"
+            android:padding="16dp"
             android:visibility="gone">
 
             <LinearLayout
@@ -1771,7 +2249,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Provider Selector -->
+                <!-- Provider Selector Card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -1783,18 +2261,17 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Active AI Engine Provider"
+                        android:text="AI Model Provider"
                         android:textColor="@color/text_primary"
-                        android:textSize="16sp"
+                        android:textSize="15sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Select whether to use Google Gemini or OpenAI for AI error diagnostics and icon generation."
+                        android:text="Choose between Google Gemini or OpenAI for smali decompilation review."
                         android:textColor="@color/text_muted"
-                        android:textSize="12sp"
-                        android:layout_marginTop="2dp"
+                        android:textSize="11sp"
                         android:layout_marginBottom="12dp" />
 
                     <RadioGroup
@@ -1809,6 +2286,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="Google Gemini"
+                            android:textColor="@color/text_primary"
                             android:checked="true" />
 
                         <RadioButton
@@ -1816,11 +2294,12 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="OpenAI" />
+                            android:text="OpenAI"
+                            android:textColor="@color/text_primary" />
                     </RadioGroup>
                 </LinearLayout>
 
-                <!-- Gemini API Key Card -->
+                <!-- Gemini Key Card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -1832,7 +2311,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Gemini API Key"
+                        android:text="Google Gemini API Key"
                         android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -1841,21 +2320,21 @@
                         android:id="@+id/txtGeminiKeyStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="No key saved"
+                        android:text="Status: No key saved"
                         android:textColor="@color/text_muted"
                         android:textSize="11sp"
-                        android:layout_marginBottom="8dp" />
+                        android:layout_marginBottom="10dp" />
 
                     <EditText
                         android:id="@+id/editGeminiApiKey"
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/bg_input_field"
                         android:hint="AIzaSy..."
-                        android:inputType="textPassword"
+                        android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="8dp" />
+                        android:layout_marginBottom="10dp" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -1866,29 +2345,30 @@
                             android:id="@+id/btnSaveGeminiKey"
                             style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                             android:layout_width="0dp"
-                            android:layout_height="36dp"
+                            android:layout_height="40dp"
                             android:layout_weight="1"
-                            android:text="Save Gemini Key"
-                            android:textSize="11sp"
+                            android:text="Save Key"
                             android:backgroundTint="@color/primary"
                             android:textColor="#FFFFFF"
+                            android:textSize="11sp"
                             android:layout_marginEnd="6dp"
                             app:cornerRadius="8dp" />
 
                         <Button
                             android:id="@+id/btnDeleteGeminiKey"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="36dp"
-                            android:text="Delete"
-                            android:textSize="11sp"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:text="Delete Key"
+                            android:backgroundTint="@color/danger_container"
                             android:textColor="@color/danger"
-                            app:strokeColor="@color/danger"
+                            android:textSize="11sp"
                             app:cornerRadius="8dp" />
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- OpenAI API Key Card -->
+                <!-- OpenAI Key Card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -1909,21 +2389,21 @@
                         android:id="@+id/txtOpenAiKeyStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="No key saved"
+                        android:text="Status: No key saved"
                         android:textColor="@color/text_muted"
                         android:textSize="11sp"
-                        android:layout_marginBottom="8dp" />
+                        android:layout_marginBottom="10dp" />
 
                     <EditText
                         android:id="@+id/editOpenAiApiKey"
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/bg_input_field"
-                        android:hint="sk-..."
-                        android:inputType="textPassword"
+                        android:hint="sk-proj-..."
+                        android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="8dp" />
+                        android:layout_marginBottom="10dp" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -1934,82 +2414,93 @@
                             android:id="@+id/btnSaveOpenAiKey"
                             style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                             android:layout_width="0dp"
-                            android:layout_height="36dp"
+                            android:layout_height="40dp"
                             android:layout_weight="1"
-                            android:text="Save OpenAI Key"
-                            android:textSize="11sp"
+                            android:text="Save Key"
                             android:backgroundTint="@color/primary"
                             android:textColor="#FFFFFF"
+                            android:textSize="11sp"
                             android:layout_marginEnd="6dp"
                             app:cornerRadius="8dp" />
 
                         <Button
                             android:id="@+id/btnDeleteOpenAiKey"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="36dp"
-                            android:text="Delete"
-                            android:textSize="11sp"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:text="Delete Key"
+                            android:backgroundTint="@color/danger_container"
                             android:textColor="@color/danger"
-                            app:strokeColor="@color/danger"
+                            android:textSize="11sp"
                             app:cornerRadius="8dp" />
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Custom Model Selection Card -->
+                <!-- Custom Models Card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
+                    android:padding="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Custom Model Selection"
+                        android:text="Custom Model Identifiers"
                         android:textColor="@color/text_primary"
                         android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="8dp" />
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Override default text and vision model IDs."
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp"
+                        android:layout_marginBottom="10dp" />
 
                     <EditText
                         android:id="@+id/editModelGeminiText"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:background="@drawable/bg_input_field"
-                        android:hint="Gemini Text Model (e.g. gemini-3.6-flash)"
+                        android:hint="Gemini Text (e.g. gemini-3.6-flash)"
+                        android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="6dp" />
+                        android:layout_marginBottom="8dp" />
 
                     <EditText
                         android:id="@+id/editModelGeminiImage"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:background="@drawable/bg_input_field"
-                        android:hint="Gemini Image Model (e.g. gemini-3.1-flash-image)"
+                        android:hint="Gemini Vision (e.g. gemini-3.1-flash-image)"
+                        android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="6dp" />
+                        android:layout_marginBottom="8dp" />
 
                     <EditText
                         android:id="@+id/editModelOpenAiText"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:background="@drawable/bg_input_field"
-                        android:hint="OpenAI Text Model (e.g. gpt-5.6-sol)"
+                        android:hint="OpenAI Text (e.g. gpt-5.6-sol)"
+                        android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="6dp" />
+                        android:layout_marginBottom="8dp" />
 
                     <EditText
                         android:id="@+id/editModelOpenAiImage"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:background="@drawable/bg_input_field"
-                        android:hint="OpenAI Image Model (e.g. gpt-image-2)"
+                        android:hint="OpenAI Vision (e.g. gpt-image-2)"
+                        android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:paddingHorizontal="10dp"
                         android:layout_marginBottom="10dp" />
@@ -2023,21 +2514,24 @@
                             android:id="@+id/btnSaveCustomModels"
                             style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                             android:layout_width="0dp"
-                            android:layout_height="36dp"
+                            android:layout_height="40dp"
                             android:layout_weight="1"
                             android:text="Save Models"
-                            android:textSize="11sp"
                             android:backgroundTint="@color/primary"
                             android:textColor="#FFFFFF"
+                            android:textSize="11sp"
                             android:layout_marginEnd="6dp"
                             app:cornerRadius="8dp" />
 
                         <Button
                             android:id="@+id/btnResetCustomModels"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="36dp"
-                            android:text="Reset to Defaults"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:text="Reset Defaults"
+                            android:backgroundTint="@color/surface_dark_border"
+                            android:textColor="@color/text_secondary"
                             android:textSize="11sp"
                             app:cornerRadius="8dp" />
                     </LinearLayout>
@@ -2050,7 +2544,8 @@
             android:id="@+id/panelAdmin"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="14dp"
+            android:fillViewport="true"
+            android:padding="16dp"
             android:visibility="gone">
 
             <LinearLayout
@@ -2058,7 +2553,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Admin User Management Card -->
+                <!-- User Provisioning Card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -2071,15 +2566,16 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="8dp">
 
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="User Accounts &amp; Quotas"
+                            android:text="User Management"
                             android:textColor="@color/text_primary"
-                            android:textSize="16sp"
+                            android:textSize="15sp"
                             android:textStyle="bold" />
 
                         <Button
@@ -2087,23 +2583,13 @@
                             style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                             android:layout_width="wrap_content"
                             android:layout_height="32dp"
-                            android:text="➕ Add User"
-                            android:textSize="11sp"
+                            android:text="+ Create User"
+                            android:textSize="10sp"
                             android:backgroundTint="@color/primary"
                             android:textColor="#FFFFFF"
                             app:cornerRadius="6dp" />
                     </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Manage users and update decompilation, compilation, keygen, and signing limits."
-                        android:textColor="@color/text_muted"
-                        android:textSize="11sp"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginBottom="10dp" />
-
-                    <!-- User Accounts Container -->
                     <LinearLayout
                         android:id="@+id/adminUsersContainer"
                         android:layout_width="match_parent"
@@ -2111,7 +2597,7 @@
                         android:orientation="vertical" />
                 </LinearLayout>
 
-                <!-- Contact Inquiries Inbox Card -->
+                <!-- Inquiries Card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -2123,13 +2609,12 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Contact Inquiries Inbox"
+                        android:text="Customer Inquiries"
                         android:textColor="@color/text_primary"
                         android:textSize="15sp"
                         android:textStyle="bold"
                         android:layout_marginBottom="8dp" />
 
-                    <!-- Inquiries Container -->
                     <LinearLayout
                         android:id="@+id/adminInquiriesContainer"
                         android:layout_width="match_parent"
@@ -2137,7 +2622,7 @@
                         android:orientation="vertical" />
                 </LinearLayout>
 
-                <!-- SEO Blog Manager Card -->
+                <!-- SEO Blog Card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -2150,13 +2635,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="8dp">
 
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="SEO Blog Post Manager"
+                            android:text="SEO Blog Posts"
                             android:textColor="@color/text_primary"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -2166,20 +2652,18 @@
                             style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                             android:layout_width="wrap_content"
                             android:layout_height="32dp"
-                            android:text="➕ New Post"
-                            android:textSize="11sp"
+                            android:text="+ New Post"
+                            android:textSize="10sp"
                             android:backgroundTint="@color/primary"
                             android:textColor="#FFFFFF"
                             app:cornerRadius="6dp" />
                     </LinearLayout>
 
-                    <!-- Blogs Container -->
                     <LinearLayout
                         android:id="@+id/adminBlogsContainer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginTop="8dp" />
+                        android:orientation="vertical" />
                 </LinearLayout>
 
                 <!-- FAQ Manager Card -->
@@ -2195,13 +2679,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="8dp">
 
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="FAQ Management"
+                            android:text="FAQ Manager"
                             android:textColor="@color/text_primary"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -2211,46 +2696,51 @@
                             style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                             android:layout_width="wrap_content"
                             android:layout_height="32dp"
-                            android:text="➕ New FAQ"
-                            android:textSize="11sp"
+                            android:text="+ Add FAQ"
+                            android:textSize="10sp"
                             android:backgroundTint="@color/primary"
                             android:textColor="#FFFFFF"
                             app:cornerRadius="6dp" />
                     </LinearLayout>
 
-                    <!-- FAQs Container -->
                     <LinearLayout
                         android:id="@+id/adminFaqsContainer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginTop="8dp" />
+                        android:orientation="vertical" />
                 </LinearLayout>
 
-                <!-- GitHub & Auto-Backup Configuration Card -->
+                <!-- GitHub Backup Card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
+                    android:padding="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="GitHub &amp; Auto-Backup Engine"
+                        android:text="Automated GitHub Storage &amp; Backup"
                         android:textColor="@color/text_primary"
                         android:textSize="15sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="8dp" />
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sync code and database backups directly to a private GitHub repository."
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp"
+                        android:layout_marginBottom="10dp" />
 
                     <EditText
                         android:id="@+id/editBackupRepoOwner"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:background="@drawable/bg_input_field"
-                        android:hint="GitHub Repo Owner (e.g. prakash111)"
+                        android:hint="Repository Owner (e.g. prakash111)"
+                        android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:paddingHorizontal="10dp"
                         android:layout_marginBottom="6dp" />
@@ -2260,7 +2750,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:background="@drawable/bg_input_field"
-                        android:hint="Repository Name (e.g. magic-ai)"
+                        android:hint="Repository Name (e.g. apk-tool-backup)"
+                        android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:paddingHorizontal="10dp"
                         android:layout_marginBottom="6dp" />
@@ -2270,7 +2761,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:background="@drawable/bg_input_field"
-                        android:hint="Branch (e.g. magicai)"
+                        android:hint="Branch (e.g. main)"
+                        android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:paddingHorizontal="10dp"
                         android:layout_marginBottom="6dp" />
@@ -2280,8 +2772,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:background="@drawable/bg_input_field"
-                        android:hint="GitHub Token (ghp_...)"
+                        android:hint="GitHub Personal Access Token (ghp_...)"
                         android:inputType="textPassword"
+                        android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:paddingHorizontal="10dp"
                         android:layout_marginBottom="10dp" />
@@ -2295,36 +2788,38 @@
                             android:id="@+id/btnSaveBackupSettings"
                             style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                             android:layout_width="0dp"
-                            android:layout_height="38dp"
+                            android:layout_height="40dp"
                             android:layout_weight="1"
-                            android:text="Save Backup Settings"
-                            android:textSize="11sp"
+                            android:text="Save Config"
                             android:backgroundTint="@color/primary"
                             android:textColor="#FFFFFF"
+                            android:textSize="11sp"
                             android:layout_marginEnd="6dp"
                             app:cornerRadius="8dp" />
 
                         <Button
                             android:id="@+id/btnRunManualBackup"
                             style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="38dp"
-                            android:text="⚡ Backup Now"
-                            android:textSize="11sp"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:text="Run Backup Now"
                             android:backgroundTint="@color/success"
                             android:textColor="#FFFFFF"
+                            android:textSize="11sp"
                             app:cornerRadius="8dp" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
 
-        <!-- 9. BLOGS, FAQS & SUPPORT PANEL -->
+        <!-- 9. COMMUNITY & SUPPORT PANEL -->
         <ScrollView
             android:id="@+id/panelCommunity"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="14dp"
+            android:fillViewport="true"
+            android:padding="16dp"
             android:visibility="gone">
 
             <LinearLayout
@@ -2332,7 +2827,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Submit Contact Inquiry Card -->
+                <!-- Submit Contact Form Card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -2344,19 +2839,18 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Get in Touch &amp; Developer Support"
+                        android:text="Contact Support &amp; Submit Inquiry"
                         android:textColor="@color/text_primary"
-                        android:textSize="16sp"
+                        android:textSize="15sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Submit an inquiry directly to the APK Tool server database."
+                        android:text="Send a message or technical issue report to the admin team."
                         android:textColor="@color/text_muted"
-                        android:textSize="12sp"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginBottom="10dp" />
+                        android:textSize="11sp"
+                        android:layout_marginBottom="12dp" />
 
                     <EditText
                         android:id="@+id/editContactName"
@@ -2364,9 +2858,10 @@
                         android:layout_height="40dp"
                         android:background="@drawable/bg_input_field"
                         android:hint="Your Name"
+                        android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="6dp" />
+                        android:layout_marginBottom="8dp" />
 
                     <EditText
                         android:id="@+id/editContactEmail"
@@ -2375,43 +2870,46 @@
                         android:background="@drawable/bg_input_field"
                         android:hint="Your Email"
                         android:inputType="textEmailAddress"
+                        android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="6dp" />
+                        android:layout_marginBottom="8dp" />
 
                     <EditText
                         android:id="@+id/editContactSubject"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:background="@drawable/bg_input_field"
-                        android:hint="Subject (e.g. Smali Hooking Question)"
+                        android:hint="Subject (e.g. Decompile Error, Limit Increase)"
+                        android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="6dp" />
+                        android:layout_marginBottom="8dp" />
 
                     <EditText
                         android:id="@+id/editContactMessage"
                         android:layout_width="match_parent"
-                        android:layout_height="80dp"
+                        android:layout_height="90dp"
                         android:background="@drawable/bg_input_field"
-                        android:hint="Your Message..."
+                        android:hint="Detailed message or log snippets..."
+                        android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:gravity="top|start"
                         android:padding="10dp"
-                        android:layout_marginBottom="10dp" />
+                        android:layout_marginBottom="12dp" />
 
                     <Button
                         android:id="@+id/btnSubmitContactInquiry"
                         style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:text="📨 Send Inquiry"
+                        android:layout_height="44dp"
+                        android:text="Submit Inquiry"
                         android:backgroundTint="@color/primary"
                         android:textColor="#FFFFFF"
                         app:cornerRadius="8dp" />
                 </LinearLayout>
 
-                <!-- Public Blogs List Card -->
+                <!-- Public Blogs Card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -2423,13 +2921,12 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tutorials &amp; Articles"
+                        android:text="Guides &amp; Tutorials"
                         android:textColor="@color/text_primary"
-                        android:textSize="16sp"
+                        android:textSize="15sp"
                         android:textStyle="bold"
                         android:layout_marginBottom="8dp" />
 
-                    <!-- Public Blogs Container -->
                     <LinearLayout
                         android:id="@+id/publicBlogsContainer"
                         android:layout_width="match_parent"
@@ -2437,25 +2934,23 @@
                         android:orientation="vertical" />
                 </LinearLayout>
 
-                <!-- FAQs Card -->
+                <!-- Public FAQs Card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
+                    android:padding="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Frequently Asked Questions"
                         android:textColor="@color/text_primary"
-                        android:textSize="16sp"
+                        android:textSize="15sp"
                         android:textStyle="bold"
                         android:layout_marginBottom="8dp" />
 
-                    <!-- Public FAQs Container -->
                     <LinearLayout
                         android:id="@+id/publicFaqsContainer"
                         android:layout_width="match_parent"
