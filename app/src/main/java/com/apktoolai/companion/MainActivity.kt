@@ -986,7 +986,7 @@ class MainActivity : AppCompatActivity() {
                         setText(item.value)
                         textSize = 12f
                         setTextColor(getColor(R.color.text_primary))
-                        setTextColorHint(getColor(R.color.text_muted))
+                        setHintTextColor(getColor(R.color.text_muted))
                         setBackgroundResource(R.drawable.bg_input_field)
                         setPadding(8, 6, 8, 6)
                         layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.6f)

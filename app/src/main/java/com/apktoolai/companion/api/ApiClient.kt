@@ -408,6 +408,35 @@ class ApiClient(private val session: SessionManager) {
         })
     }
 
+    fun uploadAndDecompileApk(apkFile: File, progressCallback: ProgressCallback? = null, callback: ApiCallback<JSONObject>) {
+        executeMultipart(
+            action = "workflow_upload_decompile_ajax",
+            fileParams = mapOf("workflow_apk" to apkFile),
+            textParams = emptyMap(),
+            progressCallback = progressCallback,
+            callback = object : ApiCallback<JSONObject> {
+                override fun onSuccess(result: JSONObject) {
+                    val state = result.optJSONObject("state")
+                    if (state != null) {
+                        session.currentProjectId = state.optString("project_id", null)
+                    }
+                    callback.onSuccess(result)
+                }
+                override fun onError(errorMessage: String) {
+                    callback.onError(errorMessage)
+                }
+            }
+        )
+    }
+
+    fun applyFirebaseJson(jsonFile: File, callback: ApiCallback<JSONObject>) {
+        executeMultipart(
+            action = "workflow_apply_firebase_ajax",
+            fileParams = mapOf("workflow_firebase_json" to jsonFile),
+            callback = callback
+        )
+    }
+
     fun getDirectory(dirPath: String, callback: ApiCallback<Pair<String, List<ProjectFile>>>) {
         executePost("workflow_get_dir_ajax", mapOf("dir_path" to dirPath), object : ApiCallback<JSONObject> {
             override fun onSuccess(result: JSONObject) {
