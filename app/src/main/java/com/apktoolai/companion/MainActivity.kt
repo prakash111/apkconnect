@@ -14,10 +14,12 @@ import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.FileProvider
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.apktoolai.companion.api.*
+import com.apktoolai.companion.ui.StudioDashboardHeader
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import org.json.JSONObject
@@ -74,7 +76,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewContact: ScrollView
     private lateinit var viewAdmin: ScrollView
 
-    // Dashboard Elements
+    // Dashboard Compose View & Traditional Views
+    private lateinit var composeDashboardMetrics: ComposeView
     private lateinit var txtStatDecompiles: TextView
     private lateinit var txtStatCompiles: TextView
     private lateinit var txtStatKeystores: TextView
@@ -86,6 +89,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnDashBuildApk: Button
     private lateinit var btnViewAllProjects: Button
     private lateinit var layoutDashProjectsList: LinearLayout
+
+    // Metrics state
+    private var curDecompileUsage = 0
+    private var curDecompileLimit = 10
+    private var curCompileUsage = 0
+    private var curCompileLimit = 10
+    private var curKeystoreUsage = 0
+    private var curKeystoreLimit = 10
 
     // Projects Elements
     private lateinit var btnUploadNewApkProject: Button
@@ -257,6 +268,7 @@ class MainActivity : AppCompatActivity() {
         viewAdmin = findViewById(R.id.viewAdmin)
 
         // Dashboard
+        composeDashboardMetrics = findViewById(R.id.composeDashboardMetrics)
         txtStatDecompiles = findViewById(R.id.txtStatDecompiles)
         txtStatCompiles = findViewById(R.id.txtStatCompiles)
         txtStatKeystores = findViewById(R.id.txtStatKeystores)
@@ -551,6 +563,7 @@ class MainActivity : AppCompatActivity() {
                 if (state != null) {
                     activeProjectName = state.optString("project_name", null)
                     updateProjectHeader()
+                    renderComposeDashboard()
                 }
             }
             override fun onError(errorMessage: String) {}
@@ -571,13 +584,39 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun renderComposeDashboard() {
+        composeDashboardMetrics.setContent {
+            StudioDashboardHeader(
+                projectName = activeProjectName,
+                decompileUsage = curDecompileUsage,
+                decompileLimit = curDecompileLimit,
+                compileUsage = curCompileUsage,
+                compileLimit = curCompileLimit,
+                keystoreUsage = curKeystoreUsage,
+                keystoreLimit = curKeystoreLimit,
+                onOpenEditor = { switchTab("editor") },
+                onBuildApk = { switchTab("build") },
+                onUploadFirebase = { firebaseFilePicker.launch("application/json") }
+            )
+        }
+    }
+
     private fun loadDashboardData() {
         api.getLimits(object : ApiClient.ApiCallback<UserLimits> {
             override fun onSuccess(result: UserLimits) {
+                curDecompileUsage = result.decompileUsage
+                curDecompileLimit = result.decompileLimit
+                curCompileUsage = result.compileUsage
+                curCompileLimit = result.compileLimit
+                curKeystoreUsage = result.generateKeyUsage
+                curKeystoreLimit = result.generateKeyLimit
+
                 txtStatDecompiles.text = "${result.decompileUsage} / ${result.decompileLimit}"
                 txtStatCompiles.text = "${result.compileUsage} / ${result.compileLimit}"
                 txtStatKeystores.text = "${result.generateKeyUsage} / ${result.generateKeyLimit}"
                 txtStatSignings.text = "${result.signApkUsage} / ${result.signApkLimit}"
+
+                renderComposeDashboard()
             }
             override fun onError(errorMessage: String) {}
         })
@@ -678,6 +717,7 @@ class MainActivity : AppCompatActivity() {
                 setBusy(false)
                 activeProjectName = projectName
                 updateProjectHeader()
+                renderComposeDashboard()
                 toast("Opened \"$projectName\" in Studio")
                 switchTab("editor")
             }
@@ -1170,6 +1210,7 @@ class MainActivity : AppCompatActivity() {
                             setBusy(false)
                             toast("Keystore generated successfully!")
                             loadKeystoresList()
+                            loadDashboardData()
                         }
                         override fun onError(errorMessage: String) {
                             setBusy(false)

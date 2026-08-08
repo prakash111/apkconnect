@@ -233,13 +233,12 @@
                         android:textStyle="bold"
                         android:textColor="@color/text_primary" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <!-- Native 120Hz Jetpack Compose Dashboard Container -->
+                    <androidx.compose.ui.platform.ComposeView
+                        android:id="@+id/composeDashboardMetrics"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Quotas, active project status, and quick launch tools."
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp"
-                        android:layout_marginBottom="14dp" />
+                        android:layout_marginBottom="12dp" />
 
                     <!-- Quota Grid Cards -->
                     <LinearLayout

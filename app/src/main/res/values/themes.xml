@@ -3,13 +3,20 @@
     <style name="Theme.ApkToolCompanion" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryVariant">@color/primary_dark</item>
-        <item name="colorOnPrimary">@color/text_inverse</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
         <item name="colorSecondary">@color/accent</item>
         <item name="colorSecondaryVariant">@color/primary_dark</item>
-        <item name="colorOnSecondary">@color/text_inverse</item>
-        <item name="android:statusBarColor">@color/bg_dark</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        
+        <item name="android:statusBarColor">#0F172A</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
-        <item name="android:navigationBarColor">@color/surface_dark</item>
+        <item name="android:navigationBarColor">#1E293B</item>
         <item name="android:windowBackground">@color/bg_body</item>
+
+        <item name="materialButtonStyle">@style/Widget.MaterialComponents.Button.UnelevatedButton</item>
+        <item name="colorButtonNormal">@color/primary</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:textColorHint">@color/text_muted</item>
     </style>
 </resources>
