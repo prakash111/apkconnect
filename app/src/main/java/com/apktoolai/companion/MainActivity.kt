@@ -723,7 +723,7 @@ class MainActivity : AppCompatActivity() {
                 text = p.projectName.ifBlank { p.projectId }
                 setTextColor(getColor(R.color.text_primary))
                 textSize = 14f
-                textStyle = android.graphics.Typeface.BOLD
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
                 layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
             }
             topRow.addView(titleTv)
@@ -734,7 +734,7 @@ class MainActivity : AppCompatActivity() {
                 background = if (isCurrent) getDrawable(R.drawable.bg_badge_success) else getDrawable(R.drawable.bg_badge_primary)
                 setTextColor(if (isCurrent) getColor(R.color.success_dark) else getColor(R.color.primary))
                 textSize = 9f
-                textStyle = android.graphics.Typeface.BOLD
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
                 setPadding(12, 4, 12, 4)
             }
             topRow.addView(statusBadge)
@@ -948,7 +948,7 @@ class MainActivity : AppCompatActivity() {
                 text = item.name
                 setTextColor(getColor(R.color.text_primary))
                 textSize = 13f
-                textStyle = if (item.isDir) android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL
+                setTypeface(typeface, if (item.isDir) android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL)
                 layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
             }
             row.addView(nameTv)
@@ -1102,8 +1102,7 @@ class MainActivity : AppCompatActivity() {
                 text = "OFFSET: 0x${r.hexOffset} (${r.offset})"
                 setTextColor(getColor(R.color.hex_offset))
                 textSize = 12f
-                fontFamily = android.graphics.Typeface.MONOSPACE
-                textStyle = android.graphics.Typeface.BOLD
+                typeface = android.graphics.Typeface.create(android.graphics.Typeface.MONOSPACE, android.graphics.Typeface.BOLD)
             }
             row.addView(offsetTv)
 
@@ -1111,7 +1110,7 @@ class MainActivity : AppCompatActivity() {
                 text = "HEX: ${r.hexSnippet}"
                 setTextColor(getColor(R.color.text_inverse))
                 textSize = 11f
-                fontFamily = android.graphics.Typeface.MONOSPACE
+                typeface = android.graphics.Typeface.MONOSPACE
             }
             row.addView(hexTv)
 
@@ -1119,7 +1118,7 @@ class MainActivity : AppCompatActivity() {
                 text = "ASCII: ${r.asciiSnippet}"
                 setTextColor(getColor(R.color.hex_ascii))
                 textSize = 11f
-                fontFamily = android.graphics.Typeface.MONOSPACE
+                typeface = android.graphics.Typeface.MONOSPACE
             }
             row.addView(asciiTv)
 
@@ -1211,8 +1210,7 @@ class MainActivity : AppCompatActivity() {
                 text = "@string/$k"
                 setTextColor(getColor(R.color.primary))
                 textSize = 12f
-                fontFamily = android.graphics.Typeface.MONOSPACE
-                textStyle = android.graphics.Typeface.BOLD
+                typeface = android.graphics.Typeface.create(android.graphics.Typeface.MONOSPACE, android.graphics.Typeface.BOLD)
             }
             row.addView(keyTv)
 
@@ -1842,7 +1840,7 @@ class MainActivity : AppCompatActivity() {
                 text = "${u.username} (${u.email}) • [${u.userType.uppercase()}]"
                 setTextColor(getColor(R.color.text_primary))
                 textSize = 12f
-                textStyle = android.graphics.Typeface.BOLD
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
             }
             row.addView(titleTv)
 
@@ -1901,7 +1899,7 @@ class MainActivity : AppCompatActivity() {
                 text = "From: ${inq.name} <${inq.email}> • ${inq.subject}"
                 setTextColor(getColor(R.color.text_primary))
                 textSize = 12f
-                textStyle = android.graphics.Typeface.BOLD
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
             }
             row.addView(titleTv)
 
@@ -2126,7 +2124,7 @@ class MainActivity : AppCompatActivity() {
                 text = b.title
                 setTextColor(getColor(R.color.primary))
                 textSize = 14f
-                textStyle = android.graphics.Typeface.BOLD
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
             }
             card.addView(titleTv)
 
@@ -2174,7 +2172,7 @@ class MainActivity : AppCompatActivity() {
                 text = "❓ ${f.question}"
                 setTextColor(getColor(R.color.text_primary))
                 textSize = 13f
-                textStyle = android.graphics.Typeface.BOLD
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
             }
             card.addView(qTv)
 
