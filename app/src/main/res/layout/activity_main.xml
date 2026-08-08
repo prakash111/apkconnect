@@ -700,7 +700,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="App Name &amp; Strings"
+                        android:text="App Name, Strings &amp; Firebase"
                         android:textSize="17sp"
                         android:textStyle="bold"
                         android:textColor="@color/text_primary" />
@@ -708,10 +708,48 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Modify the app title in AndroidManifest.xml and resource strings.xml."
+                        android:text="Update app title, search strings, or upload google-services.json for automatic injection."
                         android:textColor="@color/text_secondary"
                         android:textSize="12sp"
                         android:layout_marginBottom="12dp" />
+
+                    <!-- Firebase Auto-Injection Card -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="14dp"
+                        android:background="@drawable/bg_dashboard_card"
+                        android:layout_marginBottom="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🔥 Firebase Configuration (google-services.json)"
+                            android:textStyle="bold"
+                            android:textColor="@color/warning"
+                            android:textSize="13sp"
+                            android:layout_marginBottom="4dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Upload google-services.json to automatically inject Firebase App ID, Project ID, API Key, and Database URLs into strings.xml."
+                            android:textColor="@color/text_secondary"
+                            android:textSize="11sp"
+                            android:layout_marginBottom="10dp" />
+
+                        <Button
+                            android:id="@+id/btnUploadFirebaseJson"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:text="Upload &amp; Auto-Configure Firebase"
+                            android:textSize="12sp"
+                            android:backgroundTint="@color/warning"
+                            android:textColor="#FFFFFF"
+                            app:cornerRadius="8dp" />
+                    </LinearLayout>
 
                     <!-- App Title Card -->
                     <LinearLayout
@@ -755,14 +793,47 @@
                             app:cornerRadius="8dp" />
                     </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <!-- Filter / Find Strings Bar -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Resource Strings (strings.xml)"
-                        android:textStyle="bold"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="8dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Resource Strings (strings.xml)"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary"
+                            android:textSize="14sp" />
+
+                        <Button
+                            android:id="@+id/btnSaveAllStrings"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:text="Save All Strings"
+                            android:textSize="10sp"
+                            android:backgroundTint="@color/success"
+                            android:textColor="#FFFFFF"
+                            app:cornerRadius="6dp" />
+                    </LinearLayout>
+
+                    <!-- Strings Search Input -->
+                    <EditText
+                        android:id="@+id/editFilterStrings"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_input_field"
+                        android:hint="🔍 Filter strings by key or value..."
                         android:textColor="@color/text_primary"
-                        android:textSize="14sp"
-                        android:layout_marginBottom="8dp" />
+                        android:textColorHint="@color/text_muted"
+                        android:textSize="12sp"
+                        android:paddingHorizontal="10dp"
+                        android:layout_marginBottom="10dp" />
 
                     <LinearLayout
                         android:id="@+id/layoutStringsList"
@@ -785,6 +856,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
+                    <!-- Header & Generate Button -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -806,7 +878,7 @@
                             style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                             android:layout_width="wrap_content"
                             android:layout_height="36dp"
-                            android:text="+ New Key"
+                            android:text="+ Create New Key"
                             android:textSize="11sp"
                             android:backgroundTint="@color/primary"
                             android:textColor="#FFFFFF"

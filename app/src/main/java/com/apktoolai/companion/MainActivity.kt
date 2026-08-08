@@ -6,6 +6,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
@@ -110,9 +112,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var layoutSearchResultsList: LinearLayout
 
     // Strings Elements
+    private lateinit var btnUploadFirebaseJson: Button
     private lateinit var editAppNameInput: EditText
     private lateinit var btnSaveAppName: Button
+    private lateinit var btnSaveAllStrings: Button
+    private lateinit var editFilterStrings: EditText
     private lateinit var layoutStringsList: LinearLayout
+    private val rawStringsList = mutableListOf<StringItem>()
     private val stringMap = mutableMapOf<String, String>()
 
     // Keystores Elements
@@ -284,8 +290,11 @@ class MainActivity : AppCompatActivity() {
         layoutSearchResultsList = findViewById(R.id.layoutSearchResultsList)
 
         // Strings
+        btnUploadFirebaseJson = findViewById(R.id.btnUploadFirebaseJson)
         editAppNameInput = findViewById(R.id.editAppNameInput)
         btnSaveAppName = findViewById(R.id.btnSaveAppName)
+        btnSaveAllStrings = findViewById(R.id.btnSaveAllStrings)
+        editFilterStrings = findViewById(R.id.editFilterStrings)
         layoutStringsList = findViewById(R.id.layoutStringsList)
 
         // Keystores
@@ -354,14 +363,21 @@ class MainActivity : AppCompatActivity() {
         btnEditorReload.setOnClickListener { reloadActiveEditorFile() }
         btnEditorSaveFile.setOnClickListener { saveActiveEditorFile() }
 
-        editCodeContent.setOnFocusChangeListener { _, _ ->
-            checkEditorDirty()
-        }
-
         btnExecuteSearch.setOnClickListener { executeSearch() }
         btnExecuteReplace.setOnClickListener { executeReplace() }
 
-        btnSaveAppName.setOnClickListener { saveAppNameAndStrings() }
+        btnUploadFirebaseJson.setOnClickListener { firebaseFilePicker.launch("application/json") }
+        btnSaveAppName.setOnClickListener { saveAppNameOnly() }
+        btnSaveAllStrings.setOnClickListener { saveAppNameAndStrings() }
+
+        editFilterStrings.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                filterAndRenderStrings(s?.toString().orEmpty())
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
         btnOpenCreateKeystoreDialog.setOnClickListener { showCreateKeystoreDialog() }
         btnStartBuildAndSign.setOnClickListener { buildAndSignApk() }
         btnDownloadSignedApk.setOnClickListener { installDownloadedApk() }
@@ -756,13 +772,6 @@ class MainActivity : AppCompatActivity() {
         openFileInEditor(path)
     }
 
-    private fun checkEditorDirty(): Boolean {
-        val path = currentEditorFilePath ?: return false
-        val currentText = editCodeContent.text.toString()
-        isEditorDirty = (currentText != originalEditorContent)
-        return isEditorDirty
-    }
-
     private fun confirmLeaveUnsaved(onConfirmed: () -> Unit) {
         AlertDialog.Builder(this)
             .setTitle("Unsaved Changes")
@@ -812,8 +821,8 @@ class MainActivity : AppCompatActivity() {
             api.applyFirebaseJson(tempFile, object : ApiClient.ApiCallback<JSONObject> {
                 override fun onSuccess(result: JSONObject) {
                     setBusy(false)
-                    toast("google-services.json applied to project successfully!")
-                    refreshAllData()
+                    toast("google-services.json applied to strings.xml successfully!")
+                    loadStringsList()
                 }
                 override fun onError(errorMessage: String) {
                     setBusy(false)
@@ -953,7 +962,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // -------------------------------------------------------------
-    // App Name & Strings
+    // App Name & Strings (Optimized Filtering & Pagination)
     // -------------------------------------------------------------
 
     private fun loadStringsList() {
@@ -962,43 +971,84 @@ class MainActivity : AppCompatActivity() {
             override fun onSuccess(result: StringData) {
                 setBusy(false)
                 editAppNameInput.setText(result.appName)
+                rawStringsList.clear()
                 stringMap.clear()
-                layoutStringsList.removeAllViews()
+                rawStringsList.addAll(result.allStrings)
+                result.allStrings.forEach { stringMap[it.name] = it.value }
+                filterAndRenderStrings(editFilterStrings.text.toString())
+            }
+            override fun onError(errorMessage: String) {
+                setBusy(false)
+                toast(errorMessage)
+            }
+        })
+    }
 
-                result.allStrings.forEach { item: StringItem ->
-                    stringMap[item.name] = item.value
+    private fun filterAndRenderStrings(query: String) {
+        layoutStringsList.removeAllViews()
+        val q = query.trim().lowercase()
+        val filtered = if (q.isEmpty()) {
+            rawStringsList.take(50)
+        } else {
+            rawStringsList.filter { it.name.lowercase().contains(q) || it.value.lowercase().contains(q) }.take(60)
+        }
 
-                    val row = LinearLayout(this@MainActivity).apply {
-                        orientation = LinearLayout.HORIZONTAL
-                        setPadding(8, 8, 8, 8)
-                        gravity = android.view.Gravity.CENTER_VERTICAL
+        if (filtered.isEmpty()) {
+            val empty = TextView(this).apply {
+                text = if (q.isEmpty()) "No strings found." else "No strings matching \"$query\""
+                textSize = 12f
+                setTextColor(getColor(R.color.text_muted))
+                setPadding(8, 16, 8, 16)
+            }
+            layoutStringsList.addView(empty)
+            return
+        }
+
+        filtered.forEach { item ->
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                setPadding(8, 8, 8, 8)
+                gravity = android.view.Gravity.CENTER_VERTICAL
+            }
+
+            val keyLabel = TextView(this).apply {
+                text = item.name
+                textSize = 12f
+                setTypeface(null, android.graphics.Typeface.BOLD)
+                setTextColor(getColor(R.color.text_primary))
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.4f)
+            }
+
+            val valInput = EditText(this).apply {
+                setText(stringMap[item.name] ?: item.value)
+                textSize = 12f
+                setTextColor(getColor(R.color.text_primary))
+                setHintTextColor(getColor(R.color.text_muted))
+                setBackgroundResource(R.drawable.bg_input_field)
+                setPadding(8, 6, 8, 6)
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.6f)
+                addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                        stringMap[item.name] = s?.toString().orEmpty()
                     }
+                    override fun afterTextChanged(s: Editable?) {}
+                })
+            }
 
-                    val keyLabel = TextView(this@MainActivity).apply {
-                        text = item.name
-                        textSize = 12f
-                        setTypeface(null, android.graphics.Typeface.BOLD)
-                        setTextColor(getColor(R.color.text_primary))
-                        layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.4f)
-                    }
+            row.addView(keyLabel)
+            row.addView(valInput)
+            layoutStringsList.addView(row)
+        }
+    }
 
-                    val valInput = EditText(this@MainActivity).apply {
-                        setText(item.value)
-                        textSize = 12f
-                        setTextColor(getColor(R.color.text_primary))
-                        setHintTextColor(getColor(R.color.text_muted))
-                        setBackgroundResource(R.drawable.bg_input_field)
-                        setPadding(8, 6, 8, 6)
-                        layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.6f)
-                        setOnFocusChangeListener { _, hasFocus ->
-                            if (!hasFocus) stringMap[item.name] = text.toString()
-                        }
-                    }
-
-                    row.addView(keyLabel)
-                    row.addView(valInput)
-                    layoutStringsList.addView(row)
-                }
+    private fun saveAppNameOnly() {
+        val appName = editAppNameInput.text.toString().trim()
+        setBusy(true)
+        api.saveStrings("values", appName, emptyMap(), object : ApiClient.ApiCallback<String> {
+            override fun onSuccess(result: String) {
+                setBusy(false)
+                toast("App Name saved successfully!")
             }
             override fun onError(errorMessage: String) {
                 setBusy(false)
@@ -1013,7 +1063,7 @@ class MainActivity : AppCompatActivity() {
         api.saveStrings("values", appName, stringMap, object : ApiClient.ApiCallback<String> {
             override fun onSuccess(result: String) {
                 setBusy(false)
-                toast("App Name & Strings saved successfully.")
+                toast("App Name & Strings saved successfully!")
             }
             override fun onError(errorMessage: String) {
                 setBusy(false)
@@ -1034,7 +1084,7 @@ class MainActivity : AppCompatActivity() {
                 layoutKeystoresList.removeAllViews()
                 if (result.isEmpty()) {
                     val empty = TextView(this@MainActivity).apply {
-                        text = "No keystores created yet. Tap '+ New Key' above to generate an RSA 2048-bit key."
+                        text = "No keystores created yet. Tap '+ Create New Key' above to generate an RSA 2048-bit key."
                         setPadding(16, 24, 16, 24)
                         textSize = 13f
                         setTextColor(getColor(R.color.text_muted))
@@ -1198,45 +1248,55 @@ class MainActivity : AppCompatActivity() {
             override fun onSuccess(result: List<BlogItem>) {
                 setBusy(false)
                 layoutBlogsList.removeAllViews()
-                result.forEach { b: BlogItem ->
-                    val card = LinearLayout(this@MainActivity).apply {
-                        orientation = LinearLayout.VERTICAL
-                        setPadding(14, 14, 14, 14)
-                        setBackgroundResource(R.drawable.bg_dashboard_card)
-                        val p = LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                        )
-                        p.setMargins(0, 0, 0, 10)
-                        layoutParams = p
-                        setOnClickListener { showBlogDetailDialog(b) }
+                if (result.isEmpty()) {
+                    val empty = TextView(this@MainActivity).apply {
+                        text = "No blog posts published yet."
+                        textSize = 13f
+                        setTextColor(getColor(R.color.text_muted))
+                        setPadding(16, 24, 16, 24)
                     }
+                    layoutBlogsList.addView(empty)
+                } else {
+                    result.forEach { b: BlogItem ->
+                        val card = LinearLayout(this@MainActivity).apply {
+                            orientation = LinearLayout.VERTICAL
+                            setPadding(14, 14, 14, 14)
+                            setBackgroundResource(R.drawable.bg_dashboard_card)
+                            val p = LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                            )
+                            p.setMargins(0, 0, 0, 10)
+                            layoutParams = p
+                            setOnClickListener { showBlogDetailDialog(b) }
+                        }
 
-                    val cat = TextView(this@MainActivity).apply {
-                        text = b.category.uppercase()
-                        textSize = 10f
-                        setTypeface(null, android.graphics.Typeface.BOLD)
-                        setTextColor(getColor(R.color.primary))
+                        val cat = TextView(this@MainActivity).apply {
+                            text = b.category.uppercase()
+                            textSize = 10f
+                            setTypeface(null, android.graphics.Typeface.BOLD)
+                            setTextColor(getColor(R.color.primary))
+                        }
+
+                        val title = TextView(this@MainActivity).apply {
+                            text = b.title
+                            textSize = 14f
+                            setTypeface(null, android.graphics.Typeface.BOLD)
+                            setTextColor(getColor(R.color.text_primary))
+                            setPadding(0, 2, 0, 4)
+                        }
+
+                        val excerpt = TextView(this@MainActivity).apply {
+                            text = b.excerpt
+                            textSize = 12f
+                            setTextColor(getColor(R.color.text_secondary))
+                        }
+
+                        card.addView(cat)
+                        card.addView(title)
+                        card.addView(excerpt)
+                        layoutBlogsList.addView(card)
                     }
-
-                    val title = TextView(this@MainActivity).apply {
-                        text = b.title
-                        textSize = 14f
-                        setTypeface(null, android.graphics.Typeface.BOLD)
-                        setTextColor(getColor(R.color.text_primary))
-                        setPadding(0, 2, 0, 4)
-                    }
-
-                    val excerpt = TextView(this@MainActivity).apply {
-                        text = b.excerpt
-                        textSize = 12f
-                        setTextColor(getColor(R.color.text_secondary))
-                    }
-
-                    card.addView(cat)
-                    card.addView(title)
-                    card.addView(excerpt)
-                    layoutBlogsList.addView(card)
                 }
             }
             override fun onError(errorMessage: String) {
