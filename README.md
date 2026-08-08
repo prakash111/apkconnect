@@ -1,68 +1,96 @@
-# APK Tool Studio - Android Native Application
+# APK Tool Companion (Android)
 
-Full-featured native Android companion and mobile engineering studio connecting directly to the shared MySQL database and backend API.
+A tiny companion app so anyone can install builds from your hosted APK Tool
+straight to their own phone over the internet - no ADB, no USB, no local
+network setup, no port forwarding.
 
-## Features Implemented in Native Android App
-1. **User Authentication & Quota Management**:
-   - Secure Login (Username/Email & Password) with persistent session handling.
-   - Registration, Email Verification status, Forgot Password & Password Reset.
-   - Live Usage & Quota meters: Decompile limit/usage, Compile limit/usage, Keygen limit/usage, Signing limit/usage, Max upload size.
-   - Admin badge & access controls.
+## What it does
+1. Tap **Scan QR Code** and point the camera at the QR code shown on the web
+   app's "Cloud Debug Logs" card (once cloud logging is enabled for a
+   project) - no typing, no long codes. A "paste the code manually" fallback
+   is still there for devices without camera access.
+2. The app quietly re-checks the server in the background every ~30s while
+   it's open, so the moment a new build lands on the backend a green
+   **"New build ready - reinstall to reload the latest changes"** banner
+   appears on its own. You can also tap **Check for Update** manually.
+3. Tap **Realtime Logs → Start** to stream device/debug/network log lines
+   the app has reported to the backend, updating every ~2 seconds.
+4. Only a cryptographically verified signed APK is offered. Tap **Install
+   signed APK**; the app verifies its size, SHA-256 digest, APK structure,
+   and signer before handing it to Android's package installer.
+5. Android always requires confirmation for a normal APK installation;
+   silent installs are reserved for device-owner/root/system apps.
 
-2. **Multi-Project Management & Workflows**:
-   - View, switch, rename, and delete projects in real-time on the shared MySQL database.
-   - Upload APK binaries directly from device storage and trigger automated decompilation with Apktool.
-   - Interactive Project File Explorer: Recursive folder navigation, breadcrumbs, folder/file icons, and file size metadata.
+## What it can't do (Android platform limit, not a bug)
+This app cannot read another app's raw logcat - Android only allows that via
+ADB or root, never to a regular installed app. The **Realtime Logs** panel
+instead shows what the web app's **Cloud Debug Logs** feature has captured:
+it injects a small reporter directly into the built APK, so the target app
+reports its own crashes/debug output to your server the moment it happens,
+and this app polls that same feed - no ADB needed either.
 
-3. **Code, Smali & Visual Hex Editor**:
-   - Full code editor for Smali bytecode, XML layouts, AndroidManifest, JSON, and Properties with instant save.
-   - Replace project file with external images or binaries.
-   - Visual Hex Editor for native `.so`, DEX, and ELF binaries: search byte patterns, view hex grid with ASCII preview, data inspector, and direct byte patching with offset.
-   - AI Error Diagnostic & Automatic Fix: Diagnose build errors, review code for malformed syntax, and apply fixes with backup safety.
+## Building on Codemagic (CI)
+This repo includes a ready-to-use `codemagic.yaml` at the project root with
+two workflows:
 
-4. **Resource & AI Customizer Studio**:
-   - Multi-locale Strings Translator (`values`, `values-es`, etc.) and App Name customization.
-   - Google Services / Firebase `google-services.json` auto-injector.
-   - App Icon / Launcher Customizer: Upload gallery images to auto-replace all mipmap densities (`mdpi` to `xxxhdpi`).
-   - AI Launcher Icon Generator: Text prompt to generate new icons using AI models.
-   - Global Project Find & Replace across all project files.
+- **android-debug** - builds an unsigned debug APK. Works with zero setup.
+- **android-release** - builds a signed release APK. Needs a keystore added
+  as encrypted environment variables first (see below).
 
-5. **Build, Keystores & Cryptographic Signing**:
-   - Recompile project back into unsigned APK with live apktool logs.
-   - Keystore Manager: View keystores, generate RSA 2048-bit JKS Keystores via `keytool`, select keystore, and delete.
-   - Zipalign & Apksigner v2/v3 signing.
-   - Direct APK Download with progress bar, SHA-256 integrity check, and instant launch of Android Package Installer.
+Steps:
+1. Push this project to a Git repository (GitHub, GitLab, or Bitbucket) -
+   Codemagic builds from a connected repo, not a direct zip upload.
+2. In Codemagic: **Add application** → select your repo → it will detect
+   `codemagic.yaml` automatically and list both workflows.
+3. Pick **android-debug**, click **Start new build**. No extra
+   configuration needed - the `gradle wrapper` step in the YAML generates
+   the Gradle wrapper on the CI machine itself (the wrapper jar isn't
+   committed to the repo), then builds `assembleDebug`.
+4. The built `.apk` shows up under the build's **Artifacts** tab.
 
-6. **Device & Debugging Studio**:
-   - Wireless ADB Device Manager: IP:port connect, device listing, disconnect, APK install over ADB, and live Logcat with filters.
-   - Cloud Debug Logs: QR Code / Pairing token connect, live streaming device logs (2s auto-polling, pause/resume), and clear logs.
-   - Background Auto-Check (every 30s) with persistent "New build ready" banner.
+### Signed release builds
+To use **android-release**:
+1. In Codemagic → your app → **Environment variables**, create a group
+   named `companion_keystore` with:
+   - `CM_KEYSTORE` - your `.jks`/`.keystore` file, base64-encoded
+     (`base64 -i your.keystore | pbcopy` on macOS, or
+     `base64 -w0 your.keystore` on Linux)
+   - `CM_KEYSTORE_PASSWORD`
+   - `CM_KEY_ALIAS`
+   - `CM_KEY_PASSWORD`
+   - mark all four as **secret**
+2. In `codemagic.yaml`, uncomment the `groups: [companion_keystore]` line
+   under the `android-release` workflow's `environment:` section.
+3. Run the **android-release** workflow.
 
-7. **AI Configuration Settings**:
-   - Provider switcher (Google Gemini / OpenAI).
-   - API Key manager (Gemini & OpenAI) with masked preview and delete.
-   - Custom Model Selection for Gemini text/image and OpenAI text/image models.
+## Building locally in Android Studio
+1. Open this folder in **Android Studio** (File → Open). Let it sync Gradle
+   (it'll use Android Studio's bundled Gradle automatically).
+2. Build → Build Bundle(s) / APK(s) → Build APK(s), or just Run ▶ on a
+   connected/emulated device.
+3. Requires: Android Studio Hedgehog+ (AGP 8.4), JDK 17. minSdk 24
+   (Android 7.0+), targetSdk 34.
 
-8. **Admin Panel (for Administrator Accounts)**:
-   - User account management & quota updates (+100 or custom limits).
-   - Provision new user accounts with custom limits.
-   - Contact inquiries inbox: read messages, mark as read, delete.
-   - SEO Blog Post manager: create rich posts, edit, delete.
-   - FAQ manager: add questions/answers, sort order, active status, edit, delete.
-   - GitHub & Auto-Backup configuration and manual backup trigger.
-   - Global default AI settings.
+## Getting paired
+In the web app, open a project → **8. Cloud Debug Logs** → **Enable Cloud
+Debug Logging** → a "Pair the companion app" box appears with a QR code.
+Open this app, tap **Scan QR Code**, and point the camera at it. A text
+fallback code is also available behind "Show text code" for devices without
+camera access - paste that into this app's **Connect** field instead.
 
-9. **Public Hub, Tutorials & Support**:
-   - Searchable Blog & Tutorial reader.
-   - Searchable FAQ viewer.
-   - Documentation viewer.
-   - Direct Contact Us inquiry submission form.
+## Distributing the built APK to end users
+Once you've built `app-debug.apk` (or a signed release build), host it
+somewhere (e.g. upload it as a project/build in your own APK Tool instance,
+or any file host) so users can install the companion app itself once. After
+that, everything else happens through pairing codes - no further manual
+APK installs needed for future builds.
 
-## Database & Backend Connection
-- Server URL: Configurable in-app (defaults to `https://apk.zoomnearby.com/`).
-- Database: MySQL database `apktool` (tables: `users`, `projects`, `key_details`, `jobs`, `contact_inquiries`, `blogs`, `faqs`, `app_settings`).
-- Sessions: Maintained via `CookieManager` (`PHPSESSID`) and token credentials across all REST and Multipart API calls.
-
-## Building the App
-- **Codemagic (CI)**: Works with `codemagic.yaml` workflows `android-debug` and `android-release`.
-- **Android Studio**: Open `/android-debugger` folder, sync Gradle, and run `assembleDebug` or `assembleRelease`.
+## Notes
+- `usesCleartextTraffic="true"` is set so this also works against
+  HTTP-only self-hosted servers; if your APK Tool install is HTTPS-only
+  (recommended) this has no effect either way.
+- The pairing "token" is a long random secret embedded in the pairing code
+  - it's a bearer credential. Anyone with the pairing code can check for
+  and download builds for that project. Don't share it publicly; re-enabling
+  cloud logging doesn't rotate it, so if a code ever leaks, you'd need to
+  add a rotate/reset option server-side (not included in this MVP).

@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">APK Tool Studio</string>
-    <string name="app_tagline">Mobile APK Decompiler, Hex Editor &amp; Signing Platform</string>
-    <string name="status_not_paired">Not connected to a project yet</string>
-    <string name="status_connected">Connected to project</string>
+    <string name="status_not_paired">Connect to APK Tool Studio via QR code, pairing key, or user login.</string>
     <string name="tab_dashboard">Dashboard</string>
-    <string name="tab_projects">Projects</string>
-    <string name="tab_editor">Editor &amp; Hex</string>
-    <string name="tab_customizer">Resources &amp; AI</string>
-    <string name="tab_build">Build &amp; Sign</string>
-    <string name="tab_debugger">ADB &amp; Logs</string>
+    <string name="tab_projects">My Projects</string>
+    <string name="tab_editor">Code Editor</string>
+    <string name="tab_search">Find &amp; Replace</string>
+    <string name="tab_strings">App Name &amp; Strings</string>
+    <string name="tab_icons">Launcher Icons</string>
+    <string name="tab_firebase">Firebase Config</string>
+    <string name="tab_keystores">Keystores &amp; Signing</string>
+    <string name="tab_build">Recompile &amp; Build</string>
+    <string name="tab_cloud_logs">Cloud Logs</string>
+    <string name="tab_adb">Wireless ADB</string>
     <string name="tab_ai_settings">AI Settings</string>
+    <string name="tab_blog">Tutorials &amp; Blog</string>
+    <string name="tab_faqs">FAQs &amp; Help</string>
+    <string name="tab_contact">Contact Support</string>
     <string name="tab_admin">Admin Panel</string>
-    <string name="tab_community">Blogs &amp; Support</string>
 </resources>

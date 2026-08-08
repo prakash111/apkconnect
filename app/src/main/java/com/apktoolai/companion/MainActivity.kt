@@ -1,34 +1,26 @@
 package com.apktoolai.companion
 
-import android.Manifest
-import android.app.Dialog
+import android.app.AlertDialog
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.text.InputType
-import android.text.method.HideReturnsTransformationMethod
-import android.text.method.PasswordTransformationMethod
+import android.provider.Settings
 import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.*
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import com.apktoolai.companion.api.*
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import org.json.JSONObject
 import java.io.File
-import java.io.FileOutputStream
-import java.net.URLDecoder
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,300 +28,125 @@ class MainActivity : AppCompatActivity() {
     private lateinit var api: ApiClient
     private val mainHandler = Handler(Looper.getMainLooper())
 
-    // Top Bar & Global Banners
-    private lateinit var topBarSubtitle: TextView
-    private lateinit var btnServerConfig: Button
-    private lateinit var btnTopScanQr: Button
-    private lateinit var btnTopAuth: Button
-    private lateinit var txtActiveProjectPill: TextView
-    private lateinit var txtAdminBadge: TextView
-    private lateinit var globalUpdateBanner: LinearLayout
-    private lateinit var btnBannerInstall: Button
+    // UI - Shell & Topbar
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var btnMenuToggle: ImageButton
+    private lateinit var txtTopbarTitle: TextView
+    private lateinit var txtTopbarProjectPill: TextView
+    private lateinit var btnQuickNewApk: Button
+    private lateinit var btnQuickSaveFile: Button
+    private lateinit var btnQuickFind: ImageButton
+    private lateinit var btnQuickLogout: ImageButton
     private lateinit var globalProgressBar: ProgressBar
 
-    // Auth Hub (Shown when user is NOT logged in)
-    private lateinit var panelAuthHub: ScrollView
-    private lateinit var tabAuthSignIn: Button
-    private lateinit var tabAuthRegister: Button
-    private lateinit var tabAuthForgot: Button
-    private lateinit var tabAuthQr: Button
-    private lateinit var tabAuthSupport: Button
+    // Navigation Drawer
+    private lateinit var navDashboard: TextView
+    private lateinit var navProjects: TextView
+    private lateinit var navEditor: TextView
+    private lateinit var navSearch: TextView
+    private lateinit var navStrings: TextView
+    private lateinit var navKeystores: TextView
+    private lateinit var navBuild: TextView
+    private lateinit var navBlog: TextView
+    private lateinit var navFaqs: TextView
+    private lateinit var navContact: TextView
+    private lateinit var navAdminSectionTitle: TextView
+    private lateinit var navAdmin: TextView
+    private lateinit var txtSidebarUserAvatar: TextView
+    private lateinit var txtSidebarUsername: TextView
+    private lateinit var btnSidebarLogout: Button
 
-    private lateinit var cardAuthSignIn: LinearLayout
-    private lateinit var cardAuthRegister: LinearLayout
-    private lateinit var cardAuthForgot: LinearLayout
-    private lateinit var cardAuthQr: LinearLayout
-    private lateinit var cardAuthSupport: LinearLayout
+    // Tab Views
+    private lateinit var viewAuth: ScrollView
+    private lateinit var viewDashboard: ScrollView
+    private lateinit var viewProjects: LinearLayout
+    private lateinit var viewEditor: LinearLayout
+    private lateinit var viewSearch: ScrollView
+    private lateinit var viewStrings: ScrollView
+    private lateinit var viewKeystores: ScrollView
+    private lateinit var viewBuild: ScrollView
+    private lateinit var viewBlog: ScrollView
+    private lateinit var viewFaqs: ScrollView
+    private lateinit var viewContact: ScrollView
+    private lateinit var viewAdmin: ScrollView
 
-    private lateinit var editHubLoginUser: EditText
-    private lateinit var editHubLoginPass: EditText
-    private lateinit var btnHubTogglePass: ImageButton
-    private lateinit var btnHubSubmitLogin: Button
-    private lateinit var btnHubGoRegister: Button
-    private lateinit var btnHubGoForgot: Button
+    // Dashboard Elements
+    private lateinit var txtStatDecompiles: TextView
+    private lateinit var txtStatCompiles: TextView
+    private lateinit var txtStatKeystores: TextView
+    private lateinit var txtStatSignings: TextView
+    private lateinit var cardActiveProjectBanner: LinearLayout
+    private lateinit var txtActiveProjectTitle: TextView
+    private lateinit var txtActiveProjectSubtitle: TextView
+    private lateinit var btnDashOpenEditor: Button
+    private lateinit var btnDashBuildApk: Button
+    private lateinit var btnViewAllProjects: Button
+    private lateinit var layoutDashProjectsList: LinearLayout
 
-    private lateinit var editHubRegEmail: EditText
-    private lateinit var editHubRegPhone: EditText
-    private lateinit var editHubRegUser: EditText
-    private lateinit var editHubRegPass: EditText
-    private lateinit var btnHubSubmitRegister: Button
-    private lateinit var btnHubGoLogin: Button
+    // Projects Elements
+    private lateinit var btnUploadNewApkProject: Button
+    private lateinit var layoutProjectsList: LinearLayout
 
-    private lateinit var editHubForgotEmail: EditText
-    private lateinit var btnHubSubmitForgot: Button
-    private lateinit var btnHubBackLogin: Button
-
-    private lateinit var btnHubLaunchScanQr: Button
-    private lateinit var editHubManualToken: EditText
-    private lateinit var btnHubSubmitToken: Button
-    private lateinit var hubFaqsContainer: LinearLayout
-
-    // Studio Navigation & Panels Container (Shown when user IS logged in)
-    private lateinit var studioNavScroll: HorizontalScrollView
-    private lateinit var studioPanelsContainer: FrameLayout
-    private lateinit var tabBtnDashboard: Button
-    private lateinit var tabBtnProjects: Button
-    private lateinit var tabBtnEditor: Button
-    private lateinit var tabBtnCustomizer: Button
-    private lateinit var tabBtnBuild: Button
-    private lateinit var tabBtnDebugger: Button
-    private lateinit var tabBtnAiSettings: Button
-    private lateinit var tabBtnAdmin: Button
-    private lateinit var tabBtnCommunity: Button
-
-    // Studio Panels
-    private lateinit var panelDashboard: ScrollView
-    private lateinit var panelProjects: ScrollView
-    private lateinit var panelEditor: LinearLayout
-    private lateinit var panelCustomizer: ScrollView
-    private lateinit var panelBuild: ScrollView
-    private lateinit var panelDebugger: ScrollView
-    private lateinit var panelAiSettings: ScrollView
-    private lateinit var panelAdmin: ScrollView
-    private lateinit var panelCommunity: ScrollView
-
-    // Dashboard UI
-    private lateinit var txtDashWelcome: TextView
-    private lateinit var txtDashUserEmail: TextView
-    private lateinit var txtMeterDecompile: TextView
-    private lateinit var txtMeterCompile: TextView
-    private lateinit var txtMeterKeygen: TextView
-    private lateinit var txtMeterSign: TextView
-    private lateinit var btnQuickUploadDecompile: Button
-    private lateinit var btnQuickBuildApk: Button
-    private lateinit var btnQuickSignApk: Button
-    private lateinit var btnQuickAiFix: Button
-    private lateinit var cardActiveProjectOverview: LinearLayout
-    private lateinit var txtDashProjectName: TextView
-    private lateinit var txtDashProjectPath: TextView
-    private lateinit var btnDashCloseProject: Button
-    private lateinit var btnDashExploreFiles: Button
-    private lateinit var btnDashEditStrings: Button
-    private lateinit var btnDashRefreshProjects: Button
-    private lateinit var dashProjectsListContainer: LinearLayout
-
-    // Projects & Upload UI
-    private lateinit var boxPickApkFile: LinearLayout
-    private lateinit var txtSelectedApkName: TextView
-    private lateinit var btnUploadDecompileSubmit: Button
-    private lateinit var boxDecompileLogs: LinearLayout
-    private lateinit var txtDecompileStatus: TextView
-    private lateinit var txtDecompileLogOutput: TextView
-    private lateinit var projectsListContainer: LinearLayout
-    private var pendingUploadApkFile: File? = null
-
-    // Editor & Hex UI
-    private lateinit var txtFileBreadcrumb: TextView
-    private lateinit var btnFileUpDir: Button
-    private lateinit var btnRefreshDir: Button
-    private lateinit var scrollDirectoryBrowser: ScrollView
-    private lateinit var directoryItemsContainer: LinearLayout
-    private lateinit var boxCodeEditorView: LinearLayout
-    private lateinit var txtEditorOpenFileName: TextView
-    private lateinit var btnEditorSave: Button
-    private lateinit var btnEditorAiReview: Button
-    private lateinit var btnEditorReplaceFile: Button
-    private lateinit var btnEditorClose: Button
+    // Editor Elements
+    private lateinit var btnEditorGoUp: ImageButton
+    private lateinit var txtEditorBreadcrumb: TextView
+    private lateinit var btnEditorSaveFile: Button
+    private lateinit var layoutEditorItems: LinearLayout
     private lateinit var editCodeContent: EditText
-    private lateinit var boxHexEditorView: LinearLayout
-    private lateinit var editHexSearchQuery: EditText
-    private lateinit var btnHexSearch: Button
-    private lateinit var btnHexClose: Button
-    private lateinit var hexResultsContainer: LinearLayout
-    private lateinit var editHexPatchBytes: EditText
-    private lateinit var btnHexApplyPatch: Button
-    private var currentDirPath = ""
-    private var currentEditingFilePath = ""
+    private var currentEditorFilePath: String? = null
+    private var currentEditorDir: String = ""
 
-    // Resources & AI Customizer UI
-    private lateinit var editCustomAppName: EditText
-    private lateinit var editStringsLocale: EditText
-    private lateinit var btnLoadStrings: Button
-    private lateinit var btnSaveStrings: Button
-    private lateinit var stringsTableContainer: LinearLayout
-    private val loadedStringsMap = HashMap<String, String>()
-    private lateinit var btnUploadFirebaseJson: Button
-    private lateinit var btnPickLogoImage: Button
-    private lateinit var editAiIconPrompt: EditText
-    private lateinit var btnGenerateAiIcon: Button
-    private lateinit var editGlobalFindText: EditText
-    private lateinit var editGlobalReplaceText: EditText
-    private lateinit var btnGlobalFindOnly: Button
-    private lateinit var btnGlobalFindReplace: Button
+    // Search Elements
+    private lateinit var editSearchFindQuery: EditText
+    private lateinit var editSearchReplaceQuery: EditText
+    private lateinit var btnExecuteSearch: Button
+    private lateinit var btnExecuteReplace: Button
+    private lateinit var txtSearchResultsHeader: TextView
+    private lateinit var layoutSearchResultsList: LinearLayout
 
-    // Build & Sign UI
-    private lateinit var btnTriggerBuildApk: Button
-    private lateinit var boxBuildLogs: LinearLayout
-    private lateinit var txtBuildLogOutput: TextView
+    // Strings Elements
+    private lateinit var editAppNameInput: EditText
+    private lateinit var btnSaveAppName: Button
+    private lateinit var layoutStringsList: LinearLayout
+    private val stringMap = mutableMapOf<String, String>()
+
+    // Keystores Elements
     private lateinit var btnOpenCreateKeystoreDialog: Button
-    private lateinit var keystoresListContainer: LinearLayout
-    private lateinit var editSignPassword: EditText
-    private lateinit var btnTriggerSignApk: Button
-    private lateinit var btnDirectInstallApk: Button
+    private lateinit var layoutKeystoresList: LinearLayout
 
-    // ADB & Debugger UI
-    private lateinit var btnToggleCloudLogsStream: Button
-    private lateinit var btnClearCloudLogs: Button
-    private lateinit var txtCloudLogsStream: TextView
-    private lateinit var editAdbHostIp: EditText
-    private lateinit var btnAdbConnect: Button
-    private lateinit var adbDevicesContainer: LinearLayout
-    private lateinit var btnAdbReadLogcat: Button
-    private lateinit var txtAdbLogcatOutput: TextView
-    private var cloudLogsStreaming = false
-    private var cloudLogsTimer: Runnable? = null
-    private var autoCheckTimer: Runnable? = null
+    // Build Elements
+    private lateinit var btnStartBuildAndSign: Button
+    private lateinit var layoutBuildOutput: LinearLayout
+    private lateinit var btnDownloadSignedApk: Button
+    private var lastSignedApkUrl: String? = null
 
-    // AI Settings UI
-    private lateinit var rgAiProvider: RadioGroup
-    private lateinit var rbProviderGemini: RadioButton
-    private lateinit var rbProviderOpenAi: RadioButton
-    private lateinit var txtGeminiKeyStatus: TextView
-    private lateinit var editGeminiApiKey: EditText
-    private lateinit var btnSaveGeminiKey: Button
-    private lateinit var btnDeleteGeminiKey: Button
-    private lateinit var txtOpenAiKeyStatus: TextView
-    private lateinit var editOpenAiApiKey: EditText
-    private lateinit var btnSaveOpenAiKey: Button
-    private lateinit var btnDeleteOpenAiKey: Button
-    private lateinit var editModelGeminiText: EditText
-    private lateinit var editModelGeminiImage: EditText
-    private lateinit var editModelOpenAiText: EditText
-    private lateinit var editModelOpenAiImage: EditText
-    private lateinit var btnSaveCustomModels: Button
-    private lateinit var btnResetCustomModels: Button
-
-    // Admin UI
-    private lateinit var btnAdminCreateUserDialog: Button
-    private lateinit var adminUsersContainer: LinearLayout
-    private lateinit var adminInquiriesContainer: LinearLayout
-    private lateinit var btnAdminCreateBlogDialog: Button
-    private lateinit var adminBlogsContainer: LinearLayout
-    private lateinit var btnAdminCreateFaqDialog: Button
-    private lateinit var adminFaqsContainer: LinearLayout
-    private lateinit var editBackupRepoOwner: EditText
-    private lateinit var editBackupRepoName: EditText
-    private lateinit var editBackupBranch: EditText
-    private lateinit var editBackupToken: EditText
-    private lateinit var btnSaveBackupSettings: Button
-    private lateinit var btnRunManualBackup: Button
-
-    // Community & Support UI
+    // Blog / FAQs / Contact
+    private lateinit var layoutBlogsList: LinearLayout
+    private lateinit var layoutFaqsList: LinearLayout
     private lateinit var editContactName: EditText
     private lateinit var editContactEmail: EditText
     private lateinit var editContactSubject: EditText
     private lateinit var editContactMessage: EditText
-    private lateinit var btnSubmitContactInquiry: Button
-    private lateinit var publicBlogsContainer: LinearLayout
-    private lateinit var publicFaqsContainer: LinearLayout
+    private lateinit var btnSubmitContact: Button
 
-    private var isPasswordVisible = false
+    // Admin
+    private lateinit var btnAdminCreateUser: Button
+    private lateinit var layoutAdminUsersList: LinearLayout
 
-    // Activity Result Launchers
-    private val pickApkLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        if (uri != null) {
-            val file = copyUriToTemp(uri, "upload.apk")
-            if (file != null) {
-                pendingUploadApkFile = file
-                txtSelectedApkName.text = "Selected: ${file.name} (${formatSize(file.length())})"
-                toast("APK ready for upload.")
-            }
-        }
-    }
+    // Auth
+    private lateinit var btnScanQr: Button
+    private lateinit var btnOpenLoginDialog: Button
+    private lateinit var editPairingKeyInput: EditText
+    private lateinit var btnConnectPairingKey: Button
 
-    private val pickFirebaseLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        if (uri != null) {
-            val file = copyUriToTemp(uri, "google-services.json")
-            if (file != null) {
-                setBusy(true, "Injecting Firebase services...")
-                api.applyFirebaseJson(file, object : ApiClient.ApiCallback<JSONObject> {
-                    override fun onSuccess(result: JSONObject) {
-                        setBusy(false, "")
-                        toast(result.optString("message", "Firebase values applied."))
-                    }
-
-                    override fun onError(errorMessage: String) {
-                        setBusy(false, "")
-                        toast("Firebase error: $errorMessage")
-                    }
-                })
-            }
-        }
-    }
-
-    private val pickLogoLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        if (uri != null) {
-            val file = copyUriToTemp(uri, "logo.png")
-            if (file != null) {
-                setBusy(true, "Uploading and scaling icons across all densities...")
-                api.uploadLogo(file, object : ApiClient.ApiCallback<JSONObject> {
-                    override fun onSuccess(result: JSONObject) {
-                        setBusy(false, "")
-                        toast(result.optString("message", "Icons updated successfully."))
-                    }
-
-                    override fun onError(errorMessage: String) {
-                        setBusy(false, "")
-                        toast("Logo error: $errorMessage")
-                    }
-                })
-            }
-        }
-    }
-
-    private val pickReplacementFileLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        if (uri != null && currentEditingFilePath.isNotEmpty()) {
-            val file = copyUriToTemp(uri, File(currentEditingFilePath).name)
-            if (file != null) {
-                setBusy(true, "Replacing target file on server...")
-                api.replaceFile(currentEditingFilePath, file, object : ApiClient.ApiCallback<JSONObject> {
-                    override fun onSuccess(result: JSONObject) {
-                        setBusy(false, "")
-                        toast("File replaced on server.")
-                        openEditorForFile(currentEditingFilePath)
-                    }
-
-                    override fun onError(errorMessage: String) {
-                        setBusy(false, "")
-                        toast("Replace failed: $errorMessage")
-                    }
-                })
-            }
-        }
-    }
-
-    private val requestCameraPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        if (isGranted) {
-            startQrScannerActivity()
-        } else {
-            toast("Camera permission is required to scan QR codes. You can also paste the pairing code manually.")
-        }
-    }
+    private var currentActiveTab: String = "dashboard"
+    private var activeProjectName: String? = null
 
     private val qrScanLauncher = registerForActivityResult(ScanContract()) { result ->
         val contents = result.contents
-        if (!contents.isNullOrBlank()) {
-            handleScannedCode(contents)
+        if (contents != null) {
+            editPairingKeyInput.setText(contents)
+            handlePairingToken(contents)
         }
     }
 
@@ -337,821 +154,611 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        session = SessionManager(this)
+        session = SessionManager.getInstance(this)
         api = ApiClient(session)
 
-        bindViews()
+        initViews()
         setupListeners()
-        updateUiForAuthState()
 
-        // Initial Data Load
-        if (session.isAuthenticated()) {
-            refreshDashboardData()
+        if (session.isLoggedIn || session.isPaired) {
             switchTab("dashboard")
+            refreshAllData()
         } else {
-            loadPublicCommunityData()
-            switchAuthHubTab("signin")
+            showAuthView()
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (session.isAuthenticated()) {
-            startAutoCheckTimer()
-            if (cloudLogsStreaming) {
-                resumeCloudLogsPolling()
-            }
-        }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        stopAutoCheckTimer()
-        pauseCloudLogsPolling()
-    }
-
-    // -------------------------------------------------------------
-    // View Binding & Event Setup
-    // -------------------------------------------------------------
-
-    private fun bindViews() {
-        topBarSubtitle = findViewById(R.id.topBarSubtitle)
-        btnServerConfig = findViewById(R.id.btnServerConfig)
-        btnTopScanQr = findViewById(R.id.btnTopScanQr)
-        btnTopAuth = findViewById(R.id.btnTopAuth)
-        txtActiveProjectPill = findViewById(R.id.txtActiveProjectPill)
-        txtAdminBadge = findViewById(R.id.txtAdminBadge)
-        globalUpdateBanner = findViewById(R.id.globalUpdateBanner)
-        btnBannerInstall = findViewById(R.id.btnBannerInstall)
+    private fun initViews() {
+        drawerLayout = findViewById(R.id.drawerLayout)
+        btnMenuToggle = findViewById(R.id.btnMenuToggle)
+        txtTopbarTitle = findViewById(R.id.txtTopbarTitle)
+        txtTopbarProjectPill = findViewById(R.id.txtTopbarProjectPill)
+        btnQuickNewApk = findViewById(R.id.btnQuickNewApk)
+        btnQuickSaveFile = findViewById(R.id.btnQuickSaveFile)
+        btnQuickFind = findViewById(R.id.btnQuickFind)
+        btnQuickLogout = findViewById(R.id.btnQuickLogout)
         globalProgressBar = findViewById(R.id.globalProgressBar)
 
-        // Auth Hub
-        panelAuthHub = findViewById(R.id.panelAuthHub)
-        tabAuthSignIn = findViewById(R.id.tabAuthSignIn)
-        tabAuthRegister = findViewById(R.id.tabAuthRegister)
-        tabAuthForgot = findViewById(R.id.tabAuthForgot)
-        tabAuthQr = findViewById(R.id.tabAuthQr)
-        tabAuthSupport = findViewById(R.id.tabAuthSupport)
+        // Nav
+        navDashboard = findViewById(R.id.navDashboard)
+        navProjects = findViewById(R.id.navProjects)
+        navEditor = findViewById(R.id.navEditor)
+        navSearch = findViewById(R.id.navSearch)
+        navStrings = findViewById(R.id.navStrings)
+        navKeystores = findViewById(R.id.navKeystores)
+        navBuild = findViewById(R.id.navBuild)
+        navBlog = findViewById(R.id.navBlog)
+        navFaqs = findViewById(R.id.navFaqs)
+        navContact = findViewById(R.id.navContact)
+        navAdminSectionTitle = findViewById(R.id.navAdminSectionTitle)
+        navAdmin = findViewById(R.id.navAdmin)
+        txtSidebarUserAvatar = findViewById(R.id.txtSidebarUserAvatar)
+        txtSidebarUsername = findViewById(R.id.txtSidebarUsername)
+        btnSidebarLogout = findViewById(R.id.btnSidebarLogout)
 
-        cardAuthSignIn = findViewById(R.id.cardAuthSignIn)
-        cardAuthRegister = findViewById(R.id.cardAuthRegister)
-        cardAuthForgot = findViewById(R.id.cardAuthForgot)
-        cardAuthQr = findViewById(R.id.cardAuthQr)
-        cardAuthSupport = findViewById(R.id.cardAuthSupport)
-
-        editHubLoginUser = findViewById(R.id.editHubLoginUser)
-        editHubLoginPass = findViewById(R.id.editHubLoginPass)
-        btnHubTogglePass = findViewById(R.id.btnHubTogglePass)
-        btnHubSubmitLogin = findViewById(R.id.btnHubSubmitLogin)
-        btnHubGoRegister = findViewById(R.id.btnHubGoRegister)
-        btnHubGoForgot = findViewById(R.id.btnHubGoForgot)
-
-        editHubRegEmail = findViewById(R.id.editHubRegEmail)
-        editHubRegPhone = findViewById(R.id.editHubRegPhone)
-        editHubRegUser = findViewById(R.id.editHubRegUser)
-        editHubRegPass = findViewById(R.id.editHubRegPass)
-        btnHubSubmitRegister = findViewById(R.id.btnHubSubmitRegister)
-        btnHubGoLogin = findViewById(R.id.btnHubGoLogin)
-
-        editHubForgotEmail = findViewById(R.id.editHubForgotEmail)
-        btnHubSubmitForgot = findViewById(R.id.btnHubSubmitForgot)
-        btnHubBackLogin = findViewById(R.id.btnHubBackLogin)
-
-        btnHubLaunchScanQr = findViewById(R.id.btnHubLaunchScanQr)
-        editHubManualToken = findViewById(R.id.editHubManualToken)
-        btnHubSubmitToken = findViewById(R.id.btnHubSubmitToken)
-        hubFaqsContainer = findViewById(R.id.hubFaqsContainer)
-
-        // Studio Navigation & Container
-        studioNavScroll = findViewById(R.id.studioNavScroll)
-        studioPanelsContainer = findViewById(R.id.studioPanelsContainer)
-        tabBtnDashboard = findViewById(R.id.tabBtnDashboard)
-        tabBtnProjects = findViewById(R.id.tabBtnProjects)
-        tabBtnEditor = findViewById(R.id.tabBtnEditor)
-        tabBtnCustomizer = findViewById(R.id.tabBtnCustomizer)
-        tabBtnBuild = findViewById(R.id.tabBtnBuild)
-        tabBtnDebugger = findViewById(R.id.tabBtnDebugger)
-        tabBtnAiSettings = findViewById(R.id.tabBtnAiSettings)
-        tabBtnAdmin = findViewById(R.id.tabBtnAdmin)
-        tabBtnCommunity = findViewById(R.id.tabBtnCommunity)
-
-        // Studio Panels
-        panelDashboard = findViewById(R.id.panelDashboard)
-        panelProjects = findViewById(R.id.panelProjects)
-        panelEditor = findViewById(R.id.panelEditor)
-        panelCustomizer = findViewById(R.id.panelCustomizer)
-        panelBuild = findViewById(R.id.panelBuild)
-        panelDebugger = findViewById(R.id.panelDebugger)
-        panelAiSettings = findViewById(R.id.panelAiSettings)
-        panelAdmin = findViewById(R.id.panelAdmin)
-        panelCommunity = findViewById(R.id.panelCommunity)
+        // Views
+        viewAuth = findViewById(R.id.viewAuth)
+        viewDashboard = findViewById(R.id.viewDashboard)
+        viewProjects = findViewById(R.id.viewProjects)
+        viewEditor = findViewById(R.id.viewEditor)
+        viewSearch = findViewById(R.id.viewSearch)
+        viewStrings = findViewById(R.id.viewStrings)
+        viewKeystores = findViewById(R.id.viewKeystores)
+        viewBuild = findViewById(R.id.viewBuild)
+        viewBlog = findViewById(R.id.viewBlog)
+        viewFaqs = findViewById(R.id.viewFaqs)
+        viewContact = findViewById(R.id.viewContact)
+        viewAdmin = findViewById(R.id.viewAdmin)
 
         // Dashboard
-        txtDashWelcome = findViewById(R.id.txtDashWelcome)
-        txtDashUserEmail = findViewById(R.id.txtDashUserEmail)
-        txtMeterDecompile = findViewById(R.id.txtMeterDecompile)
-        txtMeterCompile = findViewById(R.id.txtMeterCompile)
-        txtMeterKeygen = findViewById(R.id.txtMeterKeygen)
-        txtMeterSign = findViewById(R.id.txtMeterSign)
-        btnQuickUploadDecompile = findViewById(R.id.btnQuickUploadDecompile)
-        btnQuickBuildApk = findViewById(R.id.btnQuickBuildApk)
-        btnQuickSignApk = findViewById(R.id.btnQuickSignApk)
-        btnQuickAiFix = findViewById(R.id.btnQuickAiFix)
-        cardActiveProjectOverview = findViewById(R.id.cardActiveProjectOverview)
-        txtDashProjectName = findViewById(R.id.txtDashProjectName)
-        txtDashProjectPath = findViewById(R.id.txtDashProjectPath)
-        btnDashCloseProject = findViewById(R.id.btnDashCloseProject)
-        btnDashExploreFiles = findViewById(R.id.btnDashExploreFiles)
-        btnDashEditStrings = findViewById(R.id.btnDashEditStrings)
-        btnDashRefreshProjects = findViewById(R.id.btnDashRefreshProjects)
-        dashProjectsListContainer = findViewById(R.id.dashProjectsListContainer)
+        txtStatDecompiles = findViewById(R.id.txtStatDecompiles)
+        txtStatCompiles = findViewById(R.id.txtStatCompiles)
+        txtStatKeystores = findViewById(R.id.txtStatKeystores)
+        txtStatSignings = findViewById(R.id.txtStatSignings)
+        cardActiveProjectBanner = findViewById(R.id.cardActiveProjectBanner)
+        txtActiveProjectTitle = findViewById(R.id.txtActiveProjectTitle)
+        txtActiveProjectSubtitle = findViewById(R.id.txtActiveProjectSubtitle)
+        btnDashOpenEditor = findViewById(R.id.btnDashOpenEditor)
+        btnDashBuildApk = findViewById(R.id.btnDashBuildApk)
+        btnViewAllProjects = findViewById(R.id.btnViewAllProjects)
+        layoutDashProjectsList = findViewById(R.id.layoutDashProjectsList)
 
         // Projects
-        boxPickApkFile = findViewById(R.id.boxPickApkFile)
-        txtSelectedApkName = findViewById(R.id.txtSelectedApkName)
-        btnUploadDecompileSubmit = findViewById(R.id.btnUploadDecompileSubmit)
-        boxDecompileLogs = findViewById(R.id.boxDecompileLogs)
-        txtDecompileStatus = findViewById(R.id.txtDecompileStatus)
-        txtDecompileLogOutput = findViewById(R.id.txtDecompileLogOutput)
-        projectsListContainer = findViewById(R.id.projectsListContainer)
+        btnUploadNewApkProject = findViewById(R.id.btnUploadNewApkProject)
+        layoutProjectsList = findViewById(R.id.layoutProjectsList)
 
         // Editor
-        txtFileBreadcrumb = findViewById(R.id.txtFileBreadcrumb)
-        btnFileUpDir = findViewById(R.id.btnFileUpDir)
-        btnRefreshDir = findViewById(R.id.btnRefreshDir)
-        scrollDirectoryBrowser = findViewById(R.id.scrollDirectoryBrowser)
-        directoryItemsContainer = findViewById(R.id.directoryItemsContainer)
-        boxCodeEditorView = findViewById(R.id.boxCodeEditorView)
-        txtEditorOpenFileName = findViewById(R.id.txtEditorOpenFileName)
-        btnEditorSave = findViewById(R.id.btnEditorSave)
-        btnEditorAiReview = findViewById(R.id.btnEditorAiReview)
-        btnEditorReplaceFile = findViewById(R.id.btnEditorReplaceFile)
-        btnEditorClose = findViewById(R.id.btnEditorClose)
+        btnEditorGoUp = findViewById(R.id.btnEditorGoUp)
+        txtEditorBreadcrumb = findViewById(R.id.txtEditorBreadcrumb)
+        btnEditorSaveFile = findViewById(R.id.btnEditorSaveFile)
+        layoutEditorItems = findViewById(R.id.layoutEditorItems)
         editCodeContent = findViewById(R.id.editCodeContent)
-        boxHexEditorView = findViewById(R.id.boxHexEditorView)
-        editHexSearchQuery = findViewById(R.id.editHexSearchQuery)
-        btnHexSearch = findViewById(R.id.btnHexSearch)
-        btnHexClose = findViewById(R.id.btnHexClose)
-        hexResultsContainer = findViewById(R.id.hexResultsContainer)
-        editHexPatchBytes = findViewById(R.id.editHexPatchBytes)
-        btnHexApplyPatch = findViewById(R.id.btnHexApplyPatch)
 
-        // Customizer
-        editCustomAppName = findViewById(R.id.editCustomAppName)
-        editStringsLocale = findViewById(R.id.editStringsLocale)
-        btnLoadStrings = findViewById(R.id.btnLoadStrings)
-        btnSaveStrings = findViewById(R.id.btnSaveStrings)
-        stringsTableContainer = findViewById(R.id.stringsTableContainer)
-        btnUploadFirebaseJson = findViewById(R.id.btnUploadFirebaseJson)
-        btnPickLogoImage = findViewById(R.id.btnPickLogoImage)
-        editAiIconPrompt = findViewById(R.id.editAiIconPrompt)
-        btnGenerateAiIcon = findViewById(R.id.btnGenerateAiIcon)
-        editGlobalFindText = findViewById(R.id.editGlobalFindText)
-        editGlobalReplaceText = findViewById(R.id.editGlobalReplaceText)
-        btnGlobalFindOnly = findViewById(R.id.btnGlobalFindOnly)
-        btnGlobalFindReplace = findViewById(R.id.btnGlobalFindReplace)
+        // Search
+        editSearchFindQuery = findViewById(R.id.editSearchFindQuery)
+        editSearchReplaceQuery = findViewById(R.id.editSearchReplaceQuery)
+        btnExecuteSearch = findViewById(R.id.btnExecuteSearch)
+        btnExecuteReplace = findViewById(R.id.btnExecuteReplace)
+        txtSearchResultsHeader = findViewById(R.id.txtSearchResultsHeader)
+        layoutSearchResultsList = findViewById(R.id.layoutSearchResultsList)
+
+        // Strings
+        editAppNameInput = findViewById(R.id.editAppNameInput)
+        btnSaveAppName = findViewById(R.id.btnSaveAppName)
+        layoutStringsList = findViewById(R.id.layoutStringsList)
+
+        // Keystores
+        btnOpenCreateKeystoreDialog = findViewById(R.id.btnOpenCreateKeystoreDialog)
+        layoutKeystoresList = findViewById(R.id.layoutKeystoresList)
 
         // Build
-        btnTriggerBuildApk = findViewById(R.id.btnTriggerBuildApk)
-        boxBuildLogs = findViewById(R.id.boxBuildLogs)
-        txtBuildLogOutput = findViewById(R.id.txtBuildLogOutput)
-        btnOpenCreateKeystoreDialog = findViewById(R.id.btnOpenCreateKeystoreDialog)
-        keystoresListContainer = findViewById(R.id.keystoresListContainer)
-        editSignPassword = findViewById(R.id.editSignPassword)
-        btnTriggerSignApk = findViewById(R.id.btnTriggerSignApk)
-        btnDirectInstallApk = findViewById(R.id.btnDirectInstallApk)
+        btnStartBuildAndSign = findViewById(R.id.btnStartBuildAndSign)
+        layoutBuildOutput = findViewById(R.id.layoutBuildOutput)
+        btnDownloadSignedApk = findViewById(R.id.btnDownloadSignedApk)
 
-        // Debugger
-        btnToggleCloudLogsStream = findViewById(R.id.btnToggleCloudLogsStream)
-        btnClearCloudLogs = findViewById(R.id.btnClearCloudLogs)
-        txtCloudLogsStream = findViewById(R.id.txtCloudLogsStream)
-        editAdbHostIp = findViewById(R.id.editAdbHostIp)
-        btnAdbConnect = findViewById(R.id.btnAdbConnect)
-        adbDevicesContainer = findViewById(R.id.adbDevicesContainer)
-        btnAdbReadLogcat = findViewById(R.id.btnAdbReadLogcat)
-        txtAdbLogcatOutput = findViewById(R.id.txtAdbLogcatOutput)
-
-        // AI Settings
-        rgAiProvider = findViewById(R.id.rgAiProvider)
-        rbProviderGemini = findViewById(R.id.rbProviderGemini)
-        rbProviderOpenAi = findViewById(R.id.rbProviderOpenAi)
-        txtGeminiKeyStatus = findViewById(R.id.txtGeminiKeyStatus)
-        editGeminiApiKey = findViewById(R.id.editGeminiApiKey)
-        btnSaveGeminiKey = findViewById(R.id.btnSaveGeminiKey)
-        btnDeleteGeminiKey = findViewById(R.id.btnDeleteGeminiKey)
-        txtOpenAiKeyStatus = findViewById(R.id.txtOpenAiKeyStatus)
-        editOpenAiApiKey = findViewById(R.id.editOpenAiApiKey)
-        btnSaveOpenAiKey = findViewById(R.id.btnSaveOpenAiKey)
-        btnDeleteOpenAiKey = findViewById(R.id.btnDeleteOpenAiKey)
-        editModelGeminiText = findViewById(R.id.editModelGeminiText)
-        editModelGeminiImage = findViewById(R.id.editModelGeminiImage)
-        editModelOpenAiText = findViewById(R.id.editModelOpenAiText)
-        editModelOpenAiImage = findViewById(R.id.editModelOpenAiImage)
-        btnSaveCustomModels = findViewById(R.id.btnSaveCustomModels)
-        btnResetCustomModels = findViewById(R.id.btnResetCustomModels)
-
-        // Admin
-        btnAdminCreateUserDialog = findViewById(R.id.btnAdminCreateUserDialog)
-        adminUsersContainer = findViewById(R.id.adminUsersContainer)
-        adminInquiriesContainer = findViewById(R.id.adminInquiriesContainer)
-        btnAdminCreateBlogDialog = findViewById(R.id.btnAdminCreateBlogDialog)
-        adminBlogsContainer = findViewById(R.id.adminBlogsContainer)
-        btnAdminCreateFaqDialog = findViewById(R.id.btnAdminCreateFaqDialog)
-        adminFaqsContainer = findViewById(R.id.adminFaqsContainer)
-        editBackupRepoOwner = findViewById(R.id.editBackupRepoOwner)
-        editBackupRepoName = findViewById(R.id.editBackupRepoName)
-        editBackupBranch = findViewById(R.id.editBackupBranch)
-        editBackupToken = findViewById(R.id.editBackupToken)
-        btnSaveBackupSettings = findViewById(R.id.btnSaveBackupSettings)
-        btnRunManualBackup = findViewById(R.id.btnRunManualBackup)
-
-        // Community
+        // Blog / Faqs / Contact
+        layoutBlogsList = findViewById(R.id.layoutBlogsList)
+        layoutFaqsList = findViewById(R.id.layoutFaqsList)
         editContactName = findViewById(R.id.editContactName)
         editContactEmail = findViewById(R.id.editContactEmail)
         editContactSubject = findViewById(R.id.editContactSubject)
         editContactMessage = findViewById(R.id.editContactMessage)
-        btnSubmitContactInquiry = findViewById(R.id.btnSubmitContactInquiry)
-        publicBlogsContainer = findViewById(R.id.publicBlogsContainer)
-        publicFaqsContainer = findViewById(R.id.publicFaqsContainer)
+        btnSubmitContact = findViewById(R.id.btnSubmitContact)
+
+        // Admin
+        btnAdminCreateUser = findViewById(R.id.btnAdminCreateUser)
+        layoutAdminUsersList = findViewById(R.id.layoutAdminUsersList)
+
+        // Auth
+        btnScanQr = findViewById(R.id.btnScanQr)
+        btnOpenLoginDialog = findViewById(R.id.btnOpenLoginDialog)
+        editPairingKeyInput = findViewById(R.id.editPairingKeyInput)
+        btnConnectPairingKey = findViewById(R.id.btnConnectPairingKey)
     }
 
     private fun setupListeners() {
-        btnServerConfig.setOnClickListener { showServerUrlDialog() }
-        btnTopScanQr.setOnClickListener { launchQrScanner() }
-        btnTopAuth.setOnClickListener {
-            if (session.isAuthenticated()) {
-                showUserAccountDialog()
+        btnMenuToggle.setOnClickListener {
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawer(GravityCompat.START)
             } else {
-                panelAuthHub.visibility = View.VISIBLE
-                studioNavScroll.visibility = View.GONE
-                studioPanelsContainer.visibility = View.GONE
-                switchAuthHubTab("signin")
-            }
-        }
-        btnBannerInstall.setOnClickListener { handleDownloadAndInstallApk() }
-
-        // Auth Hub Navigation
-        tabAuthSignIn.setOnClickListener { switchAuthHubTab("signin") }
-        tabAuthRegister.setOnClickListener { switchAuthHubTab("register") }
-        tabAuthForgot.setOnClickListener { switchAuthHubTab("forgot") }
-        tabAuthQr.setOnClickListener { switchAuthHubTab("qr") }
-        tabAuthSupport.setOnClickListener { switchAuthHubTab("support") }
-
-        // Auth Hub Form Submissions
-        btnHubSubmitLogin.setOnClickListener { handleHubLogin() }
-        btnHubGoRegister.setOnClickListener { switchAuthHubTab("register") }
-        btnHubGoForgot.setOnClickListener { switchAuthHubTab("forgot") }
-
-        btnHubTogglePass.setOnClickListener {
-            isPasswordVisible = !isPasswordVisible
-            if (isPasswordVisible) {
-                editHubLoginPass.transformationMethod = HideReturnsTransformationMethod.getInstance()
-                btnHubTogglePass.setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
-            } else {
-                editHubLoginPass.transformationMethod = PasswordTransformationMethod.getInstance()
-                btnHubTogglePass.setImageResource(android.R.drawable.ic_menu_view)
-            }
-            editHubLoginPass.setSelection(editHubLoginPass.text.length)
-        }
-
-        btnHubSubmitRegister.setOnClickListener { handleHubRegister() }
-        btnHubGoLogin.setOnClickListener { switchAuthHubTab("signin") }
-
-        btnHubSubmitForgot.setOnClickListener { handleHubForgot() }
-        btnHubBackLogin.setOnClickListener { switchAuthHubTab("signin") }
-
-        btnHubLaunchScanQr.setOnClickListener { launchQrScanner() }
-        btnHubSubmitToken.setOnClickListener {
-            val tok = editHubManualToken.text.toString().trim()
-            if (tok.isEmpty()) {
-                toast("Please enter or paste a pairing code.")
-            } else {
-                handleScannedCode(tok)
+                drawerLayout.openDrawer(GravityCompat.START)
             }
         }
 
-        // Studio Navigation Tabs
-        tabBtnDashboard.setOnClickListener { checkAuthAndSwitchTab("dashboard") }
-        tabBtnProjects.setOnClickListener { checkAuthAndSwitchTab("projects") }
-        tabBtnEditor.setOnClickListener { checkAuthAndSwitchTab("editor") }
-        tabBtnCustomizer.setOnClickListener { checkAuthAndSwitchTab("customizer") }
-        tabBtnBuild.setOnClickListener { checkAuthAndSwitchTab("build") }
-        tabBtnDebugger.setOnClickListener { checkAuthAndSwitchTab("debugger") }
-        tabBtnAiSettings.setOnClickListener { checkAuthAndSwitchTab("ai_settings") }
-        tabBtnAdmin.setOnClickListener { checkAuthAndSwitchTab("admin") }
-        tabBtnCommunity.setOnClickListener { checkAuthAndSwitchTab("community") }
+        btnQuickNewApk.setOnClickListener { switchTab("projects") }
+        btnQuickSaveFile.setOnClickListener { saveActiveEditorFile() }
+        btnQuickFind.setOnClickListener { switchTab("search") }
+        btnQuickLogout.setOnClickListener { handleLogout() }
+        btnSidebarLogout.setOnClickListener { handleLogout() }
 
-        // Quick Actions
-        btnQuickUploadDecompile.setOnClickListener { checkAuthAndSwitchTab("projects") }
-        btnQuickBuildApk.setOnClickListener {
-            if (session.isAuthenticated()) {
-                switchTab("build")
-                triggerBuildApk()
-            } else {
-                promptLoginRequired()
-            }
-        }
-        btnQuickSignApk.setOnClickListener { checkAuthAndSwitchTab("build") }
-        btnQuickAiFix.setOnClickListener {
-            if (session.isAuthenticated()) {
-                switchTab("customizer")
-                triggerAiFix()
-            } else {
-                promptLoginRequired()
-            }
-        }
+        navDashboard.setOnClickListener { switchTab("dashboard") }
+        navProjects.setOnClickListener { switchTab("projects") }
+        navEditor.setOnClickListener { switchTab("editor") }
+        navSearch.setOnClickListener { switchTab("search") }
+        navStrings.setOnClickListener { switchTab("strings") }
+        navKeystores.setOnClickListener { switchTab("keystores") }
+        navBuild.setOnClickListener { switchTab("build") }
+        navBlog.setOnClickListener { switchTab("blog") }
+        navFaqs.setOnClickListener { switchTab("faqs") }
+        navContact.setOnClickListener { switchTab("contact") }
+        navAdmin.setOnClickListener { switchTab("admin") }
 
-        btnDashCloseProject.setOnClickListener { closeCurrentProject() }
-        btnDashExploreFiles.setOnClickListener { checkAuthAndSwitchTab("editor"); loadDirectory("") }
-        btnDashEditStrings.setOnClickListener { checkAuthAndSwitchTab("customizer"); loadStringsForLocale("values") }
-        btnDashRefreshProjects.setOnClickListener { refreshProjectsList() }
+        btnDashOpenEditor.setOnClickListener { switchTab("editor") }
+        btnDashBuildApk.setOnClickListener { switchTab("build") }
+        btnViewAllProjects.setOnClickListener { switchTab("projects") }
 
-        // Project Upload
-        boxPickApkFile.setOnClickListener { pickApkLauncher.launch("application/vnd.android.package-archive") }
-        btnUploadDecompileSubmit.setOnClickListener { uploadAndDecompileSelectedApk() }
+        btnEditorGoUp.setOnClickListener { goUpDirectory() }
+        btnEditorSaveFile.setOnClickListener { saveActiveEditorFile() }
 
-        // File Explorer & Editor
-        btnFileUpDir.setOnClickListener { navigateUpDirectory() }
-        btnRefreshDir.setOnClickListener { loadDirectory(currentDirPath) }
-        btnEditorSave.setOnClickListener { saveCurrentOpenCodeFile() }
-        btnEditorAiReview.setOnClickListener { triggerAiReviewOnFile() }
-        btnEditorReplaceFile.setOnClickListener { pickReplacementFileLauncher.launch("*/*") }
-        btnEditorClose.setOnClickListener { closeCodeEditor() }
+        btnExecuteSearch.setOnClickListener { executeSearch() }
+        btnExecuteReplace.setOnClickListener { executeReplace() }
 
-        btnHexSearch.setOnClickListener { performHexSearch() }
-        btnHexClose.setOnClickListener { closeHexEditor() }
-        btnHexApplyPatch.setOnClickListener { applyHexPatch() }
-
-        // Resources & Customizer
-        btnLoadStrings.setOnClickListener { loadStringsForLocale(editStringsLocale.text.toString().trim()) }
-        btnSaveStrings.setOnClickListener { saveStringsChanges() }
-        btnUploadFirebaseJson.setOnClickListener { pickFirebaseLauncher.launch("application/json") }
-        btnPickLogoImage.setOnClickListener { pickLogoLauncher.launch("image/*") }
-        btnGenerateAiIcon.setOnClickListener { generateAiLauncherIcon() }
-        btnGlobalFindOnly.setOnClickListener { performGlobalFindOnly() }
-        btnGlobalFindReplace.setOnClickListener { performGlobalFindReplace() }
-
-        // Build & Keystore
-        btnTriggerBuildApk.setOnClickListener { triggerBuildApk() }
+        btnSaveAppName.setOnClickListener { saveAppNameAndStrings() }
         btnOpenCreateKeystoreDialog.setOnClickListener { showCreateKeystoreDialog() }
-        btnTriggerSignApk.setOnClickListener { triggerSignApk() }
-        btnDirectInstallApk.setOnClickListener { handleDownloadAndInstallApk() }
+        btnStartBuildAndSign.setOnClickListener { buildAndSignApk() }
+        btnDownloadSignedApk.setOnClickListener { installDownloadedApk() }
 
-        // ADB & Debugger
-        btnToggleCloudLogsStream.setOnClickListener { toggleCloudLogsStream() }
-        btnClearCloudLogs.setOnClickListener { clearCloudLogs() }
-        btnAdbConnect.setOnClickListener { connectAdbHost() }
-        btnAdbReadLogcat.setOnClickListener { readAdbLogcat("all") }
+        btnSubmitContact.setOnClickListener { submitContactInquiry() }
 
-        // AI Settings
-        rgAiProvider.setOnCheckedChangeListener { _, checkedId ->
-            val prov = if (checkedId == R.id.rbProviderOpenAi) "openai" else "gemini"
-            api.saveAiProvider(prov, object : ApiClient.ApiCallback<String> {
-                override fun onSuccess(result: String) { toast("Provider updated: $prov") }
-                override fun onError(errorMessage: String) { toast("Error: $errorMessage") }
-            })
+        btnScanQr.setOnClickListener { launchQrScanner() }
+        btnOpenLoginDialog.setOnClickListener { showAuthDialog() }
+        btnConnectPairingKey.setOnClickListener {
+            val key = editPairingKeyInput.text.toString().trim()
+            if (key.isNotEmpty()) handlePairingToken(key)
+            else toast("Please enter a pairing key.")
         }
-        btnSaveGeminiKey.setOnClickListener { saveGeminiApiKey() }
-        btnDeleteGeminiKey.setOnClickListener { deleteGeminiApiKey() }
-        btnSaveOpenAiKey.setOnClickListener { saveOpenAiApiKey() }
-        btnDeleteOpenAiKey.setOnClickListener { deleteOpenAiApiKey() }
-        btnSaveCustomModels.setOnClickListener { saveCustomModels() }
-        btnResetCustomModels.setOnClickListener { resetCustomModels() }
-
-        // Admin
-        btnAdminCreateUserDialog.setOnClickListener { showCreateUserDialog() }
-        btnAdminCreateBlogDialog.setOnClickListener { showEditBlogDialog(null) }
-        btnAdminCreateFaqDialog.setOnClickListener { showEditFaqDialog(null) }
-        btnSaveBackupSettings.setOnClickListener { saveGitHubBackupSettings() }
-        btnRunManualBackup.setOnClickListener { runManualBackup() }
-
-        // Community & Support
-        btnSubmitContactInquiry.setOnClickListener { submitContactInquiryForm() }
     }
 
     // -------------------------------------------------------------
-    // Auth Hub Tab Switcher
+    // Tab Navigation
     // -------------------------------------------------------------
 
-    private fun switchAuthHubTab(tab: String) {
-        val tabButtons = listOf(
-            Pair("signin", Pair(tabAuthSignIn, cardAuthSignIn)),
-            Pair("register", Pair(tabAuthRegister, cardAuthRegister)),
-            Pair("forgot", Pair(tabAuthForgot, cardAuthForgot)),
-            Pair("qr", Pair(tabAuthQr, cardAuthQr)),
-            Pair("support", Pair(tabAuthSupport, cardAuthSupport))
-        )
+    private fun switchTab(tab: String) {
+        currentActiveTab = tab
+        drawerLayout.closeDrawer(GravityCompat.START)
 
-        for ((key, pair) in tabButtons) {
-            val (btn, card) = pair
-            val isActive = key == tab
-            card.visibility = if (isActive) View.VISIBLE else View.GONE
-            if (isActive) {
-                btn.setBackgroundColor(getColor(R.color.primary))
-                btn.setTextColor(getColor(R.color.text_inverse))
-            } else {
-                btn.setBackgroundColor(getColor(R.color.surface_dark_border))
-                btn.setTextColor(getColor(R.color.text_secondary))
+        viewAuth.visibility = View.GONE
+        viewDashboard.visibility = View.GONE
+        viewProjects.visibility = View.GONE
+        viewEditor.visibility = View.GONE
+        viewSearch.visibility = View.GONE
+        viewStrings.visibility = View.GONE
+        viewKeystores.visibility = View.GONE
+        viewBuild.visibility = View.GONE
+        viewBlog.visibility = View.GONE
+        viewFaqs.visibility = View.GONE
+        viewContact.visibility = View.GONE
+        viewAdmin.visibility = View.GONE
+
+        btnQuickSaveFile.visibility = if (tab == "editor") View.VISIBLE else View.GONE
+
+        when (tab) {
+            "dashboard" -> {
+                viewDashboard.visibility = View.VISIBLE
+                txtTopbarTitle.text = "Dashboard"
+                loadDashboardData()
             }
-        }
-
-        if (tab == "support") {
-            loadPublicCommunityData()
+            "projects" -> {
+                viewProjects.visibility = View.VISIBLE
+                txtTopbarTitle.text = "My Projects"
+                loadProjectsList()
+            }
+            "editor" -> {
+                viewEditor.visibility = View.VISIBLE
+                txtTopbarTitle.text = "Code & File Editor"
+                loadEditorDirectory(currentEditorDir)
+            }
+            "search" -> {
+                viewSearch.visibility = View.VISIBLE
+                txtTopbarTitle.text = "Find & Replace"
+            }
+            "strings" -> {
+                viewStrings.visibility = View.VISIBLE
+                txtTopbarTitle.text = "App Name & Strings"
+                loadStringsList()
+            }
+            "keystores" -> {
+                viewKeystores.visibility = View.VISIBLE
+                txtTopbarTitle.text = "Keystores & Signing"
+                loadKeystoresList()
+            }
+            "build" -> {
+                viewBuild.visibility = View.VISIBLE
+                txtTopbarTitle.text = "Recompile & Build"
+            }
+            "blog" -> {
+                viewBlog.visibility = View.VISIBLE
+                txtTopbarTitle.text = "Tutorials & Blog"
+                loadBlogsList()
+            }
+            "faqs" -> {
+                viewFaqs.visibility = View.VISIBLE
+                txtTopbarTitle.text = "FAQs & Help"
+                loadFaqsList()
+            }
+            "contact" -> {
+                viewContact.visibility = View.VISIBLE
+                txtTopbarTitle.text = "Contact Support"
+            }
+            "admin" -> {
+                viewAdmin.visibility = View.VISIBLE
+                txtTopbarTitle.text = "User Management"
+                loadAdminUsersList()
+            }
         }
     }
 
-    private fun handleHubLogin() {
-        editHubLoginUser.error = null
-        editHubLoginPass.error = null
+    private fun showAuthView() {
+        viewDashboard.visibility = View.GONE
+        viewProjects.visibility = View.GONE
+        viewEditor.visibility = View.GONE
+        viewSearch.visibility = View.GONE
+        viewStrings.visibility = View.GONE
+        viewKeystores.visibility = View.GONE
+        viewBuild.visibility = View.GONE
+        viewBlog.visibility = View.GONE
+        viewFaqs.visibility = View.GONE
+        viewContact.visibility = View.GONE
+        viewAdmin.visibility = View.GONE
 
-        val u = editHubLoginUser.text.toString().trim()
-        val p = editHubLoginPass.text.toString().trim()
+        viewAuth.visibility = View.VISIBLE
+        txtTopbarTitle.text = "APK Tool Studio"
+        txtTopbarProjectPill.text = "Sign in to connect"
+    }
 
-        var hasError = false
-        if (u.isEmpty()) {
-            editHubLoginUser.error = "Enter your username or email"
-            hasError = true
-        }
-        if (p.isEmpty()) {
-            editHubLoginPass.error = "Enter your password"
-            hasError = true
-        }
-        if (hasError) {
-            toast("Please enter your username and password.")
-            return
-        }
+    // -------------------------------------------------------------
+    // Data Loading & Handlers
+    // -------------------------------------------------------------
 
-        btnHubSubmitLogin.isEnabled = false
-        btnHubSubmitLogin.text = "Signing in..."
-        setBusy(true, "Signing in to Studio...")
-        api.login(u, p, object : ApiClient.ApiCallback<User> {
-            override fun onSuccess(result: User) {
-                setBusy(false, "")
-                btnHubSubmitLogin.isEnabled = true
-                btnHubSubmitLogin.text = "Sign In & Unlock Studio"
-                updateUiForAuthState()
-                toast("Welcome, ${result.username}!")
-                switchTab("dashboard")
-                refreshDashboardData()
+    private fun refreshAllData() {
+        val user = session.currentUser
+        val username = user?.username ?: session.projectName ?: "Developer"
+        txtSidebarUsername.text = username
+        txtSidebarUserAvatar.text = username.take(1).uppercase()
+
+        val isAdmin = user?.isAdmin == true
+        navAdminSectionTitle.visibility = if (isAdmin) View.VISIBLE else View.GONE
+        navAdmin.visibility = if (isAdmin) View.VISIBLE else View.GONE
+
+        api.getWorkflowState(object : ApiClient.ApiCallback<JSONObject> {
+            override fun onSuccess(result: JSONObject) {
+                val state = result.optJSONObject("state")
+                if (state != null) {
+                    activeProjectName = state.optString("project_name", null)
+                    updateProjectHeader()
+                }
             }
+            override fun onError(errorMessage: String) {}
+        })
 
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                btnHubSubmitLogin.isEnabled = true
-                btnHubSubmitLogin.text = "Sign In & Unlock Studio"
-                toast("Login failed: $errorMessage")
+        loadDashboardData()
+    }
+
+    private fun updateProjectHeader() {
+        if (!activeProjectName.isNullOrEmpty()) {
+            txtTopbarProjectPill.text = "📦 $activeProjectName"
+            cardActiveProjectBanner.visibility = View.VISIBLE
+            txtActiveProjectTitle.text = activeProjectName
+        } else {
+            txtTopbarProjectPill.text = "No Project Open"
+            cardActiveProjectBanner.visibility = View.GONE
+        }
+    }
+
+    private fun loadDashboardData() {
+        api.getLimits(object : ApiClient.ApiCallback<UserLimits> {
+            override fun onSuccess(result: UserLimits) {
+                txtStatDecompiles.text = "${result.decompileUsage} / ${result.decompileLimit}"
+                txtStatCompiles.text = "${result.compileUsage} / ${result.compileLimit}"
+                txtStatKeystores.text = "${result.generateKeyUsage} / ${result.generateKeyLimit}"
+                txtStatSignings.text = "${result.signApkUsage} / ${result.signApkLimit}"
             }
+            override fun onError(errorMessage: String) {}
+        })
+
+        api.getProjects(object : ApiClient.ApiCallback<List<ProjectItem>> {
+            override fun onSuccess(result: List<ProjectItem>) {
+                layoutDashProjectsList.removeAllViews()
+                result.take(4).forEach { proj ->
+                    val row = createProjectRowView(proj)
+                    layoutDashProjectsList.addView(row)
+                }
+            }
+            override fun onError(errorMessage: String) {}
         })
     }
 
-    private fun handleHubRegister() {
-        editHubRegEmail.error = null
-        editHubRegPhone.error = null
-        editHubRegUser.error = null
-        editHubRegPass.error = null
-
-        val e = editHubRegEmail.text.toString().trim()
-        val ph = editHubRegPhone.text.toString().trim()
-        val u = editHubRegUser.text.toString().trim()
-        val p = editHubRegPass.text.toString().trim()
-
-        var hasError = false
-        if (e.isEmpty()) { editHubRegEmail.error = "Email is required"; hasError = true }
-        if (ph.isEmpty()) { editHubRegPhone.error = "Mobile number is required"; hasError = true }
-        if (u.isEmpty()) { editHubRegUser.error = "Username is required"; hasError = true }
-        if (p.isEmpty()) { editHubRegPass.error = "Password is required"; hasError = true }
-        else if (p.length < 6) { editHubRegPass.error = "Use at least 6 characters"; hasError = true }
-        if (hasError) {
-            toast("Please fill all registration fields.")
-            return
-        }
-
-        btnHubSubmitRegister.isEnabled = false
-        btnHubSubmitRegister.text = "Creating account..."
-        setBusy(true, "Creating account...")
-        api.register(e, ph, u, p, object : ApiClient.ApiCallback<String> {
-            override fun onSuccess(result: String) {
-                setBusy(false, "")
-                btnHubSubmitRegister.isEnabled = true
-                btnHubSubmitRegister.text = "Register & Create Account"
-                toast(result)
-                switchAuthHubTab("signin")
-                editHubLoginUser.setText(u)
-                editHubLoginPass.setText(p)
+    private fun loadProjectsList() {
+        setBusy(true)
+        api.getProjects(object : ApiClient.ApiCallback<List<ProjectItem>> {
+            override fun onSuccess(result: List<ProjectItem>) {
+                setBusy(false)
+                layoutProjectsList.removeAllViews()
+                if (result.isEmpty()) {
+                    val empty = TextView(this@MainActivity)
+                    empty.text = "No decompiled projects found. Upload an APK to get started."
+                    empty.setPadding(16, 32, 16, 32)
+                    empty.setTextColor(getColor(R.color.text_muted))
+                    layoutProjectsList.addView(empty)
+                } else {
+                    result.forEach { proj ->
+                        val row = createProjectRowView(proj)
+                        layoutProjectsList.addView(row)
+                    }
+                }
             }
-
             override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                btnHubSubmitRegister.isEnabled = true
-                btnHubSubmitRegister.text = "Register & Create Account"
-                toast("Registration error: $errorMessage")
-            }
-        })
-    }
-
-    private fun handleHubForgot() {
-        editHubForgotEmail.error = null
-        val e = editHubForgotEmail.text.toString().trim()
-        if (e.isEmpty()) {
-            editHubForgotEmail.error = "Enter your registered email"
-            toast("Please enter your email address.")
-            return
-        }
-
-        btnHubSubmitForgot.isEnabled = false
-        btnHubSubmitForgot.text = "Sending..."
-        setBusy(true, "Requesting password reset...")
-        api.requestPasswordReset(e, object : ApiClient.ApiCallback<String> {
-            override fun onSuccess(result: String) {
-                setBusy(false, "")
-                btnHubSubmitForgot.isEnabled = true
-                btnHubSubmitForgot.text = "Send Password Reset Link"
-                toast(result)
-                switchAuthHubTab("signin")
-            }
-
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                btnHubSubmitForgot.isEnabled = true
-                btnHubSubmitForgot.text = "Send Password Reset Link"
+                setBusy(false)
                 toast(errorMessage)
             }
         })
     }
 
-    // -------------------------------------------------------------
-    // Tab Navigation Switcher & Auth Protection
-    // -------------------------------------------------------------
-
-    private fun checkAuthAndSwitchTab(tabKey: String) {
-        if (!session.isAuthenticated() && tabKey != "community") {
-            promptLoginRequired()
-            return
-        }
-        switchTab(tabKey)
-    }
-
-    private fun promptLoginRequired() {
-        panelAuthHub.visibility = View.VISIBLE
-        studioNavScroll.visibility = View.GONE
-        studioPanelsContainer.visibility = View.GONE
-        switchAuthHubTab("signin")
-        toast("Please log in to access this feature.")
-    }
-
-    private fun switchTab(tabKey: String) {
-        val tabs = listOf(
-            Pair("dashboard", Pair(tabBtnDashboard, panelDashboard)),
-            Pair("projects", Pair(tabBtnProjects, panelProjects)),
-            Pair("editor", Pair(tabBtnEditor, panelEditor)),
-            Pair("customizer", Pair(tabBtnCustomizer, panelCustomizer)),
-            Pair("build", Pair(tabBtnBuild, panelBuild)),
-            Pair("debugger", Pair(tabBtnDebugger, panelDebugger)),
-            Pair("ai_settings", Pair(tabBtnAiSettings, panelAiSettings)),
-            Pair("admin", Pair(tabBtnAdmin, panelAdmin)),
-            Pair("community", Pair(tabBtnCommunity, panelCommunity))
-        )
-
-        for ((key, pair) in tabs) {
-            val (btn, panel) = pair
-            val isActive = key == tabKey
-            panel.visibility = if (isActive) View.VISIBLE else View.GONE
-            if (isActive) {
-                btn.setBackgroundColor(getColor(R.color.primary))
-                btn.setTextColor(getColor(R.color.text_inverse))
-            } else {
-                btn.setBackgroundColor(getColor(android.R.color.transparent))
-                btn.setTextColor(getColor(R.color.text_secondary))
-            }
+    private fun createProjectRowView(proj: ProjectItem): View {
+        val card = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setPadding(16, 16, 16, 16)
+            setBackgroundResource(R.drawable.bg_dashboard_card)
+            val params = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            params.setMargins(0, 0, 0, 12)
+            layoutParams = params
+            gravity = android.view.Gravity.CENTER_VERTICAL
         }
 
-        // On tab entry, load contextual data
-        when (tabKey) {
-            "dashboard" -> refreshDashboardData()
-            "projects" -> refreshProjectsList()
-            "editor" -> if (currentDirPath.isEmpty()) loadDirectory("")
-            "customizer" -> loadStringsForLocale("values")
-            "build" -> loadKeystoresList()
-            "debugger" -> loadAdbDevicesList()
-            "ai_settings" -> loadAiSettings()
-            "admin" -> loadAdminPanelData()
-            "community" -> loadPublicCommunityData()
-        }
-    }
-
-    // -------------------------------------------------------------
-    // UI State & Auth Updates
-    // -------------------------------------------------------------
-
-    private fun updateUiForAuthState() {
-        val user = session.currentUser
-        topBarSubtitle.text = "Host: ${session.serverUrl}"
-
-        if (user != null) {
-            panelAuthHub.visibility = View.GONE
-            studioNavScroll.visibility = View.VISIBLE
-            studioPanelsContainer.visibility = View.VISIBLE
-
-            btnTopAuth.text = user.username
-            btnTopAuth.setBackgroundColor(getColor(R.color.primary_dark))
-            txtDashWelcome.text = "Welcome back, ${user.username}!"
-            txtDashUserEmail.text = "Logged in as ${user.email} (${user.userType.uppercase()})"
-            txtAdminBadge.visibility = if (user.isAdmin) View.VISIBLE else View.GONE
-            tabBtnAdmin.visibility = if (user.isAdmin) View.VISIBLE else View.GONE
-            updateLimitsDisplay(user.decompileUsage, user.decompileLimit, user.compileUsage, user.compileLimit, user.generateKeyUsage, user.generateKeyLimit, user.signApkUsage, user.signApkLimit)
-        } else {
-            panelAuthHub.visibility = View.VISIBLE
-            studioNavScroll.visibility = View.GONE
-            studioPanelsContainer.visibility = View.GONE
-
-            btnTopAuth.text = "Login"
-            btnTopAuth.setBackgroundColor(getColor(R.color.primary))
-            txtDashWelcome.text = "Welcome to APK Tool Studio"
-            txtDashUserEmail.text = "Sign in to access all studio features"
-            txtAdminBadge.visibility = View.GONE
-            tabBtnAdmin.visibility = View.GONE
+        val infoLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
         }
 
-        val activePid = session.currentProjectId
-        val pairedName = session.pairedProjectName
-        if (!activePid.isNullOrBlank()) {
-            txtActiveProjectPill.text = "📁 Active: $activePid"
-            txtDashProjectName.text = activePid
-            cardActiveProjectOverview.visibility = View.VISIBLE
-        } else if (!pairedName.isNullOrBlank()) {
-            txtActiveProjectPill.text = "🔗 Paired: $pairedName"
-            txtDashProjectName.text = pairedName
-            cardActiveProjectOverview.visibility = View.VISIBLE
-        } else {
-            txtActiveProjectPill.text = "No project selected"
-            txtDashProjectName.text = "No active project"
-            cardActiveProjectOverview.visibility = View.GONE
-        }
-    }
-
-    private fun updateLimitsDisplay(du: Int, dl: Int, cu: Int, cl: Int, ku: Int, kl: Int, su: Int, sl: Int) {
-        txtMeterDecompile.text = "$du / $dl"
-        txtMeterCompile.text = "$cu / $cl"
-        txtMeterKeygen.text = "$ku / $kl"
-        txtMeterSign.text = "$su / $sl"
-    }
-
-    // -------------------------------------------------------------
-    // Dashboard & Multi-Project Logic
-    // -------------------------------------------------------------
-
-    private fun refreshDashboardData() {
-        if (!session.isAuthenticated()) return
-        api.getUserInfo(object : ApiClient.ApiCallback<User> {
-            override fun onSuccess(result: User) {
-                updateUiForAuthState()
-            }
-            override fun onError(errorMessage: String) {}
-        })
-        refreshProjectsList()
-    }
-
-    private fun refreshProjectsList() {
-        if (!session.isAuthenticated()) return
-        api.getProjects(object : ApiClient.ApiCallback<List<ProjectItem>> {
-            override fun onSuccess(result: List<ProjectItem>) {
-                renderProjectsList(result, dashProjectsListContainer)
-                renderProjectsList(result, projectsListContainer)
-            }
-            override fun onError(errorMessage: String) {
-                toast("Could not load projects: $errorMessage")
-            }
-        })
-    }
-
-    private fun renderProjectsList(projects: List<ProjectItem>, container: LinearLayout) {
-        container.removeAllViews()
-        if (projects.isEmpty()) {
-            val emptyTv = TextView(this).apply {
-                text = "No projects yet. Upload an APK above to decompile your first project."
-                setTextColor(getColor(R.color.text_muted))
-                textSize = 12f
-                setPadding(0, 16, 0, 16)
-            }
-            container.addView(emptyTv)
-            return
+        val title = TextView(this).apply {
+            text = proj.projectName
+            textSize = 14sp()
+            setTypeface(null, android.graphics.Typeface.BOLD)
+            setTextColor(getColor(R.color.text_primary))
         }
 
-        val inflater = LayoutInflater.from(this)
-        for (p in projects) {
-            val card = LinearLayout(this).apply {
-                orientation = LinearLayout.VERTICAL
-                background = ContextCompat.getDrawable(this@MainActivity, R.drawable.bg_card_rounded)
-                setPadding(24, 20, 24, 20)
-                val params = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-                params.setMargins(0, 0, 0, 16)
-                layoutParams = params
-            }
-
-            val titleRow = LinearLayout(this).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = android.view.Gravity.CENTER_VERTICAL
-            }
-
-            val nameTv = TextView(this).apply {
-                text = p.projectName
-                setTextColor(getColor(R.color.text_primary))
-                textSize = 14f
-                setTypeface(null, android.graphics.Typeface.BOLD)
-                layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
-            }
-            titleRow.addView(nameTv)
-
-            if (p.projectId == session.currentProjectId) {
-                val activeBadge = TextView(this).apply {
-                    text = "ACTIVE"
-                    background = ContextCompat.getDrawable(this@MainActivity, R.drawable.bg_badge_success)
-                    setTextColor(getColor(R.color.success))
-                    textSize = 9f
-                    setTypeface(null, android.graphics.Typeface.BOLD)
-                    setPadding(12, 4, 12, 4)
-                }
-                titleRow.addView(activeBadge)
-            }
-
-            card.addView(titleRow)
-
-            val metaTv = TextView(this).apply {
-                text = "Created: ${p.createdAt ?: "recent"} • Token: ${p.crashReportToken?.take(8) ?: "N/A"}"
-                setTextColor(getColor(R.color.text_muted))
-                textSize = 10f
-                setPadding(0, 4, 0, 12)
-            }
-            card.addView(metaTv)
-
-            val actionsRow = LinearLayout(this).apply {
-                orientation = LinearLayout.HORIZONTAL
-            }
-
-            val btnOpen = Button(this, null, 0, com.google.android.material.R.style.Widget_MaterialComponents_Button_UnelevatedButton).apply {
-                text = "Open in Studio"
-                textSize = 10f
-                setBackgroundColor(getColor(R.color.primary))
-                setTextColor(getColor(R.color.text_inverse))
-                val lp = LinearLayout.LayoutParams(0, 90, 1f).apply { marginEnd = 8 }
-                layoutParams = lp
-                setOnClickListener { selectActiveProject(p.projectId) }
-            }
-            actionsRow.addView(btnOpen)
-
-            val btnDelete = Button(this, null, 0, com.google.android.material.R.style.Widget_MaterialComponents_Button_UnelevatedButton).apply {
-                text = "Delete"
-                textSize = 10f
-                setBackgroundColor(getColor(R.color.danger_container))
-                setTextColor(getColor(R.color.danger))
-                val lp = LinearLayout.LayoutParams(0, 90, 1f)
-                layoutParams = lp
-                setOnClickListener { deleteProject(p.projectId) }
-            }
-            actionsRow.addView(btnDelete)
-
-            card.addView(actionsRow)
-            container.addView(card)
+        val subtitle = TextView(this).apply {
+            text = "Modified: ${proj.updatedAt.take(10)}"
+            textSize = 11sp()
+            setTextColor(getColor(R.color.text_muted))
         }
+
+        infoLayout.addView(title)
+        infoLayout.addView(subtitle)
+
+        val btnOpen = Button(this).apply {
+            text = "Open Studio"
+            textSize = 11sp()
+            setTextColor(0xFFFFFFFF.toInt())
+            setBackgroundColor(getColor(R.color.primary))
+            setOnClickListener { openProjectInStudio(proj.projectId, proj.projectName) }
+        }
+
+        card.addView(infoLayout)
+        card.addView(btnOpen)
+        return card
     }
 
-    private fun selectActiveProject(projectId: String) {
-        setBusy(true, "Selecting project: $projectId...")
-        api.selectProject(projectId, object : ApiClient.ApiCallback<JSONObject> {
+    private fun openProjectInStudio(projectId: String, projectName: String) {
+        setBusy(true)
+        api.switchProject(projectId, object : ApiClient.ApiCallback<JSONObject> {
             override fun onSuccess(result: JSONObject) {
-                setBusy(false, "")
-                session.currentProjectId = projectId
-                session.pairedProjectName = result.optString("project_name", projectId)
-                updateUiForAuthState()
-                toast("Active project switched to: $projectId")
-                refreshDashboardData()
+                setBusy(false)
+                activeProjectName = projectName
+                updateProjectHeader()
+                toast("Opened \"$projectName\" in Studio")
+                switchTab("editor")
             }
             override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                toast("Error selecting project: $errorMessage")
+                setBusy(false)
+                toast("Failed to open project: $errorMessage")
             }
         })
     }
 
-    private fun deleteProject(projectId: String) {
-        AlertDialog.Builder(this)
-            .setTitle("Delete Project")
-            .setMessage("Are you sure you want to completely delete project '$projectId' and all decompiled smali sources from the server?")
-            .setPositiveButton("Delete Permanently") { _, _ ->
-                setBusy(true, "Deleting project...")
-                api.deleteProject(projectId, object : ApiClient.ApiCallback<JSONObject> {
-                    override fun onSuccess(result: JSONObject) {
-                        setBusy(false, "")
-                        toast(result.optString("message", "Project deleted."))
-                        if (session.currentProjectId == projectId) {
-                            session.currentProjectId = null
-                            updateUiForAuthState()
+    // -------------------------------------------------------------
+    // Code & File Editor
+    // -------------------------------------------------------------
+
+    private fun loadEditorDirectory(dir: String) {
+        setBusy(true)
+        currentEditorDir = dir
+        txtEditorBreadcrumb.text = if (dir.isEmpty()) "Root /" else "/ $dir"
+
+        api.getDirectory(dir, object : ApiClient.ApiCallback<Pair<String, List<ProjectFile>>> {
+            override fun onSuccess(result: Pair<String, List<ProjectFile>>) {
+                setBusy(false)
+                layoutEditorItems.removeAllViews()
+                val files = result.second
+
+                if (files.isEmpty()) {
+                    val empty = TextView(this@MainActivity)
+                    empty.text = "Empty folder"
+                    empty.textSize = 12sp()
+                    empty.setTextColor(getColor(R.color.text_muted))
+                    layoutEditorItems.addView(empty)
+                } else {
+                    files.forEach { file ->
+                        val item = TextView(this@MainActivity).apply {
+                            text = (if (file.isDir) "📁  " else "📄  ") + file.name
+                            textSize = 12sp()
+                            setTextColor(getColor(if (file.isDir) R.color.primary else R.color.text_primary))
+                            setPadding(8, 8, 8, 8)
+                            setOnClickListener {
+                                if (file.isDir) {
+                                    loadEditorDirectory(file.path)
+                                } else {
+                                    openFileInEditor(file.path)
+                                }
+                            }
                         }
-                        refreshProjectsList()
+                        layoutEditorItems.addView(item)
+                    }
+                }
+            }
+            override fun onError(errorMessage: String) {
+                setBusy(false)
+                toast("Error loading folder: $errorMessage")
+            }
+        })
+    }
+
+    private fun goUpDirectory() {
+        if (currentEditorDir.isEmpty()) return
+        val parts = currentEditorDir.split("/").toMutableList()
+        parts.removeAt(parts.size - 1)
+        loadEditorDirectory(parts.joinToString("/"))
+    }
+
+    private fun openFileInEditor(filePath: String) {
+        setBusy(true)
+        api.openEditorFile(filePath, 0, object : ApiClient.ApiCallback<EditorFile> {
+            override fun onSuccess(result: EditorFile) {
+                setBusy(false)
+                currentEditorFilePath = result.path
+                editCodeContent.setText(result.content)
+                txtTopbarTitle.text = "Editing: ${result.path.substringAfterLast('/')}"
+                toast("Loaded ${result.path}")
+            }
+            override fun onError(errorMessage: String) {
+                setBusy(false)
+                toast("Failed to open file: $errorMessage")
+            }
+        })
+    }
+
+    private fun saveActiveEditorFile() {
+        val path = currentEditorFilePath
+        if (path == null) {
+            toast("No file open in editor to save.")
+            return
+        }
+        val content = editCodeContent.text.toString()
+        setBusy(true)
+        api.saveEditorFile(path, content, object : ApiClient.ApiCallback<String> {
+            override fun onSuccess(result: String) {
+                setBusy(false)
+                toast("Saved $path successfully.")
+            }
+            override fun onError(errorMessage: String) {
+                setBusy(false)
+                toast("Failed to save: $errorMessage")
+            }
+        })
+    }
+
+    // -------------------------------------------------------------
+    // Find & Replace
+    // -------------------------------------------------------------
+
+    private fun executeSearch() {
+        val query = editSearchFindQuery.text.toString().trim()
+        if (query.isEmpty()) {
+            toast("Please enter a query to search.")
+            return
+        }
+        setBusy(true)
+        api.findInProject(query, object : ApiClient.ApiCallback<FindResult> {
+            override fun onSuccess(result: FindResult) {
+                setBusy(false)
+                layoutSearchResultsList.removeAllViews()
+                txtSearchResultsHeader.text = "Matching Locations (${result.files.size})"
+
+                if (result.files.isEmpty()) {
+                    val empty = TextView(this@MainActivity)
+                    empty.text = "No occurrences found for \"$query\""
+                    empty.setPadding(8, 16, 8, 16)
+                    empty.setTextColor(getColor(R.color.text_muted))
+                    layoutSearchResultsList.addView(empty)
+                } else {
+                    result.files.forEach { match ->
+                        val card = LinearLayout(this@MainActivity).apply {
+                            orientation = LinearLayout.VERTICAL
+                            setPadding(12, 12, 12, 12)
+                            setBackgroundResource(R.drawable.bg_dashboard_card)
+                            val p = LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                            )
+                            p.setMargins(0, 0, 0, 8)
+                            layoutParams = p
+                            setOnClickListener {
+                                switchTab("editor")
+                                openFileInEditor(match.path)
+                            }
+                        }
+
+                        val pathText = TextView(this@MainActivity).apply {
+                            text = "📄 ${match.path}"
+                            textSize = 13sp()
+                            setTypeface(null, android.graphics.Typeface.BOLD)
+                            setTextColor(getColor(R.color.primary))
+                        }
+
+                        val snippet = TextView(this@MainActivity).apply {
+                            text = match.snippet
+                            textSize = 11sp()
+                            setTextColor(getColor(R.color.text_secondary))
+                            setPadding(0, 4, 0, 0)
+                        }
+
+                        card.addView(pathText)
+                        card.addView(snippet)
+                        layoutSearchResultsList.addView(card)
+                    }
+                }
+            }
+            override fun onError(errorMessage: String) {
+                setBusy(false)
+                toast(errorMessage)
+            }
+        })
+    }
+
+    private fun executeReplace() {
+        val find = editSearchFindQuery.text.toString().trim()
+        val replace = editSearchReplaceQuery.text.toString()
+        if (find.isEmpty()) {
+            toast("Enter text to find first.")
+            return
+        }
+        AlertDialog.Builder(this)
+            .setTitle("Confirm Replace All")
+            .setMessage("Replace all occurrences of \"$find\" with \"$replace\" across the project?")
+            .setPositiveButton("Replace") { _, _ ->
+                setBusy(true)
+                api.findAndReplace(find, replace, object : ApiClient.ApiCallback<FindReplaceResult> {
+                    override fun onSuccess(result: FindReplaceResult) {
+                        setBusy(false)
+                        toast("Replaced ${result.replacements} occurrences across ${result.filesChanged} files.")
+                        executeSearch()
                     }
                     override fun onError(errorMessage: String) {
-                        setBusy(false, "")
-                        toast("Failed to delete: $errorMessage")
+                        setBusy(false)
+                        toast(errorMessage)
                     }
                 })
             }
@@ -1159,1369 +766,501 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun closeCurrentProject() {
-        session.currentProjectId = null
-        session.pairedProjectName = null
-        updateUiForAuthState()
-        toast("Closed active project.")
+    // -------------------------------------------------------------
+    // App Name & Strings
+    // -------------------------------------------------------------
+
+    private fun loadStringsList() {
+        setBusy(true)
+        api.loadStrings("values", object : ApiClient.ApiCallback<StringData> {
+            override fun onSuccess(result: StringData) {
+                setBusy(false)
+                editAppNameInput.setText(result.appName)
+                stringMap.clear()
+                layoutStringsList.removeAllViews()
+
+                result.allStrings.forEach { item ->
+                    stringMap[item.name] = item.value
+
+                    val row = LinearLayout(this@MainActivity).apply {
+                        orientation = LinearLayout.HORIZONTAL
+                        setPadding(8, 8, 8, 8)
+                        gravity = android.view.Gravity.CENTER_VERTICAL
+                    }
+
+                    val keyLabel = TextView(this@MainActivity).apply {
+                        text = item.name
+                        textSize = 12sp()
+                        setTypeface(null, android.graphics.Typeface.BOLD)
+                        setTextColor(getColor(R.color.text_primary))
+                        layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.4f)
+                    }
+
+                    val valInput = EditText(this@MainActivity).apply {
+                        setText(item.value)
+                        textSize = 12sp()
+                        setBackgroundResource(R.drawable.bg_input_field)
+                        setPadding(8, 6, 8, 6)
+                        layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.6f)
+                        setOnFocusChangeListener { _, hasFocus ->
+                            if (!hasFocus) stringMap[item.name] = text.toString()
+                        }
+                    }
+
+                    row.addView(keyLabel)
+                    row.addView(valInput)
+                    layoutStringsList.addView(row)
+                }
+            }
+            override fun onError(errorMessage: String) {
+                setBusy(false)
+                toast(errorMessage)
+            }
+        })
     }
 
-    // -------------------------------------------------------------
-    // APK Upload & Decompilation
-    // -------------------------------------------------------------
-
-    private fun uploadAndDecompileSelectedApk() {
-        val file = pendingUploadApkFile
-        if (file == null || !file.exists()) {
-            toast("Please pick an APK file first.")
-            return
-        }
-
-        setBusy(true, "Uploading and decompiling ${file.name}...")
-        boxDecompileLogs.visibility = View.VISIBLE
-        txtDecompileStatus.text = "Decompiling ${file.name} on server..."
-        txtDecompileLogOutput.text = "Starting multi-threaded apktool decompiler...\nExtracting AndroidManifest.xml and smali bytecode..."
-
-        api.uploadAndDecompile(file, object : ApiClient.ProgressCallback {
-            override fun onProgress(percentage: Int, message: String) {
-                txtDecompileStatus.text = "Decompiling: $percentage% - $message"
+    private fun saveAppNameAndStrings() {
+        val appName = editAppNameInput.text.toString().trim()
+        setBusy(true)
+        api.saveStrings("values", appName, stringMap, object : ApiClient.ApiCallback<String> {
+            override fun onSuccess(result: String) {
+                setBusy(false)
+                toast("App Name & Strings saved successfully.")
             }
-        }, object : ApiClient.ApiCallback<JSONObject> {
-            override fun onSuccess(result: JSONObject) {
-                setBusy(false, "")
-                txtDecompileStatus.text = "Decompilation Successful!"
-                txtDecompileLogOutput.text = result.optString("log", "APK decompiled successfully.")
-                val pid = result.optString("project_id", "")
-                if (pid.isNotEmpty()) {
-                    session.currentProjectId = pid
-                    session.pairedProjectName = file.nameWithoutExtension
-                    updateUiForAuthState()
-                }
-                toast("APK decompiled successfully!")
-                refreshProjectsList()
-            }
-
             override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                txtDecompileStatus.text = "Decompilation Failed"
-                txtDecompileLogOutput.text = errorMessage
-                toast("Decompile error: $errorMessage")
+                setBusy(false)
+                toast(errorMessage)
             }
         })
     }
 
     // -------------------------------------------------------------
-    // Smali / Code / Hex Editor Logic
+    // Keystores
     // -------------------------------------------------------------
 
-    private fun loadDirectory(relPath: String) {
-        currentDirPath = relPath
-        txtFileBreadcrumb.text = if (relPath.isEmpty()) "/" else "/$relPath"
-        setBusy(true, "Reading directory: $relPath...")
-        api.getFiles(relPath, object : ApiClient.ApiCallback<List<ProjectFile>> {
-            override fun onSuccess(result: List<ProjectFile>) {
-                setBusy(false, "")
-                renderDirectoryItems(result)
-            }
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                toast("Failed to list files: $errorMessage")
-            }
-        })
-    }
-
-    private fun renderDirectoryItems(files: List<ProjectFile>) {
-        directoryItemsContainer.removeAllViews()
-        if (files.isEmpty()) {
-            val tv = TextView(this).apply {
-                text = "Empty folder"
-                setTextColor(getColor(R.color.text_muted))
-                textSize = 12f
-                setPadding(12, 12, 12, 12)
-            }
-            directoryItemsContainer.addView(tv)
-            return
-        }
-
-        for (f in files) {
-            val row = LinearLayout(this).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = android.view.Gravity.CENTER_VERTICAL
-                setPadding(12, 12, 12, 12)
-                background = ContextCompat.getDrawable(this@MainActivity, R.drawable.bg_input_field)
-                val params = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
-                    setMargins(0, 0, 0, 8)
-                }
-                layoutParams = params
-            }
-
-            val iconTv = TextView(this).apply {
-                text = if (f.isDir) "📁" else when {
-                    f.name.endsWith(".smali") -> "⚙️"
-                    f.name.endsWith(".xml") -> "📄"
-                    f.name.endsWith(".json") -> "📦"
-                    f.name.endsWith(".so") -> "🔩"
-                    else -> "📝"
-                }
-                textSize = 14f
-                setPadding(0, 0, 12, 0)
-            }
-            row.addView(iconTv)
-
-            val nameTv = TextView(this).apply {
-                text = f.name
-                setTextColor(getColor(R.color.text_primary))
-                textSize = 12f
-                setTypeface(android.graphics.Typeface.MONOSPACE)
-                layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
-            }
-            row.addView(nameTv)
-
-            val sizeTv = TextView(this).apply {
-                text = if (f.isDir) "DIR" else formatSize(f.size)
-                setTextColor(getColor(R.color.text_muted))
-                textSize = 10f
-            }
-            row.addView(sizeTv)
-
-            row.setOnClickListener {
-                if (f.isDir) {
-                    loadDirectory(f.path)
+    private fun loadKeystoresList() {
+        setBusy(true)
+        api.getKeystores(object : ApiClient.ApiCallback<List<KeystoreItem>> {
+            override fun onSuccess(result: List<KeystoreItem>) {
+                setBusy(false)
+                layoutKeystoresList.removeAllViews()
+                if (result.isEmpty()) {
+                    val empty = TextView(this@MainActivity)
+                    empty.text = "No keystores created yet. Click '+ New Key' to generate one."
+                    empty.setPadding(16, 24, 16, 24)
+                    empty.setTextColor(getColor(R.color.text_muted))
+                    layoutKeystoresList.addView(empty)
                 } else {
-                    openEditorForFile(f.path)
+                    result.forEach { ks ->
+                        val card = LinearLayout(this@MainActivity).apply {
+                            orientation = LinearLayout.HORIZONTAL
+                            setPadding(14, 14, 14, 14)
+                            setBackgroundResource(R.drawable.bg_dashboard_card)
+                            val p = LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                            )
+                            p.setMargins(0, 0, 0, 10)
+                            layoutParams = p
+                            gravity = android.view.Gravity.CENTER_VERTICAL
+                        }
+
+                        val info = LinearLayout(this@MainActivity).apply {
+                            orientation = LinearLayout.VERTICAL
+                            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                        }
+
+                        val alias = TextView(this@MainActivity).apply {
+                            text = "🔑 ${ks.keyAlias}"
+                            textSize = 14sp()
+                            setTypeface(null, android.graphics.Typeface.BOLD)
+                            setTextColor(getColor(R.color.text_primary))
+                        }
+
+                        val date = TextView(this@MainActivity).apply {
+                            text = "Created: ${ks.createdAt.take(10)}"
+                            textSize = 11sp()
+                            setTextColor(getColor(R.color.text_muted))
+                        }
+
+                        info.addView(alias)
+                        info.addView(date)
+
+                        val btnDownload = Button(this@MainActivity).apply {
+                            text = "Download"
+                            textSize = 11sp()
+                            setBackgroundColor(getColor(R.color.primary))
+                            setTextColor(0xFFFFFFFF.toInt())
+                            setOnClickListener {
+                                val url = session.serverUrl + "?download=" + Uri.encode(ks.fileName)
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                                startActivity(intent)
+                            }
+                        }
+
+                        card.addView(info)
+                        card.addView(btnDownload)
+                        layoutKeystoresList.addView(card)
+                    }
                 }
             }
-
-            directoryItemsContainer.addView(row)
-        }
+            override fun onError(errorMessage: String) {
+                setBusy(false)
+                toast(errorMessage)
+            }
+        })
     }
 
-    private fun navigateUpDirectory() {
-        if (currentDirPath.isEmpty()) return
-        val idx = currentDirPath.lastIndexOf('/')
-        val parent = if (idx == -1) "" else currentDirPath.substring(0, idx)
-        loadDirectory(parent)
-    }
+    private fun showCreateKeystoreDialog() {
+        val view = LayoutInflater.from(this).inflate(R.layout.dialog_create_keystore, null)
+        val editAlias = view.findViewById<EditText>(R.id.editKeystoreAlias)
+        val editPass = view.findViewById<EditText>(R.id.editKeystorePassword)
 
-    private fun openEditorForFile(relPath: String) {
-        currentEditingFilePath = relPath
-        txtEditorOpenFileName.text = relPath
-        scrollDirectoryBrowser.visibility = View.GONE
-        boxCodeEditorView.visibility = View.VISIBLE
-
-        setBusy(true, "Loading file: $relPath...")
-        api.getFileContent(relPath, object : ApiClient.ApiCallback<JSONObject> {
-            override fun onSuccess(result: JSONObject) {
-                setBusy(false, "")
-                val content = result.optString("content", "")
-                val isBin = result.optBoolean("is_binary", false)
-                if (isBin) {
-                    editCodeContent.setText("[Binary file - Hex editor view available]")
-                    editCodeContent.isEnabled = false
+        AlertDialog.Builder(this)
+            .setTitle("Generate RSA 2048 Keystore")
+            .setView(view)
+            .setPositiveButton("Generate") { _, _ ->
+                val alias = editAlias.text.toString().trim()
+                val pass = editPass.text.toString().trim()
+                if (alias.isNotEmpty() && pass.isNotEmpty()) {
+                    setBusy(true)
+                    api.createKeystore(alias, pass, object : ApiClient.ApiCallback<String> {
+                        override fun onSuccess(result: String) {
+                            setBusy(false)
+                            toast("Keystore generated successfully.")
+                            loadKeystoresList()
+                        }
+                        override fun onError(errorMessage: String) {
+                            setBusy(false)
+                            toast("Keystore error: $errorMessage")
+                        }
+                    })
                 } else {
-                    editCodeContent.setText(content)
-                    editCodeContent.isEnabled = true
+                    toast("Alias and password are required.")
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    // -------------------------------------------------------------
+    // Build & Recompile APK
+    // -------------------------------------------------------------
+
+    private fun buildAndSignApk() {
+        setBusy(true)
+        api.buildApk("", "", object : ApiClient.ApiCallback<BuildResult> {
+            override fun onSuccess(result: BuildResult) {
+                setBusy(false)
+                if (result.success && !result.signedApk.isNullOrEmpty()) {
+                    lastSignedApkUrl = session.serverUrl + "?download=" + Uri.encode(result.signedApk)
+                    layoutBuildOutput.visibility = View.VISIBLE
+                    toast("APK Recompiled & Signed Successfully!")
+                } else {
+                    toast(result.message ?: "Build complete.")
                 }
             }
             override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                toast("Error loading file: $errorMessage")
-            }
-        })
-    }
-
-    private fun saveCurrentOpenCodeFile() {
-        if (currentEditingFilePath.isEmpty()) return
-        val newContent = editCodeContent.text.toString()
-        setBusy(true, "Saving: $currentEditingFilePath...")
-        api.saveFileContent(currentEditingFilePath, newContent, object : ApiClient.ApiCallback<JSONObject> {
-            override fun onSuccess(result: JSONObject) {
-                setBusy(false, "")
-                toast("File saved successfully.")
-            }
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                toast("Save failed: $errorMessage")
-            }
-        })
-    }
-
-    private fun triggerAiReviewOnFile() {
-        if (currentEditingFilePath.isEmpty()) return
-        val content = editCodeContent.text.toString()
-        setBusy(true, "AI Code Review running...")
-        api.aiReview(currentEditingFilePath, content, object : ApiClient.ApiCallback<JSONObject> {
-            override fun onSuccess(result: JSONObject) {
-                setBusy(false, "")
-                val review = result.optString("review", "No suggestions.")
-                AlertDialog.Builder(this@MainActivity)
-                    .setTitle("AI Smali / Code Review")
-                    .setMessage(review)
-                    .setPositiveButton("Close", null)
-                    .show()
-            }
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                toast("AI Review Error: $errorMessage")
-            }
-        })
-    }
-
-    private fun closeCodeEditor() {
-        boxCodeEditorView.visibility = View.GONE
-        scrollDirectoryBrowser.visibility = View.VISIBLE
-        currentEditingFilePath = ""
-    }
-
-    private fun performHexSearch() {
-        if (currentEditingFilePath.isEmpty()) {
-            toast("Open a file first to search in Hex.")
-            return
-        }
-        val q = editHexSearchQuery.text.toString().trim()
-        if (q.isEmpty()) return
-        setBusy(true, "Hex searching...")
-        api.hexSearch(currentEditingFilePath, q, object : ApiClient.ApiCallback<List<HexResult>> {
-            override fun onSuccess(result: List<HexResult>) {
-                setBusy(false, "")
-                boxHexEditorView.visibility = View.VISIBLE
-                renderHexResults(result)
-            }
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                toast("Hex search error: $errorMessage")
-            }
-        })
-    }
-
-    private fun renderHexResults(results: List<HexResult>) {
-        hexResultsContainer.removeAllViews()
-        for (r in results) {
-            val tv = TextView(this).apply {
-                text = "${r.hexOffset}: ${r.hexSnippet} | ${r.asciiSnippet}"
-                setTextColor(getColor(R.color.hex_ascii))
-                textSize = 10f
-                setTypeface(android.graphics.Typeface.MONOSPACE)
-                setPadding(8, 8, 8, 8)
-                background = ContextCompat.getDrawable(this@MainActivity, R.drawable.bg_input_field)
-            }
-            hexResultsContainer.addView(tv)
-        }
-    }
-
-    private fun applyHexPatch() {
-        val patch = editHexPatchBytes.text.toString().trim()
-        if (currentEditingFilePath.isEmpty() || patch.isEmpty()) return
-        setBusy(true, "Applying hex patch...")
-        api.hexPatch(currentEditingFilePath, 0, patch, object : ApiClient.ApiCallback<JSONObject> {
-            override fun onSuccess(result: JSONObject) {
-                setBusy(false, "")
-                toast("Hex patch applied successfully.")
-            }
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                toast("Hex patch error: $errorMessage")
-            }
-        })
-    }
-
-    private fun closeHexEditor() {
-        boxHexEditorView.visibility = View.GONE
-    }
-
-    // -------------------------------------------------------------
-    // Resources & AI Customizer Logic
-    // -------------------------------------------------------------
-
-    private fun loadStringsForLocale(locale: String) {
-        setBusy(true, "Loading strings ($locale)...")
-        api.loadStrings(locale, object : ApiClient.ApiCallback<Map<String, String>> {
-            override fun onSuccess(result: Map<String, String>) {
-                setBusy(false, "")
-                loadedStringsMap.clear()
-                loadedStringsMap.putAll(result)
-                if (result.containsKey("app_name")) {
-                    editCustomAppName.setText(result["app_name"])
-                }
-                renderStringsTable()
-            }
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                toast("Failed to load strings: $errorMessage")
-            }
-        })
-    }
-
-    private fun renderStringsTable() {
-        stringsTableContainer.removeAllViews()
-        for ((key, value) in loadedStringsMap.entries.take(20)) {
-            val row = LinearLayout(this).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = android.view.Gravity.CENTER_VERTICAL
-                setPadding(8, 8, 8, 8)
-            }
-            val keyTv = TextView(this).apply {
-                text = key
-                setTextColor(getColor(R.color.text_primary))
-                textSize = 11f
-                setTypeface(null, android.graphics.Typeface.BOLD)
-                layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.4f)
-            }
-            val valTv = TextView(this).apply {
-                text = value
-                setTextColor(getColor(R.color.text_secondary))
-                textSize = 11f
-                layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.6f)
-            }
-            row.addView(keyTv)
-            row.addView(valTv)
-            row.setOnClickListener { showEditStringDialog(key, value) }
-            stringsTableContainer.addView(row)
-        }
-    }
-
-    private fun showEditStringDialog(key: String, currentVal: String) {
-        val dialog = Dialog(this)
-        val view = layoutInflater.inflate(R.layout.dialog_edit_string, null)
-        dialog.setContentView(view)
-        val txtKey = view.findViewById<TextView>(R.id.txtStringKeyName)
-        val editVal = view.findViewById<EditText>(R.id.editStringValInput)
-        val btnSubmit = view.findViewById<Button>(R.id.btnSubmitStringVal)
-
-        txtKey.text = "Key: $key"
-        editVal.setText(currentVal)
-
-        btnSubmit.setOnClickListener {
-            val newVal = editVal.text.toString()
-            loadedStringsMap[key] = newVal
-            renderStringsTable()
-            dialog.dismiss()
-        }
-        dialog.show()
-    }
-
-    private fun saveStringsChanges() {
-        val appName = editCustomAppName.text.toString().trim()
-        if (appName.isNotEmpty()) {
-            loadedStringsMap["app_name"] = appName
-        }
-        val locale = editStringsLocale.text.toString().trim().ifEmpty { "values" }
-        setBusy(true, "Saving strings.xml ($locale)...")
-        api.saveStrings(locale, loadedStringsMap, object : ApiClient.ApiCallback<JSONObject> {
-            override fun onSuccess(result: JSONObject) {
-                setBusy(false, "")
-                toast("Strings saved successfully.")
-            }
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                toast("Strings save error: $errorMessage")
-            }
-        })
-    }
-
-    private fun generateAiLauncherIcon() {
-        val prompt = editAiIconPrompt.text.toString().trim()
-        if (prompt.isEmpty()) {
-            toast("Please enter an icon prompt description.")
-            return
-        }
-        setBusy(true, "Generating AI icon: '$prompt'...")
-        api.generateIcon(prompt, object : ApiClient.ApiCallback<JSONObject> {
-            override fun onSuccess(result: JSONObject) {
-                setBusy(false, "")
-                toast("AI Icon generated and scaled to all densities!")
-            }
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                toast("AI Icon error: $errorMessage")
-            }
-        })
-    }
-
-    private fun triggerAiFix() {
-        setBusy(true, "Running full AI smali logic scan...")
-        api.aiFixAll(object : ApiClient.ApiCallback<JSONObject> {
-            override fun onSuccess(result: JSONObject) {
-                setBusy(false, "")
-                toast(result.optString("message", "AI scan complete."))
-            }
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                toast("AI Fix Error: $errorMessage")
-            }
-        })
-    }
-
-    private fun performGlobalFindOnly() {
-        val query = editGlobalFindText.text.toString().trim()
-        if (query.isEmpty()) return
-        setBusy(true, "Searching across all project files...")
-        api.globalFind(query, object : ApiClient.ApiCallback<JSONObject> {
-            override fun onSuccess(result: JSONObject) {
-                setBusy(false, "")
-                val matches = result.optInt("count", 0)
-                toast("Found $matches occurrences across files.")
-            }
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                toast("Find error: $errorMessage")
-            }
-        })
-    }
-
-    private fun performGlobalFindReplace() {
-        val find = editGlobalFindText.text.toString().trim()
-        val replace = editGlobalReplaceText.text.toString()
-        if (find.isEmpty()) return
-        setBusy(true, "Replacing across project...")
-        api.globalReplace(find, replace, object : ApiClient.ApiCallback<JSONObject> {
-            override fun onSuccess(result: JSONObject) {
-                setBusy(false, "")
-                val replaced = result.optInt("replaced", 0)
-                toast("Replaced $replaced instances across project.")
-            }
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                toast("Replace error: $errorMessage")
-            }
-        })
-    }
-
-    // -------------------------------------------------------------
-    // Build & Keystore Signer Logic
-    // -------------------------------------------------------------
-
-    private fun triggerBuildApk() {
-        setBusy(true, "Recompiling APK with apktool...")
-        boxBuildLogs.visibility = View.VISIBLE
-        txtBuildLogOutput.text = "Starting APK build process...\nCompiling resources & smali..."
-
-        api.buildApk(object : ApiClient.ApiCallback<JSONObject> {
-            override fun onSuccess(result: JSONObject) {
-                setBusy(false, "")
-                txtBuildLogOutput.text = result.optString("log", "APK built successfully.")
-                toast("APK compiled successfully!")
-            }
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                txtBuildLogOutput.text = errorMessage
+                setBusy(false)
                 toast("Build failed: $errorMessage")
             }
         })
     }
 
-    private fun loadKeystoresList() {
-        api.getKeystores(object : ApiClient.ApiCallback<List<KeystoreItem>> {
-            override fun onSuccess(result: List<KeystoreItem>) {
-                renderKeystores(result)
+    private fun installDownloadedApk() {
+        val urlStr = lastSignedApkUrl ?: return
+        val destFile = File(cacheDir, "recompiled_signed.apk")
+        setBusy(true)
+        api.downloadApk(urlStr, destFile, object : ApiClient.ProgressCallback {
+            override fun onProgress(percentage: Int, message: String) {
+                // Progress
+            }
+        }, object : ApiClient.ApiCallback<File> {
+            override fun onSuccess(result: File) {
+                setBusy(false)
+                promptInstallApk(result)
             }
             override fun onError(errorMessage: String) {
-                toast("Failed to load keystores: $errorMessage")
-            }
-        })
-    }
-
-    private fun renderKeystores(keystores: List<KeystoreItem>) {
-        keystoresListContainer.removeAllViews()
-        for (k in keystores) {
-            val row = LinearLayout(this).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = android.view.Gravity.CENTER_VERTICAL
-                setPadding(8, 8, 8, 8)
-                background = ContextCompat.getDrawable(this@MainActivity, R.drawable.bg_input_field)
-            }
-            val titleTv = TextView(this).apply {
-                text = "${k.fileName} (Alias: ${k.keyAlias})"
-                setTextColor(getColor(R.color.text_primary))
-                textSize = 12f
-                layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
-            }
-            row.addView(titleTv)
-            keystoresListContainer.addView(row)
-        }
-    }
-
-    private fun showCreateKeystoreDialog() {
-        val dialog = Dialog(this)
-        val view = layoutInflater.inflate(R.layout.dialog_create_keystore, null)
-        dialog.setContentView(view)
-
-        val editAlias = view.findViewById<EditText>(R.id.editKeystoreAlias)
-        val editPass = view.findViewById<EditText>(R.id.editKeystorePassword)
-        val btnSubmit = view.findViewById<Button>(R.id.btnSubmitCreateKeystore)
-
-        btnSubmit.setOnClickListener {
-            val alias = editAlias.text.toString().trim()
-            val pass = editPass.text.toString().trim()
-            if (alias.isEmpty() || pass.isEmpty()) {
-                toast("Please fill all fields.")
-                return@setOnClickListener
-            }
-            setBusy(true, "Generating RSA 2048-bit JKS...")
-            api.createKeystore(alias, pass, object : ApiClient.ApiCallback<JSONObject> {
-                override fun onSuccess(result: JSONObject) {
-                    setBusy(false, "")
-                    dialog.dismiss()
-                    toast("Keystore generated successfully!")
-                    loadKeystoresList()
-                }
-                override fun onError(errorMessage: String) {
-                    setBusy(false, "")
-                    toast("Keystore error: $errorMessage")
-                }
-            })
-        }
-        dialog.show()
-    }
-
-    private fun triggerSignApk() {
-        val pass = editSignPassword.text.toString().trim()
-        if (pass.isEmpty()) {
-            toast("Please enter the keystore password.")
-            return
-        }
-        setBusy(true, "Signing APK with jarsigner...")
-        api.signApk(pass, object : ApiClient.ApiCallback<JSONObject> {
-            override fun onSuccess(result: JSONObject) {
-                setBusy(false, "")
-                toast("APK signed successfully! Ready for installation.")
-            }
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                toast("Signing failed: $errorMessage")
-            }
-        })
-    }
-
-    private fun handleDownloadAndInstallApk() {
-        setBusy(true, "Downloading signed APK...")
-        api.downloadSignedApk(object : ApiClient.ApiCallback<File> {
-            override fun onSuccess(apkFile: File) {
-                setBusy(false, "")
-                installApkFile(apkFile)
-            }
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
+                setBusy(false)
                 toast("Download failed: $errorMessage")
             }
         })
     }
 
-    private fun installApkFile(apkFile: File) {
-        try {
-            val uri = FileProvider.getUriForFile(this, "${applicationContext.packageName}.fileprovider", apkFile)
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(uri, "application/vnd.android.package-archive")
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
-            }
-            startActivity(intent)
-        } catch (e: Exception) {
-            toast("Install error: ${e.message}")
+    private fun promptInstallApk(file: File) {
+        val uri = FileProvider.getUriForFile(this, "$packageName.fileprovider", file)
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, "application/vnd.android.package-archive")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
+        startActivity(intent)
     }
 
     // -------------------------------------------------------------
-    // Cloud Debugger & Wireless ADB Logic
+    // Blogs & FAQs
     // -------------------------------------------------------------
 
-    private fun toggleCloudLogsStream() {
-        cloudLogsStreaming = !cloudLogsStreaming
-        btnToggleCloudLogsStream.text = if (cloudLogsStreaming) "Pause Stream" else "Start Stream"
-        if (cloudLogsStreaming) {
-            resumeCloudLogsPolling()
-            toast("Cloud log stream started (2s auto-polling).")
-        } else {
-            pauseCloudLogsPolling()
-            toast("Cloud log stream paused.")
-        }
-    }
+    private fun loadBlogsList() {
+        setBusy(true)
+        api.getPublicBlogs(object : ApiClient.ApiCallback<List<BlogItem>> {
+            override fun onSuccess(result: List<BlogItem>) {
+                setBusy(false)
+                layoutBlogsList.removeAllViews()
+                result.forEach { b ->
+                    val card = LinearLayout(this@MainActivity).apply {
+                        orientation = LinearLayout.VERTICAL
+                        setPadding(14, 14, 14, 14)
+                        setBackgroundResource(R.drawable.bg_dashboard_card)
+                        val p = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        )
+                        p.setMargins(0, 0, 0, 10)
+                        layoutParams = p
+                    }
 
-    private fun resumeCloudLogsPolling() {
-        cloudLogsTimer = object : Runnable {
-            override fun run() {
-                fetchCloudLogsOnce()
-                if (cloudLogsStreaming) {
-                    mainHandler.postDelayed(this, 2000)
+                    val cat = TextView(this@MainActivity).apply {
+                        text = b.category.uppercase()
+                        textSize = 10sp()
+                        setTypeface(null, android.graphics.Typeface.BOLD)
+                        setTextColor(getColor(R.color.primary))
+                    }
+
+                    val title = TextView(this@MainActivity).apply {
+                        text = b.title
+                        textSize = 14sp()
+                        setTypeface(null, android.graphics.Typeface.BOLD)
+                        setTextColor(getColor(R.color.text_primary))
+                        setPadding(0, 2, 0, 4)
+                    }
+
+                    val excerpt = TextView(this@MainActivity).apply {
+                        text = b.excerpt
+                        textSize = 12sp()
+                        setTextColor(getColor(R.color.text_secondary))
+                    }
+
+                    card.addView(cat)
+                    card.addView(title)
+                    card.addView(excerpt)
+                    layoutBlogsList.addView(card)
                 }
             }
-        }
-        mainHandler.post(cloudLogsTimer!!)
-    }
-
-    private fun pauseCloudLogsPolling() {
-        cloudLogsTimer?.let { mainHandler.removeCallbacks(it) }
-        cloudLogsTimer = null
-    }
-
-    private fun fetchCloudLogsOnce() {
-        api.getCloudLogs(object : ApiClient.ApiCallback<String> {
-            override fun onSuccess(result: String) {
-                txtCloudLogsStream.text = result
-            }
-            override fun onError(errorMessage: String) {}
-        })
-    }
-
-    private fun clearCloudLogs() {
-        api.clearCloudLogs(object : ApiClient.ApiCallback<JSONObject> {
-            override fun onSuccess(result: JSONObject) {
-                txtCloudLogsStream.text = ""
-                toast("Cloud logs cleared.")
-            }
             override fun onError(errorMessage: String) {
-                toast("Clear failed: $errorMessage")
-            }
-        })
-    }
-
-    private fun connectAdbHost() {
-        val host = editAdbHostIp.text.toString().trim()
-        if (host.isEmpty()) return
-        setBusy(true, "Connecting ADB to $host...")
-        api.adbConnect(host, object : ApiClient.ApiCallback<JSONObject> {
-            override fun onSuccess(result: JSONObject) {
-                setBusy(false, "")
-                toast(result.optString("message", "ADB connected."))
-                loadAdbDevicesList()
-            }
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                toast("ADB error: $errorMessage")
-            }
-        })
-    }
-
-    private fun loadAdbDevicesList() {
-        api.getAdbDevices(object : ApiClient.ApiCallback<List<AdbDevice>> {
-            override fun onSuccess(result: List<AdbDevice>) {
-                renderAdbDevices(result)
-            }
-            override fun onError(errorMessage: String) {}
-        })
-    }
-
-    private fun renderAdbDevices(devices: List<AdbDevice>) {
-        adbDevicesContainer.removeAllViews()
-        for (d in devices) {
-            val tv = TextView(this).apply {
-                text = "📱 ${d.serial} [${d.state.uppercase()}] ${d.model}"
-                setTextColor(getColor(R.color.accent))
-                textSize = 11f
-                setPadding(8, 6, 8, 6)
-            }
-            adbDevicesContainer.addView(tv)
-        }
-    }
-
-    private fun readAdbLogcat(filter: String) {
-        setBusy(true, "Fetching Logcat...")
-        api.getAdbLogcat(filter, object : ApiClient.ApiCallback<String> {
-            override fun onSuccess(result: String) {
-                setBusy(false, "")
-                txtAdbLogcatOutput.text = result
-            }
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                toast("Logcat error: $errorMessage")
-            }
-        })
-    }
-
-    // -------------------------------------------------------------
-    // AI Settings Logic
-    // -------------------------------------------------------------
-
-    private fun loadAiSettings() {
-        api.getAiSettings(object : ApiClient.ApiCallback<AiSettingsData> {
-            override fun onSuccess(result: AiSettingsData) {
-                if (result.provider == "openai") {
-                    rbProviderOpenAi.isChecked = true
-                } else {
-                    rbProviderGemini.isChecked = true
-                }
-                txtGeminiKeyStatus.text = if (result.geminiHasKey) "Status: Saved (${result.geminiMaskedKey})" else "Status: No key saved"
-                txtOpenAiKeyStatus.text = if (result.openaiHasKey) "Status: Saved (${result.openaiMaskedKey})" else "Status: No key saved"
-                editModelGeminiText.setText(result.geminiTextModel)
-                editModelGeminiImage.setText(result.geminiImageModel)
-                editModelOpenAiText.setText(result.openaiTextModel)
-                editModelOpenAiImage.setText(result.openaiImageModel)
-            }
-            override fun onError(errorMessage: String) {}
-        })
-    }
-
-    private fun saveGeminiApiKey() {
-        val key = editGeminiApiKey.text.toString().trim()
-        if (key.isEmpty()) return
-        setBusy(true, "Saving Gemini Key...")
-        api.saveGeminiKey(key, object : ApiClient.ApiCallback<String> {
-            override fun onSuccess(result: String) {
-                setBusy(false, "")
-                toast(result)
-                editGeminiApiKey.setText("")
-                loadAiSettings()
-            }
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
+                setBusy(false)
                 toast(errorMessage)
             }
         })
     }
 
-    private fun deleteGeminiApiKey() {
-        setBusy(true, "Deleting Gemini Key...")
-        api.deleteGeminiKey(object : ApiClient.ApiCallback<String> {
-            override fun onSuccess(result: String) {
-                setBusy(false, "")
-                toast(result)
-                loadAiSettings()
-            }
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                toast(errorMessage)
-            }
-        })
-    }
-
-    private fun saveOpenAiApiKey() {
-        val key = editOpenAiApiKey.text.toString().trim()
-        if (key.isEmpty()) return
-        setBusy(true, "Saving OpenAI Key...")
-        api.saveOpenAiKey(key, object : ApiClient.ApiCallback<String> {
-            override fun onSuccess(result: String) {
-                setBusy(false, "")
-                toast(result)
-                editOpenAiApiKey.setText("")
-                loadAiSettings()
-            }
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                toast(errorMessage)
-            }
-        })
-    }
-
-    private fun deleteOpenAiApiKey() {
-        setBusy(true, "Deleting OpenAI Key...")
-        api.deleteOpenAiKey(object : ApiClient.ApiCallback<String> {
-            override fun onSuccess(result: String) {
-                setBusy(false, "")
-                toast(result)
-                loadAiSettings()
-            }
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                toast(errorMessage)
-            }
-        })
-    }
-
-    private fun saveCustomModels() {
-        val gt = editModelGeminiText.text.toString().trim()
-        val gi = editModelGeminiImage.text.toString().trim()
-        val ot = editModelOpenAiText.text.toString().trim()
-        val oi = editModelOpenAiImage.text.toString().trim()
-        setBusy(true, "Saving custom model identifiers...")
-        api.saveCustomModels(gt, gi, ot, oi, object : ApiClient.ApiCallback<String> {
-            override fun onSuccess(result: String) {
-                setBusy(false, "")
-                toast(result)
-            }
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                toast(errorMessage)
-            }
-        })
-    }
-
-    private fun resetCustomModels() {
-        editModelGeminiText.setText("gemini-3.6-flash")
-        editModelGeminiImage.setText("gemini-3.1-flash-image")
-        editModelOpenAiText.setText("gpt-5.6-sol")
-        editModelOpenAiImage.setText("gpt-image-2")
-        saveCustomModels()
-    }
-
-    // -------------------------------------------------------------
-    // Admin Panel Logic
-    // -------------------------------------------------------------
-
-    private fun loadAdminPanelData() {
-        if (!session.isAuthenticated() || session.currentUser?.isAdmin != true) return
-        loadAdminUsers()
-        loadAdminInquiries()
-        loadAdminBlogs()
-        loadAdminFaqs()
-    }
-
-    private fun loadAdminUsers() {
-        api.getAdminUsers(object : ApiClient.ApiCallback<List<User>> {
-            override fun onSuccess(result: List<User>) {
-                renderAdminUsers(result)
-            }
-            override fun onError(errorMessage: String) {}
-        })
-    }
-
-    private fun renderAdminUsers(users: List<User>) {
-        adminUsersContainer.removeAllViews()
-        for (u in users) {
-            val tv = TextView(this).apply {
-                text = "${u.username} (${u.email}) [${u.userType.uppercase()}]"
-                setTextColor(getColor(R.color.text_primary))
-                textSize = 12f
-                setPadding(8, 8, 8, 8)
-            }
-            adminUsersContainer.addView(tv)
-        }
-    }
-
-    private fun loadAdminInquiries() {
-        api.getAdminInquiries(object : ApiClient.ApiCallback<List<ContactInquiry>> {
-            override fun onSuccess(result: List<ContactInquiry>) {
-                renderAdminInquiries(result)
-            }
-            override fun onError(errorMessage: String) {}
-        })
-    }
-
-    private fun renderAdminInquiries(inquiries: List<ContactInquiry>) {
-        adminInquiriesContainer.removeAllViews()
-        for (i in inquiries) {
-            val tv = TextView(this).apply {
-                text = "From: ${i.name} <${i.email}>\nSubject: ${i.subject}\nMessage: ${i.message}"
-                setTextColor(getColor(R.color.text_secondary))
-                textSize = 11f
-                setPadding(8, 8, 8, 8)
-                background = ContextCompat.getDrawable(this@MainActivity, R.drawable.bg_input_field)
-            }
-            adminInquiriesContainer.addView(tv)
-        }
-    }
-
-    private fun loadAdminBlogs() {
-        api.getAdminBlogs(object : ApiClient.ApiCallback<List<BlogPost>> {
-            override fun onSuccess(result: List<BlogPost>) {
-                renderAdminBlogs(result)
-            }
-            override fun onError(errorMessage: String) {}
-        })
-    }
-
-    private fun renderAdminBlogs(blogs: List<BlogPost>) {
-        adminBlogsContainer.removeAllViews()
-        for (b in blogs) {
-            val tv = TextView(this).apply {
-                text = "📰 ${b.title} (${b.category})"
-                setTextColor(getColor(R.color.text_primary))
-                textSize = 12f
-                setPadding(8, 8, 8, 8)
-            }
-            adminBlogsContainer.addView(tv)
-        }
-    }
-
-    private fun loadAdminFaqs() {
-        api.getAdminFaqs(object : ApiClient.ApiCallback<List<FaqItem>> {
+    private fun loadFaqsList() {
+        setBusy(true)
+        api.getFaqs(object : ApiClient.ApiCallback<List<FaqItem>> {
             override fun onSuccess(result: List<FaqItem>) {
-                renderAdminFaqs(result)
-            }
-            override fun onError(errorMessage: String) {}
-        })
-    }
+                setBusy(false)
+                layoutFaqsList.removeAllViews()
+                result.forEach { f ->
+                    val card = LinearLayout(this@MainActivity).apply {
+                        orientation = LinearLayout.VERTICAL
+                        setPadding(14, 14, 14, 14)
+                        setBackgroundResource(R.drawable.bg_dashboard_card)
+                        val p = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        )
+                        p.setMargins(0, 0, 0, 10)
+                        layoutParams = p
+                    }
 
-    private fun renderAdminFaqs(faqs: List<FaqItem>) {
-        adminFaqsContainer.removeAllViews()
-        for (f in faqs) {
-            val tv = TextView(this).apply {
-                text = "Q: ${f.question}\nA: ${f.answer}"
-                setTextColor(getColor(R.color.text_secondary))
-                textSize = 11f
-                setPadding(8, 8, 8, 8)
-            }
-            adminFaqsContainer.addView(tv)
-        }
-    }
+                    val q = TextView(this@MainActivity).apply {
+                        text = "❓  ${f.question}"
+                        textSize = 13sp()
+                        setTypeface(null, android.graphics.Typeface.BOLD)
+                        setTextColor(getColor(R.color.text_primary))
+                    }
 
-    private fun showCreateUserDialog() {
-        val dialog = Dialog(this)
-        val view = layoutInflater.inflate(R.layout.dialog_create_user, null)
-        dialog.setContentView(view)
+                    val a = TextView(this@MainActivity).apply {
+                        text = f.answer
+                        textSize = 12sp()
+                        setTextColor(getColor(R.color.text_secondary))
+                        setPadding(0, 6, 0, 0)
+                    }
 
-        val editEmail = view.findViewById<EditText>(R.id.editNewUserEmail)
-        val editUser = view.findViewById<EditText>(R.id.editNewUserUsername)
-        val editPass = view.findViewById<EditText>(R.id.editNewUserPassword)
-        val editDec = view.findViewById<EditText>(R.id.editNewUserDecompileLimit)
-        val editCom = view.findViewById<EditText>(R.id.editNewUserCompileLimit)
-        val editKey = view.findViewById<EditText>(R.id.editNewUserKeygenLimit)
-        val editSig = view.findViewById<EditText>(R.id.editNewUserSignLimit)
-        val btnSubmit = view.findViewById<Button>(R.id.btnSubmitCreateUser)
-
-        btnSubmit.setOnClickListener {
-            val e = editEmail.text.toString().trim()
-            val u = editUser.text.toString().trim()
-            val p = editPass.text.toString().trim()
-            val d = editDec.text.toString().toIntOrNull() ?: 10
-            val c = editCom.text.toString().toIntOrNull() ?: 10
-            val k = editKey.text.toString().toIntOrNull() ?: 10
-            val s = editSig.text.toString().toIntOrNull() ?: 10
-
-            if (e.isEmpty() || u.isEmpty() || p.isEmpty()) {
-                toast("Please fill required fields.")
-                return@setOnClickListener
-            }
-            setBusy(true, "Creating user account...")
-            api.adminCreateUser(e, u, p, d, c, k, s, object : ApiClient.ApiCallback<JSONObject> {
-                override fun onSuccess(result: JSONObject) {
-                    setBusy(false, "")
-                    dialog.dismiss()
-                    toast("User created successfully!")
-                    loadAdminUsers()
+                    card.addView(q)
+                    card.addView(a)
+                    layoutFaqsList.addView(card)
                 }
-                override fun onError(errorMessage: String) {
-                    setBusy(false, "")
-                    toast("Create user error: $errorMessage")
-                }
-            })
-        }
-        dialog.show()
-    }
-
-    private fun showEditBlogDialog(post: BlogPost?) {
-        val dialog = Dialog(this)
-        val view = layoutInflater.inflate(R.layout.dialog_edit_blog, null)
-        dialog.setContentView(view)
-
-        val editTitle = view.findViewById<EditText>(R.id.editBlogTitle)
-        val editCat = view.findViewById<EditText>(R.id.editBlogCategory)
-        val editRead = view.findViewById<EditText>(R.id.editBlogReadTime)
-        val editTags = view.findViewById<EditText>(R.id.editBlogTags)
-        val editExc = view.findViewById<EditText>(R.id.editBlogExcerpt)
-        val editCont = view.findViewById<EditText>(R.id.editBlogContent)
-        val btnSubmit = view.findViewById<Button>(R.id.btnSubmitBlog)
-
-        if (post != null) {
-            editTitle.setText(post.title)
-            editCat.setText(post.category)
-            editRead.setText(post.readTime)
-            editTags.setText(post.tags)
-            editExc.setText(post.excerpt)
-            editCont.setText(post.content)
-        }
-
-        btnSubmit.setOnClickListener {
-            val t = editTitle.text.toString().trim()
-            val c = editCat.text.toString().trim()
-            val r = editRead.text.toString().trim()
-            val tg = editTags.text.toString().trim()
-            val ex = editExc.text.toString().trim()
-            val ct = editCont.text.toString()
-
-            if (t.isEmpty() || ct.isEmpty()) {
-                toast("Title and content are required.")
-                return@setOnClickListener
-            }
-
-            setBusy(true, "Saving article...")
-            api.adminSaveBlog(post?.id ?: 0, t, c, r, tg, ex, ct, object : ApiClient.ApiCallback<JSONObject> {
-                override fun onSuccess(result: JSONObject) {
-                    setBusy(false, "")
-                    dialog.dismiss()
-                    toast("Article published!")
-                    loadAdminBlogs()
-                }
-                override fun onError(errorMessage: String) {
-                    setBusy(false, "")
-                    toast("Blog error: $errorMessage")
-                }
-            })
-        }
-        dialog.show()
-    }
-
-    private fun showEditFaqDialog(faq: FaqItem?) {
-        val dialog = Dialog(this)
-        val view = layoutInflater.inflate(R.layout.dialog_edit_faq, null)
-        dialog.setContentView(view)
-
-        val editQ = view.findViewById<EditText>(R.id.editFaqQuestion)
-        val editC = view.findViewById<EditText>(R.id.editFaqCategory)
-        val editA = view.findViewById<EditText>(R.id.editFaqAnswer)
-        val btnSubmit = view.findViewById<Button>(R.id.btnSubmitFaq)
-
-        if (faq != null) {
-            editQ.setText(faq.question)
-            editC.setText(faq.category)
-            editA.setText(faq.answer)
-        }
-
-        btnSubmit.setOnClickListener {
-            val q = editQ.text.toString().trim()
-            val c = editC.text.toString().trim()
-            val a = editA.text.toString().trim()
-            if (q.isEmpty() || a.isEmpty()) return@setOnClickListener
-
-            setBusy(true, "Saving FAQ...")
-            api.adminSaveFaq(faq?.id ?: 0, q, c, a, object : ApiClient.ApiCallback<JSONObject> {
-                override fun onSuccess(result: JSONObject) {
-                    setBusy(false, "")
-                    dialog.dismiss()
-                    toast("FAQ saved!")
-                    loadAdminFaqs()
-                }
-                override fun onError(errorMessage: String) {
-                    setBusy(false, "")
-                    toast("FAQ error: $errorMessage")
-                }
-            })
-        }
-        dialog.show()
-    }
-
-    private fun saveGitHubBackupSettings() {
-        val owner = editBackupRepoOwner.text.toString().trim()
-        val repo = editBackupRepoName.text.toString().trim()
-        val branch = editBackupBranch.text.toString().trim()
-        val token = editBackupToken.text.toString().trim()
-
-        setBusy(true, "Saving GitHub Backup settings...")
-        api.saveBackupSettings(owner, repo, branch, token, object : ApiClient.ApiCallback<JSONObject> {
-            override fun onSuccess(result: JSONObject) {
-                setBusy(false, "")
-                toast("GitHub configuration saved.")
             }
             override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                toast("Backup config error: $errorMessage")
-            }
-        })
-    }
-
-    private fun runManualBackup() {
-        setBusy(true, "Executing manual GitHub backup...")
-        api.runBackup(object : ApiClient.ApiCallback<JSONObject> {
-            override fun onSuccess(result: JSONObject) {
-                setBusy(false, "")
-                toast(result.optString("message", "Backup completed successfully!"))
-            }
-            override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                toast("Backup error: $errorMessage")
+                setBusy(false)
+                toast(errorMessage)
             }
         })
     }
 
     // -------------------------------------------------------------
-    // Community & Support Logic
+    // Contact Support
     // -------------------------------------------------------------
 
-    private fun loadPublicCommunityData() {
-        api.getPublicBlogs(object : ApiClient.ApiCallback<List<BlogPost>> {
-            override fun onSuccess(result: List<BlogPost>) {
-                renderPublicBlogs(result)
-            }
-            override fun onError(errorMessage: String) {}
-        })
+    private fun submitContactInquiry() {
+        val name = editContactName.text.toString().trim()
+        val email = editContactEmail.text.toString().trim()
+        val subject = editContactSubject.text.toString().trim()
+        val message = editContactMessage.text.toString().trim()
 
-        api.getPublicFaqs(object : ApiClient.ApiCallback<List<FaqItem>> {
-            override fun onSuccess(result: List<FaqItem>) {
-                renderPublicFaqs(result, publicFaqsContainer)
-                renderPublicFaqs(result, hubFaqsContainer)
-            }
-            override fun onError(errorMessage: String) {}
-        })
-    }
-
-    private fun renderPublicBlogs(blogs: List<BlogPost>) {
-        publicBlogsContainer.removeAllViews()
-        for (b in blogs) {
-            val card = LinearLayout(this).apply {
-                orientation = LinearLayout.VERTICAL
-                background = ContextCompat.getDrawable(this@MainActivity, R.drawable.bg_card_rounded)
-                setPadding(16, 16, 16, 16)
-                val lp = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
-                    setMargins(0, 0, 0, 12)
-                }
-                layoutParams = lp
-            }
-            val titleTv = TextView(this).apply {
-                text = b.title
-                setTextColor(getColor(R.color.text_primary))
-                textSize = 13f
-                setTypeface(null, android.graphics.Typeface.BOLD)
-            }
-            val excTv = TextView(this).apply {
-                text = b.excerpt
-                setTextColor(getColor(R.color.text_secondary))
-                textSize = 11f
-                setPadding(0, 4, 0, 0)
-            }
-            card.addView(titleTv)
-            card.addView(excTv)
-            publicBlogsContainer.addView(card)
-        }
-    }
-
-    private fun renderPublicFaqs(faqs: List<FaqItem>, container: LinearLayout) {
-        container.removeAllViews()
-        for (f in faqs) {
-            val card = LinearLayout(this).apply {
-                orientation = LinearLayout.VERTICAL
-                background = ContextCompat.getDrawable(this@MainActivity, R.drawable.bg_card_rounded)
-                setPadding(16, 14, 16, 14)
-                val lp = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
-                    setMargins(0, 0, 0, 10)
-                }
-                layoutParams = lp
-            }
-            val qTv = TextView(this).apply {
-                text = "❓ ${f.question}"
-                setTextColor(getColor(R.color.accent))
-                textSize = 12f
-                setTypeface(null, android.graphics.Typeface.BOLD)
-            }
-            val aTv = TextView(this).apply {
-                text = f.answer
-                setTextColor(getColor(R.color.text_secondary))
-                textSize = 11f
-                setPadding(0, 4, 0, 0)
-            }
-            card.addView(qTv)
-            card.addView(aTv)
-            container.addView(card)
-        }
-    }
-
-    private fun submitContactInquiryForm() {
-        val n = editContactName.text.toString().trim()
-        val e = editContactEmail.text.toString().trim()
-        val s = editContactSubject.text.toString().trim()
-        val m = editContactMessage.text.toString().trim()
-
-        if (n.isEmpty() || e.isEmpty() || m.isEmpty()) {
-            toast("Please fill your name, email, and message.")
+        if (name.isEmpty() || email.isEmpty() || subject.isEmpty() || message.isEmpty()) {
+            toast("Please fill in all fields.")
             return
         }
 
-        setBusy(true, "Submitting inquiry...")
-        api.submitContactInquiry(n, e, s, m, object : ApiClient.ApiCallback<JSONObject> {
-            override fun onSuccess(result: JSONObject) {
-                setBusy(false, "")
-                toast(result.optString("message", "Inquiry submitted!"))
+        setBusy(true)
+        api.submitContactInquiry(name, email, subject, message, object : ApiClient.ApiCallback<String> {
+            override fun onSuccess(result: String) {
+                setBusy(false)
+                toast("Thank you! Inquiry submitted successfully.")
                 editContactSubject.setText("")
                 editContactMessage.setText("")
             }
             override fun onError(errorMessage: String) {
-                setBusy(false, "")
-                toast("Error submitting inquiry: $errorMessage")
+                setBusy(false)
+                toast(errorMessage)
             }
         })
     }
 
     // -------------------------------------------------------------
-    // Auto-Check Timer
+    // Admin Panel
     // -------------------------------------------------------------
 
-    private fun startAutoCheckTimer() {
-        autoCheckTimer = object : Runnable {
-            override fun run() {
-                if (session.isAuthenticated()) {
-                    api.checkBuildUpdate(object : ApiClient.ApiCallback<Boolean> {
-                        override fun onSuccess(hasUpdate: Boolean) {
-                            globalUpdateBanner.visibility = if (hasUpdate) View.VISIBLE else View.GONE
-                        }
-                        override fun onError(errorMessage: String) {}
-                    })
+    private fun loadAdminUsersList() {
+        setBusy(true)
+        api.getUsers(object : ApiClient.ApiCallback<List<User>> {
+            override fun onSuccess(result: List<User>) {
+                setBusy(false)
+                layoutAdminUsersList.removeAllViews()
+                result.forEach { u ->
+                    val card = LinearLayout(this@MainActivity).apply {
+                        orientation = LinearLayout.VERTICAL
+                        setPadding(14, 14, 14, 14)
+                        setBackgroundResource(R.drawable.bg_dashboard_card)
+                        val p = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        )
+                        p.setMargins(0, 0, 0, 10)
+                        layoutParams = p
+                    }
+
+                    val name = TextView(this@MainActivity).apply {
+                        text = "👤 ${u.username} (${u.userType})"
+                        textSize = 14sp()
+                        setTypeface(null, android.graphics.Typeface.BOLD)
+                        setTextColor(getColor(if (u.userType == "admin") R.color.danger else R.color.text_primary))
+                    }
+
+                    val limits = TextView(this@MainActivity).apply {
+                        text = "Dec: ${u.limits.decompileUsage}/${u.limits.decompileLimit} | Com: ${u.limits.compileUsage}/${u.limits.compileLimit}"
+                        textSize = 11sp()
+                        setTextColor(getColor(R.color.text_secondary))
+                        setPadding(0, 4, 0, 0)
+                    }
+
+                    card.addView(name)
+                    card.addView(limits)
+                    layoutAdminUsersList.addView(card)
                 }
-                mainHandler.postDelayed(this, 15000)
             }
-        }
-        mainHandler.postDelayed(autoCheckTimer!!, 5000)
-    }
-
-    private fun stopAutoCheckTimer() {
-        autoCheckTimer?.let { mainHandler.removeCallbacks(it) }
-        autoCheckTimer = null
+            override fun onError(errorMessage: String) {
+                setBusy(false)
+                toast(errorMessage)
+            }
+        })
     }
 
     // -------------------------------------------------------------
-    // User Profile & Account Dialog
-    // -------------------------------------------------------------
-
-    private fun showUserAccountDialog() {
-        val u = session.currentUser ?: return
-        AlertDialog.Builder(this)
-            .setTitle("User Profile (${u.username})")
-            .setMessage("Email: ${u.email}\nRole: ${u.userType.uppercase()}\nServer: ${session.serverUrl}\nDecompiles Used: ${u.decompileUsage}/${u.decompileLimit}\nCompiles Used: ${u.compileUsage}/${u.compileLimit}")
-            .setPositiveButton("Logout") { _, _ ->
-                session.clearAuth()
-                updateUiForAuthState()
-                toast("Logged out successfully.")
-                switchAuthHubTab("signin")
-            }
-            .setNegativeButton("Close", null)
-            .show()
-    }
-
-    private fun showServerUrlDialog() {
-        val dialog = Dialog(this)
-        val view = layoutInflater.inflate(R.layout.dialog_server_url, null)
-        dialog.setContentView(view)
-
-        val editUrl = view.findViewById<EditText>(R.id.editServerUrlInput)
-        val btnSave = view.findViewById<Button>(R.id.btnSaveServerUrl)
-
-        editUrl.setText(session.serverUrl)
-
-        btnSave.setOnClickListener {
-            val u = editUrl.text.toString().trim()
-            if (u.isNotEmpty()) {
-                session.serverUrl = u
-                updateUiForAuthState()
-                toast("Server URL updated.")
-                dialog.dismiss()
-            }
-        }
-        dialog.show()
-    }
-
-    // -------------------------------------------------------------
-    // QR Code Scanner & Pairing
+    // Auth & Pairing
     // -------------------------------------------------------------
 
     private fun launchQrScanner() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            startQrScannerActivity()
-        } else {
-            requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-        }
-    }
-
-    private fun startQrScannerActivity() {
         val options = ScanOptions().apply {
             setDesiredBarcodeFormats(ScanOptions.QR_CODE)
-            setPrompt("Scan project or server QR code from web app")
+            setPrompt("Scan the Studio QR code")
             setBeepEnabled(false)
             setOrientationLocked(true)
-            setCaptureActivity(PortraitCaptureActivity::class.java)
         }
         qrScanLauncher.launch(options)
     }
 
-    private fun handleScannedCode(raw: String) {
+    private fun handlePairingToken(tokenStr: String) {
         try {
-            // Case 1: Base64 JSON (as produced by web dashboard: btoa(JSON.stringify({url, token, name})))
-            var jsonStr = ""
-            try {
-                val decodedBytes = Base64.decode(raw.trim(), Base64.DEFAULT)
-                jsonStr = String(decodedBytes, Charsets.UTF_8)
-            } catch (e: Exception) {
-                jsonStr = raw.trim()
-            }
+            val decoded = String(Base64.decode(tokenStr, Base64.DEFAULT))
+            val json = JSONObject(decoded)
+            val url = json.getString("url")
+            val tok = json.getString("token")
+            val name = json.optString("name", "Studio Project")
 
-            if (jsonStr.startsWith("{") && jsonStr.endsWith("}")) {
-                val json = JSONObject(jsonStr)
-                val url = json.optString("url", "")
-                val tok = json.optString("token", "")
-                val name = json.optString("name", "app")
-                val authToken = json.optString("auth_token", "")
+            session.savePairing(url, tok, name)
+            toast("Connected to \"$name\"")
+            switchTab("dashboard")
+            refreshAllData()
+        } catch (e: Exception) {
+            toast("Invalid pairing code.")
+        }
+    }
 
-                if (url.isNotEmpty()) session.serverUrl = url
-                if (tok.isNotEmpty()) session.pairingToken = tok
-                if (name.isNotEmpty()) session.pairedProjectName = name
+    private fun showAuthDialog() {
+        val view = LayoutInflater.from(this).inflate(R.layout.dialog_auth, null)
+        val editUser = view.findViewById<EditText>(R.id.editAuthUsername)
+        val editPass = view.findViewById<EditText>(R.id.editAuthPassword)
 
-                if (authToken.isNotEmpty()) {
-                    session.pairingToken = authToken
-                }
-
-                updateUiForAuthState()
-                toast("Paired with project '$name'")
-                fetchCloudLogsOnce()
-                if (session.isAuthenticated()) {
-                    refreshDashboardData()
-                }
-                return
-            }
-
-            // Case 2: Standard URL format (e.g. https://apk.zoomnearby.com/?pairing=abc or ?token=abc)
-            if (raw.startsWith("http://") || raw.startsWith("https://")) {
-                val uri = Uri.parse(raw)
-                val tokenParam = uri.getQueryParameter("token")
-                    ?: uri.getQueryParameter("pairing")
-                    ?: uri.getQueryParameter("pairing_token")
-                    ?: uri.getQueryParameter("crash_token")
-
-                val base = "${uri.scheme}://${uri.host}${if (uri.port != -1) ":${uri.port}" else ""}${uri.path ?: "/"}"
-                session.serverUrl = base
-
-                if (!tokenParam.isNullOrEmpty()) {
-                    session.pairingToken = tokenParam
-                    session.pairedProjectName = uri.getQueryParameter("name") ?: "web_project"
-                    toast("Server & pairing token saved.")
+        AlertDialog.Builder(this)
+            .setTitle("Account Login")
+            .setView(view)
+            .setPositiveButton("Sign In") { _, _ ->
+                val user = editUser.text.toString().trim()
+                val pass = editPass.text.toString().trim()
+                if (user.isNotEmpty() && pass.isNotEmpty()) {
+                    setBusy(true)
+                    api.login(user, pass, object : ApiClient.ApiCallback<User> {
+                        override fun onSuccess(result: User) {
+                            setBusy(false)
+                            session.saveUser(result)
+                            toast("Welcome back, ${result.username}!")
+                            switchTab("dashboard")
+                            refreshAllData()
+                        }
+                        override fun onError(errorMessage: String) {
+                            setBusy(false)
+                            toast(errorMessage)
+                        }
+                    })
                 } else {
-                    toast("Server host updated.")
+                    toast("Username and password are required.")
                 }
-
-                updateUiForAuthState()
-                fetchCloudLogsOnce()
-                return
             }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
 
-            // Case 3: Raw pairing token string (e.g. pair_abcdef123 or project token)
-            if (raw.isNotBlank()) {
-                session.pairingToken = raw.trim()
-                session.pairedProjectName = "project"
-                updateUiForAuthState()
-                toast("Pairing token saved.")
-                fetchCloudLogsOnce()
-                return
-            }
-
-            toast("Unrecognized QR code format.")
-        } catch (e: Exception) {
-            toast("QR parse error: ${e.message}")
-        }
+    private fun handleLogout() {
+        session.logout()
+        activeProjectName = null
+        showAuthView()
+        toast("Signed out successfully.")
     }
 
     // -------------------------------------------------------------
-    // Utility Helpers
+    // Helpers
     // -------------------------------------------------------------
 
-    private fun setBusy(busy: Boolean, message: String) {
+    private fun setBusy(busy: Boolean) {
         globalProgressBar.visibility = if (busy) View.VISIBLE else View.GONE
-        if (busy) globalProgressBar.isIndeterminate = true
-        if (message.isNotEmpty()) {
-            topBarSubtitle.text = message
-        } else {
-            topBarSubtitle.text = "Host: ${session.serverUrl}"
-        }
-    }
-
-    private fun copyUriToTemp(uri: Uri, outputName: String): File? {
-        return try {
-            val dir = File(cacheDir, "uploads").apply { mkdirs() }
-            val out = File(dir, outputName)
-            contentResolver.openInputStream(uri)?.use { input ->
-                FileOutputStream(out).use { output ->
-                    input.copyTo(output)
-                }
-            }
-            out
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    private fun formatSize(bytes: Long): String {
-        return when {
-            bytes >= 1024 * 1024 * 1024 -> String.format("%.2f GB", bytes / (1024.0 * 1024.0 * 1024.0))
-            bytes >= 1024 * 1024 -> String.format("%.2f MB", bytes / (1024.0 * 1024.0))
-            bytes >= 1024 -> String.format("%.1f KB", bytes / 1024.0)
-            else -> "$bytes B"
-        }
     }
 
     private fun toast(msg: String) {
-        Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
+
+    private fun sp(): Float = 1f
 }

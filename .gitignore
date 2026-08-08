@@ -14,4 +14,3 @@ app/debug/
 *.apk
 *.aab
 gradle/wrapper/gradle-wrapper.jar
-gpush.php

@@ -1,235 +1,430 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/bg_body">
+    android:fitsSystemWindows="true">
 
-    <!-- Top App Bar -->
+    <!-- MAIN CONTENT WRAPPER -->
     <LinearLayout
-        android:id="@+id/topBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="@drawable/bg_gradient_header"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="12dp"
-        android:paddingBottom="12dp"
-        android:elevation="6dp">
+        android:background="@color/bg_body">
 
+        <!-- TOPBAR -->
         <LinearLayout
+            android:id="@+id/topbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="56dp"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:paddingHorizontal="12dp"
+            android:background="@color/bg_card"
+            android:elevation="4dp">
 
-            <!-- App Logo Icon -->
-            <FrameLayout
+            <!-- Hamburger menu button -->
+            <ImageButton
+                android:id="@+id/btnMenuToggle"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:background="@drawable/bg_btn_primary"
-                android:layout_marginEnd="12dp">
+                android:background="@drawable/bg_icon_button"
+                android:src="@android:drawable/ic_menu_sort_by_size"
+                android:tint="@color/text_primary"
+                android:contentDescription="Open Navigation Menu" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="⚡"
-                    android:textSize="20sp" />
-            </FrameLayout>
-
-            <!-- Brand & Tagline -->
+            <!-- Title & Active Project Pill -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_marginStart="10dp">
 
                 <TextView
+                    android:id="@+id/txtTopbarTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/app_name"
-                    android:textColor="#FFFFFF"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
+                    android:text="Dashboard"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
 
                 <TextView
-                    android:id="@+id/topBarSubtitle"
+                    android:id="@+id/txtTopbarProjectPill"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Connected to APK Tool Database"
-                    android:textColor="#94A3B8"
+                    android:text="No Project Open"
+                    android:textColor="@color/text_muted"
                     android:textSize="11sp"
-                    android:singleLine="true"
+                    android:maxLines="1"
                     android:ellipsize="end" />
             </LinearLayout>
 
-            <!-- Server Config Button -->
+            <!-- Quick Action Buttons in Topbar -->
             <Button
-                android:id="@+id/btnServerConfig"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:text="🌐 Host"
-                android:textColor="#CBD5E1"
-                android:textSize="11sp"
-                android:paddingHorizontal="6dp" />
-
-            <!-- Scan QR Button -->
-            <Button
-                android:id="@+id/btnTopScanQr"
+                android:id="@+id/btnQuickNewApk"
                 style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                 android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:text="📷 QR"
-                android:backgroundTint="@color/surface_dark_border"
-                android:textColor="#38BDF8"
+                android:layout_height="34dp"
+                android:text="+ APK"
                 android:textSize="11sp"
-                android:paddingHorizontal="8dp"
-                android:layout_marginStart="4dp"
-                app:cornerRadius="8dp" />
-
-            <!-- User Auth / Profile Button -->
-            <Button
-                android:id="@+id/btnTopAuth"
-                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:text="Login"
-                android:backgroundTint="@color/primary"
                 android:textColor="#FFFFFF"
+                android:backgroundTint="@color/primary"
+                android:layout_marginEnd="6dp"
+                app:cornerRadius="6dp" />
+
+            <Button
+                android:id="@+id/btnQuickSaveFile"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:text="Save"
                 android:textSize="11sp"
-                android:paddingHorizontal="10dp"
-                android:layout_marginStart="4dp"
-                app:cornerRadius="8dp" />
+                android:textColor="#FFFFFF"
+                android:backgroundTint="@color/success"
+                android:layout_marginEnd="6dp"
+                android:visibility="gone"
+                app:cornerRadius="6dp" />
+
+            <ImageButton
+                android:id="@+id/btnQuickFind"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_icon_button"
+                android:src="@android:drawable/ic_menu_search"
+                android:tint="@color/text_secondary"
+                android:layout_marginEnd="4dp"
+                android:contentDescription="Search Project" />
+
+            <ImageButton
+                android:id="@+id/btnQuickLogout"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_icon_button"
+                android:src="@android:drawable/ic_lock_power_off"
+                android:tint="@color/danger"
+                android:contentDescription="Logout" />
         </LinearLayout>
 
-        <!-- Active Project Banner & Admin Pill -->
-        <LinearLayout
+        <!-- PROGRESS BAR / BUSY INDICATOR -->
+        <ProgressBar
+            android:id="@+id/globalProgressBar"
+            style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="8dp">
+            android:layout_height="4dp"
+            android:indeterminate="true"
+            android:visibility="gone" />
 
-            <TextView
-                android:id="@+id/txtActiveProjectPill"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="No project selected"
-                android:textColor="#E2E8F0"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:singleLine="true"
-                android:ellipsize="end" />
-
-            <TextView
-                android:id="@+id/txtAdminBadge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ADMIN"
-                android:background="@drawable/bg_badge_danger"
-                android:textColor="@color/danger"
-                android:textSize="9sp"
-                android:textStyle="bold"
-                android:paddingHorizontal="6dp"
-                android:paddingVertical="2dp"
-                android:visibility="gone" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <!-- Global Persistent Background Update Banner -->
-    <LinearLayout
-        android:id="@+id/globalUpdateBanner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="#064E3B"
-        android:paddingHorizontal="14dp"
-        android:paddingVertical="10dp"
-        android:gravity="center_vertical"
-        android:visibility="gone">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="⚡"
-            android:textSize="16sp"
-            android:layout_marginEnd="8dp" />
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="New Verified Build Ready"
-                android:textColor="#4ADE80"
-                android:textStyle="bold"
-                android:textSize="12sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Backend changes detected. Tap Install to reload the latest APK."
-                android:textColor="#BBF7D0"
-                android:textSize="10sp" />
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/btnBannerInstall"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:text="Install"
-            android:textSize="11sp"
-            android:backgroundTint="@color/success"
-            android:textColor="#FFFFFF"
-            android:paddingHorizontal="12dp"
-            app:cornerRadius="6dp" />
-    </LinearLayout>
-
-    <!-- Global Progress Bar -->
-    <ProgressBar
-        android:id="@+id/globalProgressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="4dp"
-        android:max="100"
-        android:progress="0"
-        android:visibility="gone" />
-
-    <!-- ============================================================= -->
-    <!-- AUTHENTICATION & ONBOARDING HUB (SHOWN WHEN NOT LOGGED IN)     -->
-    <!-- ============================================================= -->
-    <ScrollView
-        android:id="@+id/panelAuthHub"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true"
-        android:background="@color/bg_body"
-        android:visibility="gone">
-
-        <LinearLayout
+        <!-- MAIN CONTENT AREA -->
+        <FrameLayout
+            android:id="@+id/contentFrame"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
-            <!-- Hero Welcome Card -->
-            <LinearLayout
+            <!-- 0. AUTH / PAIR VIEW -->
+            <ScrollView
+                android:id="@+id/viewAuth"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_card_hero_gradient"
+                android:layout_height="match_parent"
                 android:padding="20dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="16dp">
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Connect to Studio"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary"
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Scan QR code, enter pairing key, or login with your studio account."
+                        android:textColor="@color/text_muted"
+                        android:textSize="13sp"
+                        android:layout_marginBottom="16dp" />
+
+                    <Button
+                        android:id="@+id/btnScanQr"
+                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="46dp"
+                        android:text="Scan Studio QR Code"
+                        android:drawableStart="@android:drawable/ic_menu_camera"
+                        android:drawableTint="#FFFFFF"
+                        android:backgroundTint="@color/primary"
+                        android:textColor="#FFFFFF"
+                        android:layout_marginBottom="12dp"
+                        app:cornerRadius="10dp" />
+
+                    <Button
+                        android:id="@+id/btnOpenLoginDialog"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="46dp"
+                        android:text="Sign In with Username &amp; Password"
+                        android:textColor="@color/primary"
+                        app:strokeColor="@color/primary"
+                        android:layout_marginBottom="16dp"
+                        app:cornerRadius="10dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Or paste pairing key manually:"
+                        android:textSize="12sp"
+                        android:textColor="@color/text_secondary"
+                        android:layout_marginBottom="6dp" />
+
+                    <EditText
+                        android:id="@+id/editPairingKeyInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="70dp"
+                        android:background="@drawable/bg_input_field"
+                        android:hint="Paste base64 pairing token here..."
+                        android:textSize="13sp"
+                        android:gravity="top|start"
+                        android:padding="10dp"
+                        android:layout_marginBottom="10dp" />
+
+                    <Button
+                        android:id="@+id/btnConnectPairingKey"
+                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:text="Connect Pairing Key"
+                        android:backgroundTint="@color/success"
+                        android:textColor="#FFFFFF"
+                        app:cornerRadius="10dp" />
+                </LinearLayout>
+            </ScrollView>
+
+            <!-- 1. DASHBOARD VIEW -->
+            <ScrollView
+                android:id="@+id/viewDashboard"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Studio Overview"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Quotas, active project status, and quick launch tools."
+                        android:textColor="@color/text_muted"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="14dp" />
+
+                    <!-- Quota Grid Cards -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="10dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:padding="12dp"
+                            android:background="@drawable/bg_dashboard_card"
+                            android:layout_marginEnd="6dp">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="DECOMPILES" android:textSize="10sp" android:textColor="@color/text_muted" android:textStyle="bold" />
+                            <TextView android:id="@+id/txtStatDecompiles" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 / 0" android:textSize="16sp" android:textStyle="bold" android:textColor="@color/primary" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:padding="12dp"
+                            android:background="@drawable/bg_dashboard_card"
+                            android:layout_marginStart="6dp">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="COMPILES" android:textSize="10sp" android:textColor="@color/text_muted" android:textStyle="bold" />
+                            <TextView android:id="@+id/txtStatCompiles" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 / 0" android:textSize="16sp" android:textStyle="bold" android:textColor="@color/success" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="16dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:padding="12dp"
+                            android:background="@drawable/bg_dashboard_card"
+                            android:layout_marginEnd="6dp">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="KEYSTORES" android:textSize="10sp" android:textColor="@color/text_muted" android:textStyle="bold" />
+                            <TextView android:id="@+id/txtStatKeystores" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 / 0" android:textSize="16sp" android:textStyle="bold" android:textColor="@color/warning" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:padding="12dp"
+                            android:background="@drawable/bg_dashboard_card"
+                            android:layout_marginStart="6dp">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="SIGNINGS" android:textSize="10sp" android:textColor="@color/text_muted" android:textStyle="bold" />
+                            <TextView android:id="@+id/txtStatSignings" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 / 0" android:textSize="16sp" android:textStyle="bold" android:textColor="@color/danger" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Active Project Banner Card -->
+                    <LinearLayout
+                        android:id="@+id/cardActiveProjectBanner"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:background="@drawable/bg_active_project"
+                        android:layout_marginBottom="16dp"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="ACTIVE WORKSPACE"
+                            android:textSize="10sp"
+                            android:textColor="#C7D2FE"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/txtActiveProjectTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="MyProject.apk"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="#FFFFFF"
+                            android:layout_marginTop="2dp"
+                            android:layout_marginBottom="4dp" />
+
+                        <TextView
+                            android:id="@+id/txtActiveProjectSubtitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="App Name: Detected • Ready in Studio"
+                            android:textSize="12sp"
+                            android:textColor="#E0E7FF"
+                            android:layout_marginBottom="12dp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <Button
+                                android:id="@+id/btnDashOpenEditor"
+                                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                                android:layout_width="0dp"
+                                android:layout_height="38dp"
+                                android:layout_weight="1"
+                                android:text="Code Editor"
+                                android:textSize="12sp"
+                                android:backgroundTint="#FFFFFF"
+                                android:textColor="@color/primary"
+                                android:layout_marginEnd="6dp"
+                                app:cornerRadius="8dp" />
+
+                            <Button
+                                android:id="@+id/btnDashBuildApk"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                android:layout_width="0dp"
+                                android:layout_height="38dp"
+                                android:layout_weight="1"
+                                android:text="Build &amp; Sign"
+                                android:textSize="12sp"
+                                android:textColor="#FFFFFF"
+                                app:strokeColor="#FFFFFF"
+                                app:cornerRadius="8dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Recent Projects Card -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:background="@drawable/bg_dashboard_card"
+                        android:layout_marginBottom="16dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="10dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="My Projects"
+                                android:textSize="15sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_primary" />
+
+                            <Button
+                                android:id="@+id/btnViewAllProjects"
+                                style="@style/Widget.MaterialComponents.Button.TextButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="34dp"
+                                android:text="View All"
+                                android:textSize="12sp"
+                                android:textColor="@color/primary" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/layoutDashProjectsList"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical" />
+                    </LinearLayout>
+                </LinearLayout>
+            </ScrollView>
+
+            <!-- 2. MY PROJECTS VIEW -->
+            <LinearLayout
+                android:id="@+id/viewProjects"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -238,2673 +433,589 @@
                     android:gravity="center_vertical"
                     android:layout_marginBottom="12dp">
 
-                    <FrameLayout
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:layout_marginEnd="12dp">
-
-                        <TextView
-                            android:layout_width="44dp"
-                            android:layout_height="44dp"
-                            android:background="@drawable/bg_logo_badge"
-                            android:gravity="center"
-                            android:text="🔐"
-                            android:textSize="20sp" />
-                    </FrameLayout>
-
-                    <LinearLayout
+                    <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Welcome to APK Tool Studio"
-                            android:textColor="@color/text_primary"
-                            android:textSize="17sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Sign in or scan a pairing QR code to unlock the studio"
-                            android:textColor="@color/text_muted"
-                            android:textSize="11sp" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="To decompile APKs, edit smali/resources, sign packages, and stream live ADB/cloud crash logs, you must be logged into your account."
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp"
-                    android:lineSpacingExtra="2dp"
-                    android:layout_marginBottom="14dp" />
-
-                <!-- Segmented Auth Switcher -->
-                <HorizontalScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:scrollbars="none">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <Button
-                            android:id="@+id/tabAuthSignIn"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="36dp"
-                            android:text="Sign In"
-                            android:textSize="11sp"
-                            android:backgroundTint="@color/primary"
-                            android:textColor="#FFFFFF"
-                            android:layout_marginEnd="6dp"
-                            app:cornerRadius="8dp" />
-
-                        <Button
-                            android:id="@+id/tabAuthRegister"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="36dp"
-                            android:text="Create Account"
-                            android:textSize="11sp"
-                            android:backgroundTint="@color/surface_dark_border"
-                            android:textColor="@color/text_secondary"
-                            android:layout_marginEnd="6dp"
-                            app:cornerRadius="8dp" />
-
-                        <Button
-                            android:id="@+id/tabAuthForgot"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="36dp"
-                            android:text="Forgot Pass"
-                            android:textSize="11sp"
-                            android:backgroundTint="@color/surface_dark_border"
-                            android:textColor="@color/text_secondary"
-                            android:layout_marginEnd="6dp"
-                            app:cornerRadius="8dp" />
-
-                        <Button
-                            android:id="@+id/tabAuthQr"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="36dp"
-                            android:text="📷 Scan QR Login"
-                            android:textSize="11sp"
-                            android:backgroundTint="@color/surface_dark_border"
-                            android:textColor="#38BDF8"
-                            android:layout_marginEnd="6dp"
-                            app:cornerRadius="8dp" />
-
-                        <Button
-                            android:id="@+id/tabAuthSupport"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="36dp"
-                            android:text="💬 FAQs &amp; Help"
-                            android:textSize="11sp"
-                            android:backgroundTint="@color/surface_dark_border"
-                            android:textColor="@color/text_secondary"
-                            app:cornerRadius="8dp" />
-                    </LinearLayout>
-                </HorizontalScrollView>
-            </LinearLayout>
-
-            <!-- CARD 1: SIGN IN FORM -->
-            <LinearLayout
-                android:id="@+id/cardAuthSignIn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_card_rounded"
-                android:padding="18dp"
-                android:layout_marginBottom="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Sign In to Your Studio Account"
-                    android:textColor="@color/text_primary"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Enter your registered username or email address and password"
-                    android:textColor="@color/text_muted"
-                    android:textSize="11sp"
-                    android:layout_marginBottom="14dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Username or Email"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="11sp"
-                    android:layout_marginBottom="4dp" />
-
-                <EditText
-                    android:id="@+id/editHubLoginUser"
-                    android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:background="@drawable/bg_input_field"
-                    android:hint="e.g. admin or developer@domain.com"
-                    android:textColor="@color/text_primary"
-                    android:textColorHint="@color/text_disabled"
-                    android:inputType="text"
-                    android:textSize="13sp"
-                    android:paddingHorizontal="12dp"
-                    android:layout_marginBottom="10dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Password"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="11sp"
-                    android:layout_marginBottom="4dp" />
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:layout_marginBottom="16dp">
-
-                    <EditText
-                        android:id="@+id/editHubLoginPass"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/bg_input_field"
-                        android:hint="Enter password"
-                        android:textColor="@color/text_primary"
-                        android:textColorHint="@color/text_disabled"
-                        android:inputType="textPassword"
-                        android:textSize="13sp"
-                        android:paddingStart="12dp"
-                        android:paddingEnd="46dp" />
-
-                    <ImageButton
-                        android:id="@+id/btnHubTogglePass"
-                        android:layout_width="40dp"
-                        android:layout_height="match_parent"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:background="@android:color/transparent"
-                        android:src="@android:drawable/ic_menu_view"
-                        android:contentDescription="Toggle Password" />
-                </RelativeLayout>
-
-                <Button
-                    android:id="@+id/btnHubSubmitLogin"
-                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="46dp"
-                    android:text="Sign In &amp; Unlock Studio"
-                    android:backgroundTint="@color/primary"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="10dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center"
-                    android:layout_marginTop="14dp">
-
-                    <Button
-                        android:id="@+id/btnHubGoRegister"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Create Account"
-                        android:textColor="@color/primary_light"
-                        android:textSize="11sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=" • "
-                        android:textColor="@color/text_muted" />
-
-                    <Button
-                        android:id="@+id/btnHubGoForgot"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Forgot Password?"
-                        android:textColor="@color/text_muted"
-                        android:textSize="11sp" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- CARD 2: REGISTER FORM -->
-            <LinearLayout
-                android:id="@+id/cardAuthRegister"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_card_rounded"
-                android:padding="18dp"
-                android:layout_marginBottom="16dp"
-                android:visibility="gone">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Create New Account"
-                    android:textColor="@color/text_primary"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Register to manage your APK projects and cloud debug sessions"
-                    android:textColor="@color/text_muted"
-                    android:textSize="11sp"
-                    android:layout_marginBottom="14dp" />
-
-                <EditText
-                    android:id="@+id/editHubRegEmail"
-                    android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:background="@drawable/bg_input_field"
-                    android:hint="Email Address"
-                    android:textColor="@color/text_primary"
-                    android:textColorHint="@color/text_disabled"
-                    android:inputType="textEmailAddress"
-                    android:textSize="13sp"
-                    android:paddingHorizontal="12dp"
-                    android:layout_marginBottom="10dp" />
-
-                <EditText
-                    android:id="@+id/editHubRegPhone"
-                    android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:background="@drawable/bg_input_field"
-                    android:hint="Mobile Number"
-                    android:textColor="@color/text_primary"
-                    android:textColorHint="@color/text_disabled"
-                    android:inputType="phone"
-                    android:textSize="13sp"
-                    android:paddingHorizontal="12dp"
-                    android:layout_marginBottom="10dp" />
-
-                <EditText
-                    android:id="@+id/editHubRegUser"
-                    android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:background="@drawable/bg_input_field"
-                    android:hint="Desired Username"
-                    android:textColor="@color/text_primary"
-                    android:textColorHint="@color/text_disabled"
-                    android:inputType="text"
-                    android:textSize="13sp"
-                    android:paddingHorizontal="12dp"
-                    android:layout_marginBottom="10dp" />
-
-                <EditText
-                    android:id="@+id/editHubRegPass"
-                    android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:background="@drawable/bg_input_field"
-                    android:hint="Password (min 6 characters)"
-                    android:textColor="@color/text_primary"
-                    android:textColorHint="@color/text_disabled"
-                    android:inputType="textPassword"
-                    android:textSize="13sp"
-                    android:paddingHorizontal="12dp"
-                    android:layout_marginBottom="14dp" />
-
-                <Button
-                    android:id="@+id/btnHubSubmitRegister"
-                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="46dp"
-                    android:text="Register &amp; Create Account"
-                    android:backgroundTint="@color/success"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="10dp" />
-
-                <Button
-                    android:id="@+id/btnHubGoLogin"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Already have an account? Sign In"
-                    android:textColor="@color/primary_light"
-                    android:textSize="11sp"
-                    android:layout_marginTop="8dp" />
-            </LinearLayout>
-
-            <!-- CARD 3: FORGOT PASSWORD FORM -->
-            <LinearLayout
-                android:id="@+id/cardAuthForgot"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_card_rounded"
-                android:padding="18dp"
-                android:layout_marginBottom="16dp"
-                android:visibility="gone">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Reset Account Password"
-                    android:textColor="@color/text_primary"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Enter your registered email and we will send a password reset link."
-                    android:textColor="@color/text_muted"
-                    android:textSize="11sp"
-                    android:layout_marginBottom="14dp" />
-
-                <EditText
-                    android:id="@+id/editHubForgotEmail"
-                    android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:background="@drawable/bg_input_field"
-                    android:hint="Your Email Address"
-                    android:textColor="@color/text_primary"
-                    android:textColorHint="@color/text_disabled"
-                    android:inputType="textEmailAddress"
-                    android:textSize="13sp"
-                    android:paddingHorizontal="12dp"
-                    android:layout_marginBottom="14dp" />
-
-                <Button
-                    android:id="@+id/btnHubSubmitForgot"
-                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="46dp"
-                    android:text="Send Password Reset Link"
-                    android:backgroundTint="@color/warning"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="10dp" />
-
-                <Button
-                    android:id="@+id/btnHubBackLogin"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Back to Sign In"
-                    android:textColor="@color/primary_light"
-                    android:textSize="11sp"
-                    android:layout_marginTop="8dp" />
-            </LinearLayout>
-
-            <!-- CARD 4: INSTANT QR SCAN & TOKEN PAIRING -->
-            <LinearLayout
-                android:id="@+id/cardAuthQr"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_card_rounded"
-                android:padding="18dp"
-                android:layout_marginBottom="16dp"
-                android:visibility="gone">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="📷 Instant QR Code Pairing"
-                    android:textColor="@color/text_primary"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Point your camera at the QR code displayed on the web dashboard to instantly connect your device."
-                    android:textColor="@color/text_muted"
-                    android:textSize="11sp"
-                    android:layout_marginBottom="14dp" />
-
-                <Button
-                    android:id="@+id/btnHubLaunchScanQr"
-                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:text="📷 Open Camera QR Scanner"
-                    android:backgroundTint="@color/accent_dark"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="14dp"
-                    app:cornerRadius="10dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Or Paste Pairing Code Manually:"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="11sp"
-                    android:layout_marginBottom="4dp" />
-
-                <EditText
-                    android:id="@+id/editHubManualToken"
-                    android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:background="@drawable/bg_input_field"
-                    android:hint="Paste base64 code or URL..."
-                    android:textColor="@color/text_primary"
-                    android:textColorHint="@color/text_disabled"
-                    android:inputType="text"
-                    android:textSize="12sp"
-                    android:paddingHorizontal="12dp"
-                    android:layout_marginBottom="10dp" />
-
-                <Button
-                    android:id="@+id/btnHubSubmitToken"
-                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:text="Connect via Pairing Code"
-                    android:backgroundTint="@color/surface_dark_border"
-                    android:textColor="#38BDF8"
-                    android:textSize="12sp"
-                    app:cornerRadius="8dp" />
-            </LinearLayout>
-
-            <!-- CARD 5: PUBLIC FAQS & SUPPORT INQUIRY -->
-            <LinearLayout
-                android:id="@+id/cardAuthSupport"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_card_rounded"
-                android:padding="18dp"
-                android:layout_marginBottom="16dp"
-                android:visibility="gone">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="💬 Public Documentation &amp; Support"
-                    android:textColor="@color/text_primary"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Browse help questions or send an inquiry to the technical support team."
-                    android:textColor="@color/text_muted"
-                    android:textSize="11sp"
-                    android:layout_marginBottom="12dp" />
-
-                <LinearLayout
-                    android:id="@+id/hubFaqsContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginBottom="12dp" />
-            </LinearLayout>
-
-            <!-- FEATURES SHOWCASE (LOCK PREVIEW) -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_card_alt"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🌟 Studio Features Included:"
-                    android:textColor="@color/text_primary"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="• Multi-Project APK Decompilation &amp; Smali Reconstruction\n• Real-Time Smali, Java, XML &amp; Hex Bytecode Editor\n• AI Smali Logic Review &amp; Intelligent Auto-Fix\n• RSA-2048 Keystore Generator &amp; Fast APK Signer\n• Cloud Debugger with 2s Auto-Polling Crash Stream\n• Wireless ADB Connect &amp; Live Logcat Filtering"
-                    android:textColor="@color/text_muted"
-                    android:textSize="11sp"
-                    android:lineSpacingExtra="3dp" />
-            </LinearLayout>
-        </LinearLayout>
-    </ScrollView>
-
-    <!-- ============================================================= -->
-    <!-- STUDIO NAVIGATION TABS (SHOWN WHEN LOGGED IN)                  -->
-    <!-- ============================================================= -->
-    <HorizontalScrollView
-        android:id="@+id/studioNavScroll"
-        android:layout_width="match_parent"
-        android:layout_height="46dp"
-        android:background="@color/surface_dark"
-        android:scrollbars="none"
-        android:visibility="visible">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="8dp">
-
-            <Button
-                android:id="@+id/tabBtnDashboard"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:text="📊 Dashboard"
-                android:textColor="@color/text_inverse"
-                android:textSize="11sp"
-                android:backgroundTint="@color/primary"
-                android:paddingHorizontal="10dp"
-                android:layout_marginEnd="4dp"
-                app:cornerRadius="6dp" />
-
-            <Button
-                android:id="@+id/tabBtnProjects"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:text="📁 Projects"
-                android:textColor="@color/text_secondary"
-                android:textSize="11sp"
-                android:paddingHorizontal="10dp"
-                android:layout_marginEnd="4dp"
-                app:cornerRadius="6dp" />
-
-            <Button
-                android:id="@+id/tabBtnEditor"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:text="📝 Editor &amp; Hex"
-                android:textColor="@color/text_secondary"
-                android:textSize="11sp"
-                android:paddingHorizontal="10dp"
-                android:layout_marginEnd="4dp"
-                app:cornerRadius="6dp" />
-
-            <Button
-                android:id="@+id/tabBtnCustomizer"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:text="🎨 Resources &amp; AI"
-                android:textColor="@color/text_secondary"
-                android:textSize="11sp"
-                android:paddingHorizontal="10dp"
-                android:layout_marginEnd="4dp"
-                app:cornerRadius="6dp" />
-
-            <Button
-                android:id="@+id/tabBtnBuild"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:text="🔨 Build &amp; Sign"
-                android:textColor="@color/text_secondary"
-                android:textSize="11sp"
-                android:paddingHorizontal="10dp"
-                android:layout_marginEnd="4dp"
-                app:cornerRadius="6dp" />
-
-            <Button
-                android:id="@+id/tabBtnDebugger"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:text="⚡ ADB &amp; Logs"
-                android:textColor="@color/text_secondary"
-                android:textSize="11sp"
-                android:paddingHorizontal="10dp"
-                android:layout_marginEnd="4dp"
-                app:cornerRadius="6dp" />
-
-            <Button
-                android:id="@+id/tabBtnAiSettings"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:text="🤖 AI Config"
-                android:textColor="@color/text_secondary"
-                android:textSize="11sp"
-                android:paddingHorizontal="10dp"
-                android:layout_marginEnd="4dp"
-                app:cornerRadius="6dp" />
-
-            <Button
-                android:id="@+id/tabBtnAdmin"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:text="👑 Admin"
-                android:textColor="@color/text_secondary"
-                android:textSize="11sp"
-                android:paddingHorizontal="10dp"
-                android:layout_marginEnd="4dp"
-                android:visibility="gone"
-                app:cornerRadius="6dp" />
-
-            <Button
-                android:id="@+id/tabBtnCommunity"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:text="💬 Support"
-                android:textColor="@color/text_secondary"
-                android:textSize="11sp"
-                android:paddingHorizontal="10dp"
-                app:cornerRadius="6dp" />
-        </LinearLayout>
-    </HorizontalScrollView>
-
-    <!-- ============================================================= -->
-    <!-- STUDIO PANELS CONTAINER                                        -->
-    <!-- ============================================================= -->
-    <FrameLayout
-        android:id="@+id/studioPanelsContainer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <!-- 1. DASHBOARD PANEL -->
-        <ScrollView
-            android:id="@+id/panelDashboard"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true"
-            android:padding="16dp"
-            android:visibility="visible">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <!-- Welcome Card -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
-
-                    <TextView
-                        android:id="@+id/txtDashWelcome"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Welcome to APK Tool Studio"
-                        android:textColor="@color/text_primary"
+                        android:text="Decompiled APK Projects"
                         android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/txtDashUserEmail"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Connected to cloud studio account"
-                        android:textColor="@color/text_muted"
-                        android:textSize="11sp"
-                        android:layout_marginTop="2dp" />
-                </LinearLayout>
-
-                <!-- Quota Meters (2x2 Grid) -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="10dp">
-
-                    <!-- Decompile Meter -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:background="@drawable/bg_card_rounded"
-                        android:padding="12dp"
-                        android:layout_marginEnd="6dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Decompiles"
-                            android:textColor="@color/text_muted"
-                            android:textSize="10sp" />
-
-                        <TextView
-                            android:id="@+id/txtMeterDecompile"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0 / 10"
-                            android:textColor="@color/primary_light"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <!-- Compile Meter -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:background="@drawable/bg_card_rounded"
-                        android:padding="12dp"
-                        android:layout_marginStart="6dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Compiles"
-                            android:textColor="@color/text_muted"
-                            android:textSize="10sp" />
-
-                        <TextView
-                            android:id="@+id/txtMeterCompile"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0 / 10"
-                            android:textColor="@color/accent"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="14dp">
-
-                    <!-- Keygen Meter -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:background="@drawable/bg_card_rounded"
-                        android:padding="12dp"
-                        android:layout_marginEnd="6dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="RSA Keystores"
-                            android:textColor="@color/text_muted"
-                            android:textSize="10sp" />
-
-                        <TextView
-                            android:id="@+id/txtMeterKeygen"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0 / 10"
-                            android:textColor="@color/warning"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <!-- Sign Meter -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:background="@drawable/bg_card_rounded"
-                        android:padding="12dp"
-                        android:layout_marginStart="6dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="APK Signatures"
-                            android:textColor="@color/text_muted"
-                            android:textSize="10sp" />
-
-                        <TextView
-                            android:id="@+id/txtMeterSign"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0 / 10"
-                            android:textColor="@color/success"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <!-- Quick Action Buttons -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="14dp">
-
-                    <Button
-                        android:id="@+id/btnQuickUploadDecompile"
-                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                        android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:layout_weight="1"
-                        android:text="Upload APK"
-                        android:textSize="11sp"
-                        android:backgroundTint="@color/primary"
-                        android:textColor="#FFFFFF"
-                        android:layout_marginEnd="4dp"
-                        app:cornerRadius="8dp" />
-
-                    <Button
-                        android:id="@+id/btnQuickBuildApk"
-                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                        android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:layout_weight="1"
-                        android:text="Build APK"
-                        android:textSize="11sp"
-                        android:backgroundTint="@color/accent_dark"
-                        android:textColor="#FFFFFF"
-                        android:layout_marginEnd="4dp"
-                        app:cornerRadius="8dp" />
-
-                    <Button
-                        android:id="@+id/btnQuickSignApk"
-                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                        android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:layout_weight="1"
-                        android:text="Sign APK"
-                        android:textSize="11sp"
-                        android:backgroundTint="@color/success"
-                        android:textColor="#FFFFFF"
-                        android:layout_marginEnd="4dp"
-                        app:cornerRadius="8dp" />
-
-                    <Button
-                        android:id="@+id/btnQuickAiFix"
-                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                        android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:layout_weight="1"
-                        android:text="AI Review"
-                        android:textSize="11sp"
-                        android:backgroundTint="@color/purple_ai"
-                        android:textColor="#FFFFFF"
-                        app:cornerRadius="8dp" />
-                </LinearLayout>
-
-                <!-- Active Project Overview Card -->
-                <LinearLayout
-                    android:id="@+id/cardActiveProjectOverview"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_elevated"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp"
-                    android:visibility="gone">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Active Studio Project"
-                        android:textColor="@color/accent"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/txtDashProjectName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="project-name"
-                        android:textColor="@color/text_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/txtDashProjectPath"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="/uploads/workflow-projects/..."
-                        android:textColor="@color/text_muted"
-                        android:textSize="10sp"
-                        android:fontFamily="monospace"
-                        android:layout_marginBottom="10dp" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <Button
-                            android:id="@+id/btnDashExploreFiles"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="36dp"
-                            android:layout_weight="1"
-                            android:text="Explore Files"
-                            android:textSize="10sp"
-                            android:backgroundTint="@color/primary"
-                            android:textColor="#FFFFFF"
-                            android:layout_marginEnd="4dp"
-                            app:cornerRadius="6dp" />
-
-                        <Button
-                            android:id="@+id/btnDashEditStrings"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="36dp"
-                            android:layout_weight="1"
-                            android:text="Edit Strings"
-                            android:textSize="10sp"
-                            android:backgroundTint="@color/surface_dark_border"
-                            android:textColor="@color/text_secondary"
-                            android:layout_marginEnd="4dp"
-                            app:cornerRadius="6dp" />
-
-                        <Button
-                            android:id="@+id/btnDashCloseProject"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="36dp"
-                            android:layout_weight="1"
-                            android:text="Close"
-                            android:textSize="10sp"
-                            android:backgroundTint="@color/danger_container"
-                            android:textColor="@color/danger"
-                            app:cornerRadius="6dp" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <!-- Recent Projects Header & Container -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="8dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Your Projects"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <Button
-                        android:id="@+id/btnDashRefreshProjects"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="32dp"
-                        android:text="🔄 Refresh"
-                        android:textColor="@color/primary_light"
-                        android:textSize="11sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/dashProjectsListContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" />
-            </LinearLayout>
-        </ScrollView>
-
-        <!-- 2. PROJECTS & UPLOAD PANEL -->
-        <ScrollView
-            android:id="@+id/panelProjects"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true"
-            android:padding="16dp"
-            android:visibility="gone">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <!-- Upload Card -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Upload APK to Decompile"
-                        android:textColor="@color/text_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Select any APK from storage to decompile smali, manifest, resources, and assets."
-                        android:textColor="@color/text_muted"
-                        android:textSize="11sp"
-                        android:layout_marginBottom="12dp" />
-
-                    <LinearLayout
-                        android:id="@+id/boxPickApkFile"
-                        android:layout_width="match_parent"
-                        android:layout_height="70dp"
-                        android:background="@drawable/bg_input_field"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:layout_marginBottom="12dp">
-
-                        <TextView
-                            android:id="@+id/txtSelectedApkName"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Tap to select APK file from device..."
-                            android:textColor="@color/text_secondary"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <Button
-                        android:id="@+id/btnUploadDecompileSubmit"
-                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:text="Upload &amp; Decompile APK"
-                        android:backgroundTint="@color/primary"
-                        android:textColor="#FFFFFF"
-                        app:cornerRadius="8dp" />
-                </LinearLayout>
-
-                <!-- Decompile Logs Card -->
-                <LinearLayout
-                    android:id="@+id/boxDecompileLogs"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="14dp"
-                    android:layout_marginBottom="14dp"
-                    android:visibility="gone">
-
-                    <TextView
-                        android:id="@+id/txtDecompileStatus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Decompilation In Progress..."
-                        android:textColor="@color/warning"
-                        android:textSize="13sp"
                         android:textStyle="bold"
-                        android:layout_marginBottom="8dp" />
-
-                    <TextView
-                        android:id="@+id/txtDecompileLogOutput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@color/code_bg"
-                        android:textColor="#38BDF8"
-                        android:fontFamily="monospace"
-                        android:textSize="11sp"
-                        android:padding="10dp" />
-                </LinearLayout>
-
-                <!-- Projects List Container -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="All Projects"
-                    android:textColor="@color/text_primary"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
-
-                <LinearLayout
-                    android:id="@+id/projectsListContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" />
-            </LinearLayout>
-        </ScrollView>
-
-        <!-- 3. FILE EDITOR & HEX PANEL -->
-        <LinearLayout
-            android:id="@+id/panelEditor"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="12dp"
-            android:visibility="gone">
-
-            <!-- Directory Toolbar -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="@drawable/bg_card_rounded"
-                android:padding="10dp"
-                android:layout_marginBottom="8dp">
-
-                <Button
-                    android:id="@+id/btnFileUpDir"
-                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="34dp"
-                    android:text="⬆ Up"
-                    android:backgroundTint="@color/surface_dark_border"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="11sp"
-                    app:cornerRadius="6dp" />
-
-                <TextView
-                    android:id="@+id/txtFileBreadcrumb"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="/"
-                    android:textColor="@color/text_primary"
-                    android:textSize="12sp"
-                    android:fontFamily="monospace"
-                    android:paddingHorizontal="8dp"
-                    android:singleLine="true"
-                    android:ellipsize="start" />
-
-                <Button
-                    android:id="@+id/btnRefreshDir"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="34dp"
-                    android:text="🔄"
-                    android:textColor="@color/primary_light"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <!-- Directory Items ScrollView -->
-            <ScrollView
-                android:id="@+id/scrollDirectoryBrowser"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_card_rounded"
-                android:padding="8dp">
-
-                <LinearLayout
-                    android:id="@+id/directoryItemsContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" />
-            </ScrollView>
-
-            <!-- Code Editor View (When file is open) -->
-            <LinearLayout
-                android:id="@+id/boxCodeEditorView"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:background="@drawable/bg_card_rounded"
-                android:padding="10dp"
-                android:visibility="gone">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="6dp">
-
-                    <TextView
-                        android:id="@+id/txtEditorOpenFileName"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="file.smali"
-                        android:textColor="@color/accent"
-                        android:textSize="12sp"
-                        android:fontFamily="monospace"
-                        android:singleLine="true"
-                        android:ellipsize="middle" />
+                        android:textColor="@color/text_primary" />
 
                     <Button
-                        android:id="@+id/btnEditorAiReview"
-                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="30dp"
-                        android:text="🤖 AI Fix"
-                        android:textSize="9sp"
-                        android:backgroundTint="@color/purple_ai"
-                        android:textColor="#FFFFFF"
-                        android:layout_marginEnd="4dp"
-                        app:cornerRadius="6dp" />
-
-                    <Button
-                        android:id="@+id/btnEditorSave"
-                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="30dp"
-                        android:text="💾 Save"
-                        android:textSize="9sp"
-                        android:backgroundTint="@color/success"
-                        android:textColor="#FFFFFF"
-                        android:layout_marginEnd="4dp"
-                        app:cornerRadius="6dp" />
-
-                    <Button
-                        android:id="@+id/btnEditorReplaceFile"
-                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="30dp"
-                        android:text="Replace"
-                        android:textSize="9sp"
-                        android:backgroundTint="@color/surface_dark_border"
-                        android:textColor="@color/text_secondary"
-                        android:layout_marginEnd="4dp"
-                        app:cornerRadius="6dp" />
-
-                    <Button
-                        android:id="@+id/btnEditorClose"
-                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="30dp"
-                        android:text="✖"
-                        android:textSize="9sp"
-                        android:backgroundTint="@color/danger_container"
-                        android:textColor="@color/danger"
-                        app:cornerRadius="6dp" />
-                </LinearLayout>
-
-                <EditText
-                    android:id="@+id/editCodeContent"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/code_bg"
-                    android:textColor="#F8FAFC"
-                    android:fontFamily="monospace"
-                    android:textSize="11sp"
-                    android:gravity="top|start"
-                    android:padding="10dp"
-                    android:inputType="textMultiLine|textNoSuggestions" />
-            </LinearLayout>
-
-            <!-- Hex Editor View -->
-            <LinearLayout
-                android:id="@+id/boxHexEditorView"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:background="@drawable/bg_card_rounded"
-                android:padding="10dp"
-                android:visibility="gone">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="6dp">
-
-                    <EditText
-                        android:id="@+id/editHexSearchQuery"
-                        android:layout_width="0dp"
-                        android:layout_height="36dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_input_field"
-                        android:hint="Hex bytes or ASCII string..."
-                        android:textColor="@color/text_primary"
-                        android:textSize="11sp"
-                        android:paddingHorizontal="8dp"
-                        android:layout_marginEnd="4dp" />
-
-                    <Button
-                        android:id="@+id/btnHexSearch"
+                        android:id="@+id/btnUploadNewApkProject"
                         style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                         android:layout_width="wrap_content"
                         android:layout_height="36dp"
-                        android:text="Search"
-                        android:textSize="10sp"
+                        android:text="+ Upload APK"
+                        android:textSize="11sp"
+                        android:textColor="#FFFFFF"
                         android:backgroundTint="@color/primary"
-                        android:textColor="#FFFFFF"
-                        android:layout_marginEnd="4dp"
-                        app:cornerRadius="6dp" />
-
-                    <Button
-                        android:id="@+id/btnHexClose"
-                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="36dp"
-                        android:text="Close"
-                        android:textSize="10sp"
-                        android:backgroundTint="@color/surface_dark_border"
-                        android:textColor="@color/text_secondary"
-                        app:cornerRadius="6dp" />
+                        app:cornerRadius="8dp" />
                 </LinearLayout>
 
                 <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:layout_marginBottom="6dp">
+                    android:layout_height="match_parent">
 
                     <LinearLayout
-                        android:id="@+id/hexResultsContainer"
+                        android:id="@+id/layoutProjectsList"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical" />
                 </ScrollView>
+            </LinearLayout>
 
+            <!-- 3. CODE & FILE EDITOR VIEW -->
+            <LinearLayout
+                android:id="@+id/viewEditor"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- Explorer & Breadcrumbs Bar -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_height="42dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="12dp"
+                    android:background="@color/bg_card_alt">
 
-                    <EditText
-                        android:id="@+id/editHexPatchBytes"
+                    <ImageButton
+                        android:id="@+id/btnEditorGoUp"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:background="@drawable/bg_icon_button"
+                        android:src="@android:drawable/ic_menu_revert"
+                        android:tint="@color/text_secondary"
+                        android:contentDescription="Parent Directory" />
+
+                    <TextView
+                        android:id="@+id/txtEditorBreadcrumb"
                         android:layout_width="0dp"
-                        android:layout_height="36dp"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:background="@drawable/bg_input_field"
-                        android:hint="Replacement hex bytes..."
-                        android:textColor="@color/text_primary"
-                        android:textSize="11sp"
-                        android:paddingHorizontal="8dp"
-                        android:layout_marginEnd="4dp" />
+                        android:text="Root /"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp"
+                        android:fontFamily="monospace"
+                        android:layout_marginStart="8dp"
+                        android:maxLines="1"
+                        android:ellipsize="start" />
 
                     <Button
-                        android:id="@+id/btnHexApplyPatch"
+                        android:id="@+id/btnEditorSaveFile"
                         style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                         android:layout_width="wrap_content"
-                        android:layout_height="36dp"
-                        android:text="Patch"
-                        android:textSize="10sp"
-                        android:backgroundTint="@color/success"
+                        android:layout_height="32dp"
+                        android:text="Save"
+                        android:textSize="11sp"
                         android:textColor="#FFFFFF"
+                        android:backgroundTint="@color/success"
                         app:cornerRadius="6dp" />
                 </LinearLayout>
+
+                <!-- Split layout: File tree & Text editor -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <!-- File explorer list (Collapsible/Scrollable) -->
+                    <LinearLayout
+                        android:id="@+id/layoutEditorFileList"
+                        android:layout_width="match_parent"
+                        android:layout_height="140dp"
+                        android:orientation="vertical"
+                        android:background="@color/bg_card">
+
+                        <ScrollView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+                            <LinearLayout
+                                android:id="@+id/layoutEditorItems"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="6dp" />
+                        </ScrollView>
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border_light" />
+
+                    <!-- Code text editor -->
+                    <EditText
+                        android:id="@+id/editCodeContent"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:background="#0F172A"
+                        android:textColor="#F8FAFC"
+                        android:textSize="12sp"
+                        android:fontFamily="monospace"
+                        android:gravity="top|start"
+                        android:padding="12dp"
+                        android:inputType="textMultiLine|textNoSuggestions"
+                        android:hint="Select a file above to edit code..."
+                        android:textColorHint="#64748B" />
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
 
-        <!-- 4. RESOURCES & AI CUSTOMIZER PANEL -->
-        <ScrollView
-            android:id="@+id/panelCustomizer"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true"
-            android:padding="16dp"
-            android:visibility="gone">
-
-            <LinearLayout
+            <!-- 4. FIND & REPLACE VIEW -->
+            <ScrollView
+                android:id="@+id/viewSearch"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="match_parent"
+                android:padding="16dp"
+                android:visibility="gone">
 
-                <!-- Strings Editor Card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Application Strings &amp; Localization"
-                        android:textColor="@color/text_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
+                        android:text="Find &amp; Replace in Project"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Edit app_name and localized string keys directly in res/values/strings.xml."
+                        android:text="Search strings, class names, XML tags, and Smali bytecode across all project files."
                         android:textColor="@color/text_muted"
-                        android:textSize="11sp"
+                        android:textSize="12sp"
                         android:layout_marginBottom="12dp" />
 
                     <EditText
-                        android:id="@+id/editCustomAppName"
+                        android:id="@+id/editSearchFindQuery"
                         android:layout_width="match_parent"
-                        android:layout_height="42dp"
+                        android:layout_height="44dp"
                         android:background="@drawable/bg_input_field"
-                        android:hint="New App Display Name"
-                        android:textColor="@color/text_primary"
+                        android:hint="Search query / string..."
                         android:textSize="13sp"
-                        android:paddingHorizontal="10dp"
+                        android:paddingHorizontal="12dp"
+                        android:layout_marginBottom="8dp" />
+
+                    <EditText
+                        android:id="@+id/editSearchReplaceQuery"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:background="@drawable/bg_input_field"
+                        android:hint="Replace with (optional)..."
+                        android:textSize="13sp"
+                        android:paddingHorizontal="12dp"
                         android:layout_marginBottom="10dp" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="10dp">
+                        android:layout_marginBottom="16dp">
 
-                        <EditText
-                            android:id="@+id/editStringsLocale"
+                        <Button
+                            android:id="@+id/btnExecuteSearch"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                             android:layout_width="0dp"
-                            android:layout_height="40dp"
+                            android:layout_height="42dp"
                             android:layout_weight="1"
-                            android:background="@drawable/bg_input_field"
-                            android:text="values"
-                            android:hint="Locale (e.g. values, values-es)"
-                            android:textColor="@color/text_primary"
+                            android:text="Search Project"
                             android:textSize="12sp"
-                            android:paddingHorizontal="10dp"
-                            android:layout_marginEnd="6dp" />
-
-                        <Button
-                            android:id="@+id/btnLoadStrings"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="40dp"
-                            android:text="Load"
-                            android:backgroundTint="@color/surface_dark_border"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="11sp"
-                            android:layout_marginEnd="4dp"
-                            app:cornerRadius="6dp" />
-
-                        <Button
-                            android:id="@+id/btnSaveStrings"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="40dp"
-                            android:text="Save"
-                            android:backgroundTint="@color/success"
-                            android:textColor="#FFFFFF"
-                            android:textSize="11sp"
-                            app:cornerRadius="6dp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/stringsTableContainer"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical" />
-                </LinearLayout>
-
-                <!-- Assets & Logo Injection Card -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Firebase &amp; Logo Generator"
-                        android:textColor="@color/text_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Inject google-services.json or upload/AI-generate high resolution app icons."
-                        android:textColor="@color/text_muted"
-                        android:textSize="11sp"
-                        android:layout_marginBottom="12dp" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="10dp">
-
-                        <Button
-                            android:id="@+id/btnUploadFirebaseJson"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="40dp"
-                            android:layout_weight="1"
-                            android:text="Inject Firebase JSON"
-                            android:backgroundTint="@color/warning_dark"
-                            android:textColor="#FFFFFF"
-                            android:textSize="10sp"
-                            android:layout_marginEnd="6dp"
-                            app:cornerRadius="8dp" />
-
-                        <Button
-                            android:id="@+id/btnPickLogoImage"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="40dp"
-                            android:layout_weight="1"
-                            android:text="Pick Logo Image"
                             android:backgroundTint="@color/primary"
                             android:textColor="#FFFFFF"
-                            android:textSize="10sp"
-                            app:cornerRadius="8dp" />
-                    </LinearLayout>
-
-                    <EditText
-                        android:id="@+id/editAiIconPrompt"
-                        android:layout_width="match_parent"
-                        android:layout_height="42dp"
-                        android:background="@drawable/bg_input_field"
-                        android:hint="AI Logo Prompt (e.g. Modern Cyberpunk Falcon)"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="8dp" />
-
-                    <Button
-                        android:id="@+id/btnGenerateAiIcon"
-                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:text="🤖 Generate &amp; Scale Icons"
-                        android:backgroundTint="@color/purple_ai"
-                        android:textColor="#FFFFFF"
-                        android:textSize="11sp"
-                        app:cornerRadius="8dp" />
-                </LinearLayout>
-
-                <!-- Global Find & Replace Card -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Global Project Find &amp; Replace"
-                        android:textColor="@color/text_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Recursively search and replace strings across all smali, XML, and Java files."
-                        android:textColor="@color/text_muted"
-                        android:textSize="11sp"
-                        android:layout_marginBottom="12dp" />
-
-                    <EditText
-                        android:id="@+id/editGlobalFindText"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_input_field"
-                        android:hint="Target string to find..."
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="8dp" />
-
-                    <EditText
-                        android:id="@+id/editGlobalReplaceText"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_input_field"
-                        android:hint="Replacement string..."
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="10dp" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <Button
-                            android:id="@+id/btnGlobalFindOnly"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="40dp"
-                            android:layout_weight="1"
-                            android:text="Find Occurrences"
-                            android:backgroundTint="@color/surface_dark_border"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="10sp"
                             android:layout_marginEnd="6dp"
                             app:cornerRadius="8dp" />
 
                         <Button
-                            android:id="@+id/btnGlobalFindReplace"
+                            android:id="@+id/btnExecuteReplace"
                             style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                             android:layout_width="0dp"
-                            android:layout_height="40dp"
+                            android:layout_height="42dp"
                             android:layout_weight="1"
                             android:text="Replace All"
-                            android:backgroundTint="@color/danger"
+                            android:textSize="12sp"
+                            android:backgroundTint="@color/warning"
                             android:textColor="#FFFFFF"
-                            android:textSize="10sp"
+                            android:layout_marginStart="6dp"
                             app:cornerRadius="8dp" />
                     </LinearLayout>
-                </LinearLayout>
-            </LinearLayout>
-        </ScrollView>
-
-        <!-- 5. BUILD & SIGN PANEL -->
-        <ScrollView
-            android:id="@+id/panelBuild"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true"
-            android:padding="16dp"
-            android:visibility="gone">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <!-- Build APK Card -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
 
                     <TextView
+                        android:id="@+id/txtSearchResultsHeader"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Recompile Android Package (APK)"
-                        android:textColor="@color/text_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Compiles decompiled smali sources and resources into an unsigned binary."
-                        android:textColor="@color/text_muted"
-                        android:textSize="11sp"
-                        android:layout_marginBottom="12dp" />
-
-                    <Button
-                        android:id="@+id/btnTriggerBuildApk"
-                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:text="🔨 Trigger Full Rebuild"
-                        android:backgroundTint="@color/primary"
-                        android:textColor="#FFFFFF"
-                        app:cornerRadius="8dp" />
-                </LinearLayout>
-
-                <!-- Build Logs Box -->
-                <LinearLayout
-                    android:id="@+id/boxBuildLogs"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="14dp"
-                    android:layout_marginBottom="14dp"
-                    android:visibility="gone">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Compiler Output"
-                        android:textColor="@color/accent"
-                        android:textSize="12sp"
+                        android:text="Matching Locations"
                         android:textStyle="bold"
-                        android:layout_marginBottom="6dp" />
-
-                    <TextView
-                        android:id="@+id/txtBuildLogOutput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@color/code_bg"
-                        android:textColor="#4ADE80"
-                        android:fontFamily="monospace"
-                        android:textSize="11sp"
-                        android:padding="10dp" />
-                </LinearLayout>
-
-                <!-- Keystore & Sign Card -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Keystore Management &amp; APK Signer"
                         android:textColor="@color/text_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Select a JKS key on the server, enter password, and sign with jarsigner."
-                        android:textColor="@color/text_muted"
-                        android:textSize="11sp"
-                        android:layout_marginBottom="12dp" />
-
-                    <Button
-                        android:id="@+id/btnOpenCreateKeystoreDialog"
-                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="38dp"
-                        android:text="🔑 Generate RSA 2048-bit Keystore"
-                        android:backgroundTint="@color/surface_dark_border"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="11sp"
-                        android:layout_marginBottom="10dp"
-                        app:cornerRadius="8dp" />
+                        android:textSize="14sp"
+                        android:layout_marginBottom="8dp" />
 
                     <LinearLayout
-                        android:id="@+id/keystoresListContainer"
+                        android:id="@+id/layoutSearchResultsList"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+                </LinearLayout>
+            </ScrollView>
+
+            <!-- 5. APP NAME & STRINGS VIEW -->
+            <ScrollView
+                android:id="@+id/viewStrings"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="16dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="App Name &amp; Strings"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Modify the app title in AndroidManifest.xml and resource strings.xml."
+                        android:textColor="@color/text_muted"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- App Title Card -->
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:layout_marginBottom="10dp" />
-
-                    <EditText
-                        android:id="@+id/editSignPassword"
-                        android:layout_width="match_parent"
-                        android:layout_height="42dp"
-                        android:background="@drawable/bg_input_field"
-                        android:hint="Keystore Password"
-                        android:inputType="textPassword"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="10dp" />
-
-                    <Button
-                        android:id="@+id/btnTriggerSignApk"
-                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:text="✍ Sign APK"
-                        android:backgroundTint="@color/success"
-                        android:textColor="#FFFFFF"
-                        app:cornerRadius="8dp" />
-                </LinearLayout>
-
-                <!-- Direct Install Card -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Download &amp; Install on Device"
-                        android:textColor="@color/text_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Directly install the signed APK onto this device via FileProvider."
-                        android:textColor="@color/text_muted"
-                        android:textSize="11sp"
-                        android:layout_marginBottom="12dp" />
-
-                    <Button
-                        android:id="@+id/btnDirectInstallApk"
-                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:text="📲 Download &amp; Install APK"
-                        android:backgroundTint="@color/accent_dark"
-                        android:textColor="#FFFFFF"
-                        app:cornerRadius="8dp" />
-                </LinearLayout>
-            </LinearLayout>
-        </ScrollView>
-
-        <!-- 6. DEBUGGER & ADB LOGS PANEL -->
-        <ScrollView
-            android:id="@+id/panelDebugger"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true"
-            android:padding="16dp"
-            android:visibility="gone">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <!-- Cloud Logs Card -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="6dp">
+                        android:padding="14dp"
+                        android:background="@drawable/bg_dashboard_card"
+                        android:layout_marginBottom="14dp">
 
                         <TextView
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Cloud Crash &amp; Debug Logs"
-                            android:textColor="@color/text_primary"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <Button
-                            android:id="@+id/btnToggleCloudLogsStream"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="32dp"
-                            android:text="Start Stream"
-                            android:textSize="10sp"
-                            android:backgroundTint="@color/primary"
-                            android:textColor="#FFFFFF"
-                            android:layout_marginEnd="4dp"
-                            app:cornerRadius="6dp" />
-
-                        <Button
-                            android:id="@+id/btnClearCloudLogs"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="32dp"
-                            android:text="Clear"
-                            android:textSize="10sp"
-                            android:backgroundTint="@color/surface_dark_border"
+                            android:text="Application Title (Launcher Label)"
+                            android:textStyle="bold"
                             android:textColor="@color/text_secondary"
-                            app:cornerRadius="6dp" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Auto-polls every 2s for crash dumps, stack traces, and HTTP traffic."
-                        android:textColor="@color/text_muted"
-                        android:textSize="11sp"
-                        android:layout_marginBottom="10dp" />
-
-                    <TextView
-                        android:id="@+id/txtCloudLogsStream"
-                        android:layout_width="match_parent"
-                        android:layout_height="180dp"
-                        android:background="@color/code_bg"
-                        android:textColor="#38BDF8"
-                        android:fontFamily="monospace"
-                        android:textSize="11sp"
-                        android:padding="10dp"
-                        android:scrollbars="vertical" />
-                </LinearLayout>
-
-                <!-- ADB Remote Connect Card -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Wireless ADB Debugger"
-                        android:textColor="@color/text_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Connect to an Android device over Wi-Fi (IP:Port) to read real-time logcat."
-                        android:textColor="@color/text_muted"
-                        android:textSize="11sp"
-                        android:layout_marginBottom="12dp" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="10dp">
+                            android:textSize="12sp"
+                            android:layout_marginBottom="4dp" />
 
                         <EditText
-                            android:id="@+id/editAdbHostIp"
-                            android:layout_width="0dp"
-                            android:layout_height="42dp"
-                            android:layout_weight="1"
+                            android:id="@+id/editAppNameInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="44dp"
                             android:background="@drawable/bg_input_field"
-                            android:hint="192.168.1.100:5555"
-                            android:textColor="@color/text_primary"
-                            android:textSize="12sp"
-                            android:paddingHorizontal="10dp"
-                            android:layout_marginEnd="6dp" />
+                            android:hint="e.g. My Custom App"
+                            android:textSize="13sp"
+                            android:paddingHorizontal="12dp"
+                            android:layout_marginBottom="10dp" />
 
                         <Button
-                            android:id="@+id/btnAdbConnect"
+                            android:id="@+id/btnSaveAppName"
                             style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                             android:layout_width="wrap_content"
-                            android:layout_height="42dp"
-                            android:text="Connect ADB"
+                            android:layout_height="36dp"
+                            android:text="Save App Name"
+                            android:textSize="11sp"
                             android:backgroundTint="@color/primary"
                             android:textColor="#FFFFFF"
+                            app:cornerRadius="8dp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Resource Strings (strings.xml)"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="8dp" />
+
+                    <LinearLayout
+                        android:id="@+id/layoutStringsList"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+                </LinearLayout>
+            </ScrollView>
+
+            <!-- 6. KEYSTORES & SIGNING VIEW -->
+            <ScrollView
+                android:id="@+id/viewKeystores"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="16dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="RSA 2048 Keystores"
+                            android:textSize="17sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary" />
+
+                        <Button
+                            android:id="@+id/btnOpenCreateKeystoreDialog"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:text="+ New Key"
                             android:textSize="11sp"
+                            android:backgroundTint="@color/primary"
+                            android:textColor="#FFFFFF"
                             app:cornerRadius="8dp" />
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/adbDevicesContainer"
+                        android:id="@+id/layoutKeystoresList"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+                </LinearLayout>
+            </ScrollView>
+
+            <!-- 7. RECOMPILE & BUILD VIEW -->
+            <ScrollView
+                android:id="@+id/viewBuild"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="16dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Recompile &amp; Sign APK"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rebuild bytecode, assemble resources, and sign with V2/V3 schemes."
+                        android:textColor="@color/text_muted"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="14dp" />
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:layout_marginBottom="10dp" />
-
-                    <Button
-                        android:id="@+id/btnAdbReadLogcat"
-                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="38dp"
-                        android:text="Read Logcat (All Levels)"
-                        android:backgroundTint="@color/surface_dark_border"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="11sp"
-                        android:layout_marginBottom="10dp"
-                        app:cornerRadius="8dp" />
-
-                    <TextView
-                        android:id="@+id/txtAdbLogcatOutput"
-                        android:layout_width="match_parent"
-                        android:layout_height="160dp"
-                        android:background="@color/code_bg"
-                        android:textColor="#4ADE80"
-                        android:fontFamily="monospace"
-                        android:textSize="11sp"
-                        android:padding="10dp"
-                        android:scrollbars="vertical" />
-                </LinearLayout>
-            </LinearLayout>
-        </ScrollView>
-
-        <!-- 7. AI CONFIG PANEL -->
-        <ScrollView
-            android:id="@+id/panelAiSettings"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true"
-            android:padding="16dp"
-            android:visibility="gone">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <!-- Provider Selector Card -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="AI Model Provider"
-                        android:textColor="@color/text_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Choose between Google Gemini or OpenAI for smali decompilation review."
-                        android:textColor="@color/text_muted"
-                        android:textSize="11sp"
-                        android:layout_marginBottom="12dp" />
-
-                    <RadioGroup
-                        android:id="@+id/rgAiProvider"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <RadioButton
-                            android:id="@+id/rbProviderGemini"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Google Gemini"
-                            android:textColor="@color/text_primary"
-                            android:checked="true" />
-
-                        <RadioButton
-                            android:id="@+id/rbProviderOpenAi"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="OpenAI"
-                            android:textColor="@color/text_primary" />
-                    </RadioGroup>
-                </LinearLayout>
-
-                <!-- Gemini Key Card -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Google Gemini API Key"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/txtGeminiKeyStatus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Status: No key saved"
-                        android:textColor="@color/text_muted"
-                        android:textSize="11sp"
-                        android:layout_marginBottom="10dp" />
-
-                    <EditText
-                        android:id="@+id/editGeminiApiKey"
-                        android:layout_width="match_parent"
-                        android:layout_height="42dp"
-                        android:background="@drawable/bg_input_field"
-                        android:hint="AIzaSy..."
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="10dp" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:padding="16dp"
+                        android:background="@drawable/bg_dashboard_card"
+                        android:layout_marginBottom="16dp">
 
                         <Button
-                            android:id="@+id/btnSaveGeminiKey"
+                            android:id="@+id/btnStartBuildAndSign"
                             style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="40dp"
-                            android:layout_weight="1"
-                            android:text="Save Key"
-                            android:backgroundTint="@color/primary"
-                            android:textColor="#FFFFFF"
-                            android:textSize="11sp"
-                            android:layout_marginEnd="6dp"
-                            app:cornerRadius="8dp" />
-
-                        <Button
-                            android:id="@+id/btnDeleteGeminiKey"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="40dp"
-                            android:layout_weight="1"
-                            android:text="Delete Key"
-                            android:backgroundTint="@color/danger_container"
-                            android:textColor="@color/danger"
-                            android:textSize="11sp"
-                            app:cornerRadius="8dp" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <!-- OpenAI Key Card -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="OpenAI API Key"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/txtOpenAiKeyStatus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Status: No key saved"
-                        android:textColor="@color/text_muted"
-                        android:textSize="11sp"
-                        android:layout_marginBottom="10dp" />
-
-                    <EditText
-                        android:id="@+id/editOpenAiApiKey"
-                        android:layout_width="match_parent"
-                        android:layout_height="42dp"
-                        android:background="@drawable/bg_input_field"
-                        android:hint="sk-proj-..."
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="10dp" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <Button
-                            android:id="@+id/btnSaveOpenAiKey"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="40dp"
-                            android:layout_weight="1"
-                            android:text="Save Key"
-                            android:backgroundTint="@color/primary"
-                            android:textColor="#FFFFFF"
-                            android:textSize="11sp"
-                            android:layout_marginEnd="6dp"
-                            app:cornerRadius="8dp" />
-
-                        <Button
-                            android:id="@+id/btnDeleteOpenAiKey"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="40dp"
-                            android:layout_weight="1"
-                            android:text="Delete Key"
-                            android:backgroundTint="@color/danger_container"
-                            android:textColor="@color/danger"
-                            android:textSize="11sp"
-                            app:cornerRadius="8dp" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <!-- Custom Models Card -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Custom Model Identifiers"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Override default text and vision model IDs."
-                        android:textColor="@color/text_muted"
-                        android:textSize="11sp"
-                        android:layout_marginBottom="10dp" />
-
-                    <EditText
-                        android:id="@+id/editModelGeminiText"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_input_field"
-                        android:hint="Gemini Text (e.g. gemini-3.6-flash)"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="8dp" />
-
-                    <EditText
-                        android:id="@+id/editModelGeminiImage"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_input_field"
-                        android:hint="Gemini Vision (e.g. gemini-3.1-flash-image)"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="8dp" />
-
-                    <EditText
-                        android:id="@+id/editModelOpenAiText"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_input_field"
-                        android:hint="OpenAI Text (e.g. gpt-5.6-sol)"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="8dp" />
-
-                    <EditText
-                        android:id="@+id/editModelOpenAiImage"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_input_field"
-                        android:hint="OpenAI Vision (e.g. gpt-image-2)"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="10dp" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <Button
-                            android:id="@+id/btnSaveCustomModels"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="40dp"
-                            android:layout_weight="1"
-                            android:text="Save Models"
-                            android:backgroundTint="@color/primary"
-                            android:textColor="#FFFFFF"
-                            android:textSize="11sp"
-                            android:layout_marginEnd="6dp"
-                            app:cornerRadius="8dp" />
-
-                        <Button
-                            android:id="@+id/btnResetCustomModels"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="40dp"
-                            android:layout_weight="1"
-                            android:text="Reset Defaults"
-                            android:backgroundTint="@color/surface_dark_border"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="11sp"
-                            app:cornerRadius="8dp" />
-                    </LinearLayout>
-                </LinearLayout>
-            </LinearLayout>
-        </ScrollView>
-
-        <!-- 8. ADMIN PANEL -->
-        <ScrollView
-            android:id="@+id/panelAdmin"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true"
-            android:padding="16dp"
-            android:visibility="gone">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <!-- User Provisioning Card -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="8dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="User Management"
-                            android:textColor="@color/text_primary"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <Button
-                            android:id="@+id/btnAdminCreateUserDialog"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="32dp"
-                            android:text="+ Create User"
-                            android:textSize="10sp"
-                            android:backgroundTint="@color/primary"
-                            android:textColor="#FFFFFF"
-                            app:cornerRadius="6dp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/adminUsersContainer"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical" />
-                </LinearLayout>
-
-                <!-- Inquiries Card -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Customer Inquiries"
-                        android:textColor="@color/text_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="8dp" />
-
-                    <LinearLayout
-                        android:id="@+id/adminInquiriesContainer"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical" />
-                </LinearLayout>
-
-                <!-- SEO Blog Card -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="8dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="SEO Blog Posts"
-                            android:textColor="@color/text_primary"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <Button
-                            android:id="@+id/btnAdminCreateBlogDialog"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="32dp"
-                            android:text="+ New Post"
-                            android:textSize="10sp"
-                            android:backgroundTint="@color/primary"
-                            android:textColor="#FFFFFF"
-                            app:cornerRadius="6dp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/adminBlogsContainer"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical" />
-                </LinearLayout>
-
-                <!-- FAQ Manager Card -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="8dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="FAQ Manager"
-                            android:textColor="@color/text_primary"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <Button
-                            android:id="@+id/btnAdminCreateFaqDialog"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="32dp"
-                            android:text="+ Add FAQ"
-                            android:textSize="10sp"
-                            android:backgroundTint="@color/primary"
-                            android:textColor="#FFFFFF"
-                            app:cornerRadius="6dp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/adminFaqsContainer"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical" />
-                </LinearLayout>
-
-                <!-- GitHub Backup Card -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Automated GitHub Storage &amp; Backup"
-                        android:textColor="@color/text_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Sync code and database backups directly to a private GitHub repository."
-                        android:textColor="@color/text_muted"
-                        android:textSize="11sp"
-                        android:layout_marginBottom="10dp" />
-
-                    <EditText
-                        android:id="@+id/editBackupRepoOwner"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_input_field"
-                        android:hint="Repository Owner (e.g. prakash111)"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="6dp" />
-
-                    <EditText
-                        android:id="@+id/editBackupRepoName"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_input_field"
-                        android:hint="Repository Name (e.g. apk-tool-backup)"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="6dp" />
-
-                    <EditText
-                        android:id="@+id/editBackupBranch"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_input_field"
-                        android:hint="Branch (e.g. main)"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="6dp" />
-
-                    <EditText
-                        android:id="@+id/editBackupToken"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_input_field"
-                        android:hint="GitHub Personal Access Token (ghp_...)"
-                        android:inputType="textPassword"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:paddingHorizontal="10dp"
-                        android:layout_marginBottom="10dp" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <Button
-                            android:id="@+id/btnSaveBackupSettings"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="40dp"
-                            android:layout_weight="1"
-                            android:text="Save Config"
-                            android:backgroundTint="@color/primary"
-                            android:textColor="#FFFFFF"
-                            android:textSize="11sp"
-                            android:layout_marginEnd="6dp"
-                            app:cornerRadius="8dp" />
-
-                        <Button
-                            android:id="@+id/btnRunManualBackup"
-                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="40dp"
-                            android:layout_weight="1"
-                            android:text="Run Backup Now"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:text="Build &amp; Sign Production APK"
+                            android:textSize="13sp"
                             android:backgroundTint="@color/success"
                             android:textColor="#FFFFFF"
-                            android:textSize="11sp"
-                            app:cornerRadius="8dp" />
+                            app:cornerRadius="10dp" />
+                    </LinearLayout>
+
+                    <!-- Build Output / Install Section -->
+                    <LinearLayout
+                        android:id="@+id/layoutBuildOutput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:background="@drawable/bg_dashboard_card"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Signed APK Ready"
+                            android:textStyle="bold"
+                            android:textColor="@color/success"
+                            android:textSize="15sp"
+                            android:layout_marginBottom="8dp" />
+
+                        <Button
+                            android:id="@+id/btnDownloadSignedApk"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="44dp"
+                            android:text="Install Signed APK on Device"
+                            android:backgroundTint="@color/primary"
+                            android:textColor="#FFFFFF"
+                            app:cornerRadius="10dp" />
                     </LinearLayout>
                 </LinearLayout>
-            </LinearLayout>
-        </ScrollView>
+            </ScrollView>
 
-        <!-- 9. COMMUNITY & SUPPORT PANEL -->
-        <ScrollView
-            android:id="@+id/panelCommunity"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true"
-            android:padding="16dp"
-            android:visibility="gone">
-
-            <LinearLayout
+            <!-- 8. BLOGS & TUTORIALS VIEW -->
+            <ScrollView
+                android:id="@+id/viewBlog"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="match_parent"
+                android:padding="16dp"
+                android:visibility="gone">
 
-                <!-- Submit Contact Form Card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Contact Support &amp; Submit Inquiry"
-                        android:textColor="@color/text_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
+                        android:text="Android Engineering Tutorials"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Send a message or technical issue report to the admin team."
+                        android:text="Guides on Smali reverse engineering, APK patching, and security."
                         android:textColor="@color/text_muted"
-                        android:textSize="11sp"
+                        android:textSize="12sp"
                         android:layout_marginBottom="12dp" />
+
+                    <LinearLayout
+                        android:id="@+id/layoutBlogsList"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+                </LinearLayout>
+            </ScrollView>
+
+            <!-- 9. FAQS VIEW -->
+            <ScrollView
+                android:id="@+id/viewFaqs"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="16dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Frequently Asked Questions"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Common questions about decompiling, smali editing, keystores, and signing."
+                        android:textColor="@color/text_muted"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="12dp" />
+
+                    <LinearLayout
+                        android:id="@+id/layoutFaqsList"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+                </LinearLayout>
+            </ScrollView>
+
+            <!-- 10. CONTACT SUPPORT VIEW -->
+            <ScrollView
+                android:id="@+id/viewContact"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="16dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Contact Support"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Send a message directly to our engineering support team."
+                        android:textColor="@color/text_muted"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="14dp" />
 
                     <EditText
                         android:id="@+id/editContactName"
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
+                        android:layout_height="44dp"
                         android:background="@drawable/bg_input_field"
                         android:hint="Your Name"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:paddingHorizontal="10dp"
+                        android:textSize="13sp"
+                        android:paddingHorizontal="12dp"
                         android:layout_marginBottom="8dp" />
 
                     <EditText
                         android:id="@+id/editContactEmail"
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
+                        android:layout_height="44dp"
                         android:background="@drawable/bg_input_field"
-                        android:hint="Your Email"
+                        android:hint="Email Address"
                         android:inputType="textEmailAddress"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:paddingHorizontal="10dp"
+                        android:textSize="13sp"
+                        android:paddingHorizontal="12dp"
                         android:layout_marginBottom="8dp" />
 
                     <EditText
                         android:id="@+id/editContactSubject"
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
+                        android:layout_height="44dp"
                         android:background="@drawable/bg_input_field"
-                        android:hint="Subject (e.g. Decompile Error, Limit Increase)"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:paddingHorizontal="10dp"
+                        android:hint="Inquiry Subject"
+                        android:textSize="13sp"
+                        android:paddingHorizontal="12dp"
                         android:layout_marginBottom="8dp" />
 
                     <EditText
@@ -2912,73 +1023,195 @@
                         android:layout_width="match_parent"
                         android:layout_height="90dp"
                         android:background="@drawable/bg_input_field"
-                        android:hint="Detailed message or log snippets..."
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
+                        android:hint="Message..."
                         android:gravity="top|start"
+                        android:textSize="13sp"
                         android:padding="10dp"
                         android:layout_marginBottom="12dp" />
 
                     <Button
-                        android:id="@+id/btnSubmitContactInquiry"
+                        android:id="@+id/btnSubmitContact"
                         style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                         android:layout_width="match_parent"
                         android:layout_height="44dp"
-                        android:text="Submit Inquiry"
+                        android:text="Send Inquiry"
                         android:backgroundTint="@color/primary"
                         android:textColor="#FFFFFF"
-                        app:cornerRadius="8dp" />
+                        app:cornerRadius="10dp" />
                 </LinearLayout>
+            </ScrollView>
 
-                <!-- Public Blogs Card -->
+            <!-- 11. ADMIN USERS VIEW -->
+            <ScrollView
+                android:id="@+id/viewAdmin"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="16dp"
+                android:visibility="gone">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Guides &amp; Tutorials"
-                        android:textColor="@color/text_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="8dp" />
+                    android:orientation="vertical">
 
                     <LinearLayout
-                        android:id="@+id/publicBlogsContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="User Management &amp; Quotas"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/danger" />
+
+                        <Button
+                            android:id="@+id/btnAdminCreateUser"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:text="+ User"
+                            android:textSize="11sp"
+                            android:backgroundTint="@color/danger"
+                            android:textColor="#FFFFFF"
+                            app:cornerRadius="8dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layoutAdminUsersList"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical" />
                 </LinearLayout>
+            </ScrollView>
+        </FrameLayout>
+    </LinearLayout>
 
-                <!-- Public FAQs Card -->
-                <LinearLayout
-                    android:layout_width="match_parent"
+    <!-- SIDEBAR NAVIGATION DRAWER -->
+    <LinearLayout
+        android:id="@+id/navigationDrawer"
+        android:layout_width="280dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@color/bg_sidebar"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Sidebar Brand Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="10dp"
+            android:background="@drawable/bg_nav_item_selected"
+            android:layout_marginBottom="14dp">
+
+            <TextView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@color/primary"
+                android:text="📱"
+                android:textSize="18sp"
+                android:gravity="center" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_card_rounded"
-                    android:padding="16dp">
+                    android:text="APK Tool Studio"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:textSize="14sp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Frequently Asked Questions"
-                        android:textColor="@color/text_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="8dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Companion 2.0"
+                    android:textColor="#818CF8"
+                    android:textSize="10sp" />
+            </LinearLayout>
+        </LinearLayout>
 
-                    <LinearLayout
-                        android:id="@+id/publicFaqsContainer"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical" />
-                </LinearLayout>
+        <!-- Navigation Items (Scrollable) -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="WORKSPACE" android:textColor="#64748B" android:textSize="10sp" android:textStyle="bold" android:layout_marginVertical="6dp" />
+                <TextView android:id="@+id/navDashboard" android:layout_width="match_parent" android:layout_height="38dp" android:text="📊  Dashboard" android:textColor="#E2E8F0" android:gravity="center_vertical" android:paddingHorizontal="10dp" />
+                <TextView android:id="@+id/navProjects" android:layout_width="match_parent" android:layout_height="38dp" android:text="📁  My Projects" android:textColor="#E2E8F0" android:gravity="center_vertical" android:paddingHorizontal="10dp" />
+                <TextView android:id="@+id/navEditor" android:layout_width="match_parent" android:layout_height="38dp" android:text="📝  Code &amp; File Editor" android:textColor="#E2E8F0" android:gravity="center_vertical" android:paddingHorizontal="10dp" />
+                <TextView android:id="@+id/navSearch" android:layout_width="match_parent" android:layout_height="38dp" android:text="🔍  Find &amp; Replace" android:textColor="#E2E8F0" android:gravity="center_vertical" android:paddingHorizontal="10dp" />
+                <TextView android:id="@+id/navStrings" android:layout_width="match_parent" android:layout_height="38dp" android:text="🔤  App Name &amp; Strings" android:textColor="#E2E8F0" android:gravity="center_vertical" android:paddingHorizontal="10dp" />
+                <TextView android:id="@+id/navKeystores" android:layout_width="match_parent" android:layout_height="38dp" android:text="🔑  Keystores &amp; Signing" android:textColor="#E2E8F0" android:gravity="center_vertical" android:paddingHorizontal="10dp" />
+                <TextView android:id="@+id/navBuild" android:layout_width="match_parent" android:layout_height="38dp" android:text="🔨  Recompile &amp; Build" android:textColor="#E2E8F0" android:gravity="center_vertical" android:paddingHorizontal="10dp" />
+
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="COMMUNITY &amp; SUPPORT" android:textColor="#64748B" android:textSize="10sp" android:textStyle="bold" android:layout_marginTop="14dp" android:layout_marginBottom="6dp" />
+                <TextView android:id="@+id/navBlog" android:layout_width="match_parent" android:layout_height="38dp" android:text="📰  Tutorials &amp; Blog" android:textColor="#E2E8F0" android:gravity="center_vertical" android:paddingHorizontal="10dp" />
+                <TextView android:id="@+id/navFaqs" android:layout_width="match_parent" android:layout_height="38dp" android:text="❓  FAQs &amp; Help" android:textColor="#E2E8F0" android:gravity="center_vertical" android:paddingHorizontal="10dp" />
+                <TextView android:id="@+id/navContact" android:layout_width="match_parent" android:layout_height="38dp" android:text="✉️  Contact Support" android:textColor="#E2E8F0" android:gravity="center_vertical" android:paddingHorizontal="10dp" />
+
+                <TextView android:id="@+id/navAdminSectionTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="ADMINISTRATION" android:textColor="#EF4444" android:textSize="10sp" android:textStyle="bold" android:layout_marginTop="14dp" android:layout_marginBottom="6dp" android:visibility="gone" />
+                <TextView android:id="@+id/navAdmin" android:layout_width="match_parent" android:layout_height="38dp" android:text="🛡️  User Management" android:textColor="#FCA5A5" android:gravity="center_vertical" android:paddingHorizontal="10dp" android:visibility="gone" />
             </LinearLayout>
         </ScrollView>
-    </FrameLayout>
-</LinearLayout>
+
+        <!-- Sidebar Footer / Logout -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingTop="12dp">
+
+            <TextView
+                android:id="@+id/txtSidebarUserAvatar"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@color/primary"
+                android:text="U"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/txtSidebarUsername"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Developer"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:layout_marginStart="8dp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <Button
+                android:id="@+id/btnSidebarLogout"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:text="Logout"
+                android:textColor="@color/danger"
+                android:textSize="11sp" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.drawerlayout.widget.DrawerLayout>
