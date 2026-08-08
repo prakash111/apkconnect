@@ -3,10 +3,10 @@ package com.apktoolai.companion.api
 import org.json.JSONObject
 
 data class User(
-    val id: Int,
-    val username: String,
-    val email: String,
-    val userType: String,
+    val id: Int = 0,
+    val username: String = "",
+    val email: String = "",
+    val userType: String = "user",
     val emailVerified: Int = 0,
     val decompileLimit: Int = 1,
     val decompileUsage: Int = 0,
@@ -33,38 +33,48 @@ data class UserLimits(
 )
 
 data class ProjectItem(
-    val id: Int,
-    val projectId: String,
-    val projectName: String,
-    val sourceApk: String?,
-    val projectPath: String?,
-    val projectRoot: String?,
-    val unsignedApk: String?,
-    val signedApk: String?,
-    val keystorePath: String?,
-    val keystoreAlias: String?,
-    val logoPreviewName: String?,
-    val logoPreviewPath: String?,
+    val id: Int = 0,
+    val projectId: String = "",
+    val projectName: String = "",
+    val sourceApk: String? = null,
+    val projectPath: String? = null,
+    val projectRoot: String? = null,
+    val unsignedApk: String? = null,
+    val signedApk: String? = null,
+    val keystorePath: String? = null,
+    val keystoreAlias: String? = null,
+    val logoPreviewName: String? = null,
+    val logoPreviewPath: String? = null,
     val logoVersion: Long = 0,
-    val crashReportToken: String?,
-    val createdAt: String?,
-    val updatedAt: String?
+    val crashReportToken: String? = null,
+    val createdAt: String? = null,
+    val updatedAt: String? = null,
+    val apkName: String? = null,
+    val apkSize: Long = 0,
+    val packageName: String? = null,
+    val versionCode: String? = null,
+    val versionName: String? = null,
+    val minSdk: String? = null,
+    val targetSdk: String? = null,
+    val status: String? = null,
+    val lastStep: String? = null,
+    val userId: Int = 0
 )
 
 data class ProjectState(
-    val projectId: String,
-    val projectName: String,
-    val projectPath: String,
-    val projectRoot: String,
-    val sourceApk: String?,
-    val unsignedApk: String?,
-    val signedApk: String?,
-    val keystorePath: String?,
-    val keystoreAlias: String?,
-    val logoPreviewName: String?,
-    val logoPreviewPath: String?,
+    val projectId: String = "",
+    val projectName: String = "",
+    val projectPath: String = "",
+    val projectRoot: String = "",
+    val sourceApk: String? = null,
+    val unsignedApk: String? = null,
+    val signedApk: String? = null,
+    val keystorePath: String? = null,
+    val keystoreAlias: String? = null,
+    val logoPreviewName: String? = null,
+    val logoPreviewPath: String? = null,
     val logoVersion: Long = 0,
-    val crashReportToken: String?,
+    val crashReportToken: String? = null,
     val lastBuildLog: String? = null,
     val lastBuildFailed: Boolean = false,
     val selectedLocale: String = "values",
@@ -74,72 +84,72 @@ data class ProjectState(
 )
 
 data class ProjectFile(
-    val name: String,
-    val path: String,
-    val isDir: Boolean,
-    val size: Long
+    val name: String = "",
+    val path: String = "",
+    val isDir: Boolean = false,
+    val size: Long = 0
 )
 
 data class StringItem(
-    val name: String,
-    var value: String
+    val name: String = "",
+    var value: String = ""
 )
 
 data class KeystoreItem(
-    val id: Int,
-    val username: String,
-    val fileName: String,
-    val keyAlias: String,
-    val createdAt: String
+    val id: Int = 0,
+    val username: String = "",
+    val fileName: String = "",
+    val keyAlias: String = "",
+    val createdAt: String = ""
 )
 
 data class ContactInquiry(
-    val id: Int,
-    val name: String,
-    val email: String,
-    val subject: String,
-    val message: String,
-    val status: String,
-    val createdAt: String
+    val id: Int = 0,
+    val name: String = "",
+    val email: String = "",
+    val subject: String = "",
+    val message: String = "",
+    val status: String = "new",
+    val createdAt: String = ""
 ) {
     val isRead: Boolean get() = status.equals("read", ignoreCase = true)
 }
 
 data class BlogPost(
-    val id: Int,
-    val title: String,
-    val slug: String,
-    val excerpt: String,
-    val content: String,
-    val category: String,
-    val tags: String,
-    val readTime: String,
+    val id: Int = 0,
+    val title: String = "",
+    val slug: String = "",
+    val excerpt: String = "",
+    val content: String = "",
+    val category: String = "",
+    val tags: String = "",
+    val readTime: String = "5 min read",
     val views: Int = 0,
-    val createdAt: String
+    val createdAt: String = ""
 )
 
 data class FaqItem(
-    val id: Int,
-    val question: String,
-    val answer: String,
-    val category: String,
+    val id: Int = 0,
+    val question: String = "",
+    val answer: String = "",
+    val category: String = "",
     val sortOrder: Int = 0,
     val isActive: Int = 1
 )
 
 data class AdbDevice(
-    val serial: String,
-    val state: String,
+    val serial: String = "",
+    val state: String = "",
     val model: String = ""
 )
 
 data class HexResult(
-    val offset: Long,
-    val hexOffset: String,
-    val pageOffset: Long,
-    val pageHex: String,
-    val hexSnippet: String,
-    val asciiSnippet: String
+    val offset: Long = 0,
+    val hexOffset: String = "",
+    val pageOffset: Long = 0,
+    val pageHex: String = "",
+    val hexSnippet: String = "",
+    val asciiSnippet: String = ""
 )
 
 data class AiSettingsData(

@@ -454,8 +454,22 @@ class ApiClient(private val session: SessionManager) {
                     val o = arr.optJSONObject(i) ?: continue
                     list.add(
                         ProjectItem(
+                            id = o.optInt("id", 0),
                             projectId = o.optString("project_id", ""),
-                            userId = o.optInt("user_id", 0),
+                            projectName = o.optString("project_name", o.optString("apk_name", "project")),
+                            sourceApk = o.optString("source_apk", o.optString("apk_name", "")),
+                            projectPath = o.optString("project_path", ""),
+                            projectRoot = o.optString("project_root", ""),
+                            unsignedApk = o.optString("unsigned_apk", ""),
+                            signedApk = o.optString("signed_apk", ""),
+                            keystorePath = o.optString("keystore_path", ""),
+                            keystoreAlias = o.optString("keystore_alias", ""),
+                            logoPreviewName = o.optString("logo_preview_name", ""),
+                            logoPreviewPath = o.optString("logo_preview_path", ""),
+                            logoVersion = o.optLong("logo_version", 0),
+                            crashReportToken = o.optString("crash_report_token", ""),
+                            createdAt = o.optString("created_at", ""),
+                            updatedAt = o.optString("updated_at", ""),
                             apkName = o.optString("apk_name", ""),
                             apkSize = o.optLong("apk_size", 0),
                             packageName = o.optString("package_name", ""),
@@ -465,8 +479,7 @@ class ApiClient(private val session: SessionManager) {
                             targetSdk = o.optString("target_sdk", ""),
                             status = o.optString("status", ""),
                             lastStep = o.optString("last_step", ""),
-                            createdAt = o.optString("created_at", ""),
-                            updatedAt = o.optString("updated_at", "")
+                            userId = o.optInt("user_id", 0)
                         )
                     )
                 }
