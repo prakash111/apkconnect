@@ -3,10 +3,12 @@ package com.apktoolai.companion
 import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
+import android.text.Html
 import android.text.TextWatcher
 import android.util.Base64
 import android.view.LayoutInflater
@@ -151,9 +153,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var editContactMessage: EditText
     private lateinit var btnSubmitContact: Button
 
-    // Admin
+    // Admin Elements
+    private lateinit var btnAdminSubtabUsers: Button
+    private lateinit var btnAdminSubtabInquiries: Button
+    private lateinit var txtAdminSectionHeader: TextView
     private lateinit var btnAdminCreateUser: Button
     private lateinit var layoutAdminUsersList: LinearLayout
+    private var currentAdminSubtab: String = "users"
 
     // Auth
     private lateinit var btnScanQr: Button
@@ -328,6 +334,9 @@ class MainActivity : AppCompatActivity() {
         btnSubmitContact = findViewById(R.id.btnSubmitContact)
 
         // Admin
+        btnAdminSubtabUsers = findViewById(R.id.btnAdminSubtabUsers)
+        btnAdminSubtabInquiries = findViewById(R.id.btnAdminSubtabInquiries)
+        txtAdminSectionHeader = findViewById(R.id.txtAdminSectionHeader)
         btnAdminCreateUser = findViewById(R.id.btnAdminCreateUser)
         layoutAdminUsersList = findViewById(R.id.layoutAdminUsersList)
 
@@ -396,6 +405,20 @@ class MainActivity : AppCompatActivity() {
 
         btnSubmitContact.setOnClickListener { submitContactInquiry() }
         btnAdminCreateUser.setOnClickListener { showCreateUserDialog() }
+
+        btnAdminSubtabUsers.setOnClickListener {
+            currentAdminSubtab = "users"
+            txtAdminSectionHeader.text = "User Accounts & Quotas"
+            btnAdminCreateUser.visibility = View.VISIBLE
+            loadAdminUsersList()
+        }
+
+        btnAdminSubtabInquiries.setOnClickListener {
+            currentAdminSubtab = "inquiries"
+            txtAdminSectionHeader.text = "Contact Messages & Inquiries"
+            btnAdminCreateUser.visibility = View.GONE
+            loadAdminInquiriesList()
+        }
 
         btnScanQr.setOnClickListener { launchQrScanner() }
         btnOpenLoginDialog.setOnClickListener { showAuthDialog() }
@@ -487,7 +510,7 @@ class MainActivity : AppCompatActivity() {
             }
             "admin" -> {
                 viewAdmin.visibility = View.VISIBLE
-                txtTopbarTitle.text = "User Management"
+                txtTopbarTitle.text = "Admin Management"
                 loadAdminUsersList()
             }
         }
@@ -701,7 +724,7 @@ class MainActivity : AppCompatActivity() {
             text = "Open Studio"
             textSize = 11f
             setTextColor(0xFFFFFFFF.toInt())
-            setBackgroundColor(getColor(R.color.primary))
+            setBackgroundResource(R.drawable.bg_btn_primary)
             setOnClickListener { openProjectInStudio(proj.projectId, proj.projectName) }
         }
 
@@ -1170,7 +1193,7 @@ class MainActivity : AppCompatActivity() {
                         val btnDownload = Button(this@MainActivity).apply {
                             text = "Download"
                             textSize = 11f
-                            setBackgroundColor(getColor(R.color.primary))
+                            setBackgroundResource(R.drawable.bg_btn_primary)
                             setTextColor(0xFFFFFFFF.toInt())
                             setOnClickListener {
                                 val url = session.serverUrl + "?download=" + Uri.encode(ks.fileName)
@@ -1280,7 +1303,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // -------------------------------------------------------------
-    // Blogs & FAQs
+    // Blogs & FAQs (Formatted Rich Text Reader)
     // -------------------------------------------------------------
 
     private fun loadBlogsList() {
@@ -1359,7 +1382,7 @@ class MainActivity : AppCompatActivity() {
             textSize = 18f
             setTypeface(null, android.graphics.Typeface.BOLD)
             setTextColor(getColor(R.color.text_primary))
-            setPadding(0, 0, 0, 8)
+            setPadding(0, 0, 0, 6)
         }
 
         val meta = TextView(this).apply {
@@ -1369,9 +1392,17 @@ class MainActivity : AppCompatActivity() {
             setPadding(0, 0, 0, 12)
         }
 
+        // Render HTML content cleanly instead of showing raw code tags
+        val raw = if (blog.content.isNotEmpty()) blog.content else blog.excerpt
+        val formattedSpan = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Html.fromHtml(raw, Html.FROM_HTML_MODE_COMPACT)
+        } else {
+            Html.fromHtml(raw)
+        }
+
         val scroll = ScrollView(this).apply {
             val contentText = TextView(this@MainActivity).apply {
-                text = if (blog.content.isNotEmpty()) blog.content else blog.excerpt
+                text = formattedSpan
                 textSize = 13f
                 setTextColor(getColor(R.color.text_secondary))
                 setLineSpacing(4f, 1.2f)
@@ -1465,7 +1496,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // -------------------------------------------------------------
-    // Admin Panel
+    // Admin Panel & Management (Users & Inquiries)
     // -------------------------------------------------------------
 
     private fun loadAdminUsersList() {
@@ -1499,7 +1530,7 @@ class MainActivity : AppCompatActivity() {
                         val decL = u.decompileLimit
                         val comU = u.compileUsage
                         val comL = u.compileLimit
-                        text = "Dec: $decU/$decL | Com: $comU/$comL"
+                        text = "Decompiles: $decU / $decL • Compiles: $comU / $comL"
                         textSize = 11f
                         setTextColor(getColor(R.color.text_secondary))
                         setPadding(0, 4, 0, 0)
@@ -1513,6 +1544,70 @@ class MainActivity : AppCompatActivity() {
             override fun onError(errorMessage: String) {
                 setBusy(false)
                 toast(errorMessage)
+            }
+        })
+    }
+
+    private fun loadAdminInquiriesList() {
+        setBusy(true)
+        api.executePost("get_admin_contact_inquiries", emptyMap(), object : ApiClient.ApiCallback<JSONObject> {
+            override fun onSuccess(result: JSONObject) {
+                setBusy(false)
+                layoutAdminUsersList.removeAllViews()
+                val inquiries = result.optJSONArray("inquiries")
+                if (inquiries == null || inquiries.length() == 0) {
+                    val empty = TextView(this@MainActivity).apply {
+                        text = "No contact inquiries received yet."
+                        textSize = 12f
+                        setTextColor(getColor(R.color.text_muted))
+                        setPadding(16, 24, 16, 24)
+                    }
+                    layoutAdminUsersList.addView(empty)
+                } else {
+                    for (i in 0 until inquiries.length()) {
+                        val inq = inquiries.getJSONObject(i)
+                        val card = LinearLayout(this@MainActivity).apply {
+                            orientation = LinearLayout.VERTICAL
+                            setPadding(14, 14, 14, 14)
+                            setBackgroundResource(R.drawable.bg_dashboard_card)
+                            val p = LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                            )
+                            p.setMargins(0, 0, 0, 10)
+                            layoutParams = p
+                        }
+
+                        val subj = TextView(this@MainActivity).apply {
+                            text = "✉️ " + inq.optString("subject", "Inquiry")
+                            textSize = 14f
+                            setTypeface(null, android.graphics.Typeface.BOLD)
+                            setTextColor(getColor(R.color.text_primary))
+                        }
+
+                        val from = TextView(this@MainActivity).apply {
+                            text = "From: " + inq.optString("name") + " <" + inq.optString("email") + ">"
+                            textSize = 11f
+                            setTextColor(getColor(R.color.primary))
+                            setPadding(0, 2, 0, 4)
+                        }
+
+                        val msg = TextView(this@MainActivity).apply {
+                            text = inq.optString("message")
+                            textSize = 12f
+                            setTextColor(getColor(R.color.text_secondary))
+                        }
+
+                        card.addView(subj)
+                        card.addView(from)
+                        card.addView(msg)
+                        layoutAdminUsersList.addView(card)
+                    }
+                }
+            }
+            override fun onError(errorMessage: String) {
+                setBusy(false)
+                toast("Failed to load inquiries: $errorMessage")
             }
         })
     }

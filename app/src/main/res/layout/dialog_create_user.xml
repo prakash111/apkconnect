@@ -1,115 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
     android:padding="20dp"
     android:background="@color/bg_card">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:text="Provision User Account"
+        android:textColor="#F8FAFC"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="4dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Create User Account"
-            android:textColor="@color/text_primary"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create a new developer or client account with decompilation quotas."
+        android:textColor="#94A3B8"
+        android:textSize="12sp"
+        android:layout_marginBottom="16dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Admin tool to provision new user accounts and quotas directly."
-            android:textColor="@color/text_muted"
-            android:textSize="12sp"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="14dp" />
+    <EditText
+        android:id="@+id/editNewUserEmail"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:background="@drawable/bg_input_field"
+        android:hint="User Email Address"
+        android:inputType="textEmailAddress"
+        android:textColor="#F8FAFC"
+        android:textColorHint="#64748B"
+        android:textSize="13sp"
+        android:paddingHorizontal="12dp"
+        android:layout_marginBottom="10dp" />
 
-        <EditText
-            android:id="@+id/editNewUserEmail"
-            android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:background="@drawable/bg_input_field"
-            android:hint="Email Address"
-            android:inputType="textEmailAddress"
-            android:textColor="@color/text_primary"
-            android:textColorHint="@color/text_muted"
-            android:textSize="13sp"
-            android:paddingHorizontal="12dp"
-            android:layout_marginBottom="8dp" />
+    <EditText
+        android:id="@+id/editNewUserUsername"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:background="@drawable/bg_input_field"
+        android:hint="Username"
+        android:textColor="#F8FAFC"
+        android:textColorHint="#64748B"
+        android:textSize="13sp"
+        android:paddingHorizontal="12dp"
+        android:layout_marginBottom="10dp" />
 
-        <EditText
-            android:id="@+id/editNewUserUsername"
-            android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:background="@drawable/bg_input_field"
-            android:hint="Username"
-            android:textColor="@color/text_primary"
-            android:textColorHint="@color/text_muted"
-            android:textSize="13sp"
-            android:paddingHorizontal="12dp"
-            android:layout_marginBottom="8dp" />
+    <EditText
+        android:id="@+id/editNewUserPassword"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:background="@drawable/bg_input_field"
+        android:hint="Account Password"
+        android:inputType="textPassword"
+        android:textColor="#F8FAFC"
+        android:textColorHint="#64748B"
+        android:textSize="13sp"
+        android:paddingHorizontal="12dp"
+        android:layout_marginBottom="16dp" />
 
-        <EditText
-            android:id="@+id/editNewUserPassword"
-            android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:background="@drawable/bg_input_field"
-            android:hint="Password"
-            android:inputType="textPassword"
-            android:textColor="@color/text_primary"
-            android:textColorHint="@color/text_muted"
-            android:textSize="13sp"
-            android:paddingHorizontal="12dp"
-            android:layout_marginBottom="8dp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
-
-            <EditText
-                android:id="@+id/editNewUserDecompileLimit"
-                android:layout_width="0dp"
-                android:layout_height="42dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_input_field"
-                android:hint="Decompile Limit"
-                android:text="10"
-                android:inputType="number"
-                android:textColor="@color/text_primary"
-                android:textColorHint="@color/text_muted"
-                android:textSize="12sp"
-                android:paddingHorizontal="10dp"
-                android:layout_marginEnd="6dp" />
-
-            <EditText
-                android:id="@+id/editNewUserCompileLimit"
-                android:layout_width="0dp"
-                android:layout_height="42dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_input_field"
-                android:hint="Compile Limit"
-                android:text="10"
-                android:inputType="number"
-                android:textColor="@color/text_primary"
-                android:textColorHint="@color/text_muted"
-                android:textSize="12sp"
-                android:paddingHorizontal="10dp" />
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/btnSubmitCreateUser"
-            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-            android:layout_width="match_parent"
-            android:layout_height="46dp"
-            android:text="Provision User"
-            android:backgroundTint="@color/danger"
-            android:textColor="#FFFFFF"
-            app:cornerRadius="10dp" />
-    </LinearLayout>
-</ScrollView>
+    <Button
+        android:id="@+id/btnSubmitCreateUser"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:text="Create Account"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:background="@drawable/bg_btn_danger"
+        android:textColor="#FFFFFF" />
+</LinearLayout>

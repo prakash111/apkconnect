@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Theme.ApkToolCompanion" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.ApkToolCompanion" parent="Theme.MaterialComponents.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryVariant">@color/primary_dark</item>
         <item name="colorOnPrimary">#FFFFFF</item>
@@ -8,15 +8,14 @@
         <item name="colorSecondaryVariant">@color/primary_dark</item>
         <item name="colorOnSecondary">#FFFFFF</item>
         
-        <item name="android:statusBarColor">#0F172A</item>
+        <item name="android:statusBarColor">#0B0F19</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
-        <item name="android:navigationBarColor">#1E293B</item>
+        <item name="android:navigationBarColor">#0B0F19</item>
         <item name="android:windowBackground">@color/bg_body</item>
 
-        <item name="materialButtonStyle">@style/Widget.MaterialComponents.Button.UnelevatedButton</item>
-        <item name="colorButtonNormal">@color/primary</item>
-        <item name="android:textColorPrimary">@color/text_primary</item>
-        <item name="android:textColorSecondary">@color/text_secondary</item>
-        <item name="android:textColorHint">@color/text_muted</item>
+        <item name="android:textColorPrimary">#F8FAFC</item>
+        <item name="android:textColorSecondary">#CBD5E1</item>
+        <item name="android:textColorHint">#64748B</item>
+        <item name="android:editTextColor">#F8FAFC</item>
     </style>
 </resources>
