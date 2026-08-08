@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">APK Tool Studio</string>
+    <string name="app_tagline">Mobile APK Decompiler, Hex Editor &amp; Signing Platform</string>
+    <string name="status_not_paired">Not connected to a project yet</string>
+    <string name="status_connected">Connected to project</string>
+    <string name="tab_dashboard">Dashboard</string>
+    <string name="tab_projects">Projects</string>
+    <string name="tab_editor">Editor &amp; Hex</string>
+    <string name="tab_customizer">Resources &amp; AI</string>
+    <string name="tab_build">Build &amp; Sign</string>
+    <string name="tab_debugger">ADB &amp; Logs</string>
+    <string name="tab_ai_settings">AI Settings</string>
+    <string name="tab_admin">Admin Panel</string>
+    <string name="tab_community">Blogs &amp; Support</string>
+</resources>

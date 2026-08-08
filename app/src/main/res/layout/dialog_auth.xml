@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="20dp"
+    android:background="@color/bg_card">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/txtAuthDialogTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Account Login"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtAuthDialogSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sign in to your APK Tool Studio account"
+            android:textColor="@color/text_muted"
+            android:textSize="12sp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Mode Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="14dp">
+
+            <Button
+                android:id="@+id/btnAuthModeLogin"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:text="Login"
+                android:textSize="11sp"
+                android:backgroundTint="@color/primary"
+                android:textColor="#FFFFFF"
+                android:layout_marginEnd="4dp"
+                app:cornerRadius="8dp" />
+
+            <Button
+                android:id="@+id/btnAuthModeRegister"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:text="Register"
+                android:textSize="11sp"
+                android:textColor="@color/text_secondary"
+                android:layout_marginEnd="4dp"
+                app:strokeColor="@color/border_light"
+                app:cornerRadius="8dp" />
+
+            <Button
+                android:id="@+id/btnAuthModeForgot"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:text="Forgot"
+                android:textSize="11sp"
+                android:textColor="@color/text_secondary"
+                app:strokeColor="@color/border_light"
+                app:cornerRadius="8dp" />
+        </LinearLayout>
+
+        <!-- Email Field -->
+        <EditText
+            android:id="@+id/editAuthEmail"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="Email Address"
+            android:inputType="textEmailAddress"
+            android:textSize="13sp"
+            android:paddingHorizontal="12dp"
+            android:layout_marginBottom="10dp"
+            android:visibility="gone" />
+
+        <!-- Username or Login Field -->
+        <EditText
+            android:id="@+id/editAuthUsername"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="Username or Email"
+            android:inputType="text"
+            android:textSize="13sp"
+            android:paddingHorizontal="12dp"
+            android:layout_marginBottom="10dp" />
+
+        <!-- Password Field -->
+        <EditText
+            android:id="@+id/editAuthPassword"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="Password (min 6 characters)"
+            android:inputType="textPassword"
+            android:textSize="13sp"
+            android:paddingHorizontal="12dp"
+            android:layout_marginBottom="14dp" />
+
+        <!-- Submit Button -->
+        <Button
+            android:id="@+id/btnAuthSubmit"
+            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:text="Sign In"
+            android:backgroundTint="@color/primary"
+            android:textColor="#FFFFFF"
+            app:cornerRadius="10dp" />
+    </LinearLayout>
+</ScrollView>

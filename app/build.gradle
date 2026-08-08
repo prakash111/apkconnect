@@ -1,0 +1,66 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.apktoolai.companion'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.apktoolai.companion"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
+
+    signingConfigs {
+        release {
+            // Left blank on purpose: when Codemagic (or any CI) passes
+            // -Pandroid.injected.signing.store.file / .store.password /
+            // .key.alias / .key.password on the command line, the Android
+            // Gradle Plugin fills these in automatically for this config.
+            // For a purely local unsigned test build, just use
+            // `./gradlew assembleDebug` instead - it needs no signing config.
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            outputFileName = "APK-Debugger-${variant.name}.apk"
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    // Self-contained QR/barcode scanner (own camera Activity, no Play
+    // Services / Google Barcode Scanner app dependency needed) - used to
+    // pair with the backend by scanning the QR code instead of typing a
+    // long pairing code.
+    implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+}

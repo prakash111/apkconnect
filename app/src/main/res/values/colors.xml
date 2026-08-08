@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#4F46E5</color>
+    <color name="primary_dark">#3730A3</color>
+    <color name="primary_light">#EEF2FF</color>
+    <color name="accent">#2563EB</color>
+    <color name="accent_light">#DBEAFE</color>
+    <color name="success">#10B981</color>
+    <color name="success_dark">#047857</color>
+    <color name="success_light">#D1FAE5</color>
+    <color name="warning">#F59E0B</color>
+    <color name="warning_light">#FEF3C7</color>
+    <color name="danger">#EF4444</color>
+    <color name="danger_light">#FEE2E2</color>
+    <color name="info">#06B6D4</color>
+    <color name="info_light">#CFFAFE</color>
+
+    <color name="bg_body">#F0F4FE</color>
+    <color name="bg_card">#FFFFFF</color>
+    <color name="bg_card_alt">#F8FAFF</color>
+    <color name="bg_dark">#0B1120</color>
+    <color name="surface_dark">#0F172A</color>
+    <color name="surface_dark_alt">#1E293B</color>
+    <color name="surface_dark_border">#334155</color>
+
+    <color name="text_primary">#0B1120</color>
+    <color name="text_secondary">#475569</color>
+    <color name="text_muted">#94A3B8</color>
+    <color name="text_inverse">#FFFFFF</color>
+    <color name="border_light">#E2E8F0</color>
+    <color name="border_focus">#6366F1</color>
+
+    <color name="hex_offset">#60A5FA</color>
+    <color name="hex_ascii">#4ADE80</color>
+    <color name="hex_match">#FDE047</color>
+    <color name="hex_selected">#0284C7</color>
+    <color name="hex_modified">#92400E</color>
+
+    <color name="ic_launcher_background">#010C1E</color>
+</resources>

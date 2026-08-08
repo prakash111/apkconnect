@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@color/bg_card">
+
+    <TextView
+        android:id="@+id/txtFaqDialogTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="FAQ Management"
+        android:textColor="@color/text_primary"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add or edit frequently asked questions in the database."
+        android:textColor="@color/text_muted"
+        android:textSize="12sp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="14dp" />
+
+    <EditText
+        android:id="@+id/editFaqQuestion"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:background="@drawable/bg_input_field"
+        android:hint="Question"
+        android:textSize="13sp"
+        android:paddingHorizontal="10dp"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/editFaqCategory"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@drawable/bg_input_field"
+        android:hint="Category (e.g. General, Decompiling)"
+        android:textSize="12sp"
+        android:paddingHorizontal="10dp"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/editFaqAnswer"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:background="@drawable/bg_input_field"
+        android:hint="Answer text..."
+        android:textSize="12sp"
+        android:gravity="top|start"
+        android:padding="10dp"
+        android:layout_marginBottom="14dp" />
+
+    <Button
+        android:id="@+id/btnSubmitFaq"
+        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:text="Save FAQ"
+        android:backgroundTint="@color/primary"
+        android:textColor="#FFFFFF"
+        app:cornerRadius="10dp" />
+</LinearLayout>

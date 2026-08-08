@@ -1,0 +1,80 @@
+workflows:
+  android-debug:
+    name: APK Debugger - Debug Build
+    max_build_duration: 30
+    instance_type: mac_mini_m2
+
+    environment:
+      java: 17
+      vars:
+        PACKAGE_NAME: "com.apktoolai.companion"
+
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: "*"
+          include: true
+
+    scripts:
+      - name: Generate Gradle wrapper
+        script: |
+          gradle wrapper --gradle-version 8.7 --distribution-type all
+
+      - name: Build debug APK
+        script: |
+          ./gradlew assembleDebug --stacktrace
+
+    artifacts:
+      - app/build/outputs/apk/**/*.apk
+      - app/build/outputs/**/mapping.txt
+
+  android-release:
+    name: APK Debugger - Release Build (signed)
+    max_build_duration: 30
+    instance_type: mac_mini_m2
+
+    environment:
+      java: 17
+
+      vars:
+        PACKAGE_NAME: "com.apktoolai.companion"
+
+        # Keystore (stored in repository root)
+        KEYSTORE_FILE: "zoom-app.jks"
+        KEYSTORE_PASSWORD: "123456789"
+        KEY_ALIAS: "zoom_app"
+        KEY_PASSWORD: "123456789"
+
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: "*"
+          include: true
+
+    scripts:
+      - name: Generate Gradle wrapper
+        script: |
+          gradle wrapper --gradle-version 8.7 --distribution-type all
+
+      - name: Verify keystore
+        script: |
+          if [ ! -f "$CM_BUILD_DIR/$KEYSTORE_FILE" ]; then
+            echo "Keystore not found:"
+            echo "$CM_BUILD_DIR/$KEYSTORE_FILE"
+            exit 1
+          fi
+
+      - name: Build signed Release APK
+        script: |
+          ./gradlew assembleRelease \
+            -Pandroid.injected.signing.store.file="$CM_BUILD_DIR/$KEYSTORE_FILE" \
+            -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
+            -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+            -Pandroid.injected.signing.key.password="$KEY_PASSWORD" \
+            --stacktrace
+
+    artifacts:
+      - app/build/outputs/apk/**/*.apk
+      - app/build/outputs/**/mapping.txt
