@@ -1,0 +1,108 @@
+workflows:
+  android-debug:
+    name: APK Tool Companion - Debug Build
+    max_build_duration: 30
+    instance_type: mac_mini_m2
+
+    environment:
+      node: 20
+      java: 17
+      vars:
+        PACKAGE_NAME: "com.apktoolai.companion"
+
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: "*"
+          include: true
+
+    scripts:
+      - name: Install npm dependencies
+        script: |
+          npm install
+
+      - name: Set gradlew permissions
+        script: |
+          chmod +x android/gradlew
+
+      - name: Clean previous build artifacts
+        script: |
+          cd android
+          rm -rf app/build
+          ./gradlew clean --stacktrace
+
+      - name: Build debug APK
+        script: |
+          cd android
+          ./gradlew assembleDebug --no-build-cache --stacktrace
+
+    artifacts:
+      - android/app/build/outputs/apk/**/*.apk
+      - android/app/build/outputs/**/mapping.txt
+
+
+  android-release:
+    name: APK Tool Companion - Release Build (signed)
+    max_build_duration: 30
+    instance_type: mac_mini_m2
+
+    environment:
+      node: 20
+      java: 17
+
+      vars:
+        PACKAGE_NAME: "com.apktoolai.companion"
+
+        # Keystore stored in repository root
+        KEYSTORE_FILE: "zoom-app.jks"
+        KEYSTORE_PASSWORD: "123456789"
+        KEY_ALIAS: "zoom_app"
+        KEY_PASSWORD: "123456789"
+
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: "*"
+          include: true
+
+    scripts:
+      - name: Install npm dependencies
+        script: |
+          npm install
+
+      - name: Set gradlew permissions
+        script: |
+          chmod +x android/gradlew
+
+      - name: Verify keystore
+        script: |
+          if [ ! -f "$CM_BUILD_DIR/$KEYSTORE_FILE" ]; then
+            echo "Keystore not found:"
+            echo "$CM_BUILD_DIR/$KEYSTORE_FILE"
+            exit 1
+          fi
+
+          echo "Keystore found: $CM_BUILD_DIR/$KEYSTORE_FILE"
+
+      - name: Clean previous build artifacts
+        script: |
+          cd android
+          rm -rf app/build
+          ./gradlew clean --stacktrace
+
+      - name: Build signed Release APK
+        script: |
+          cd android
+          ./gradlew assembleRelease \
+            -Pandroid.injected.signing.store.file="$CM_BUILD_DIR/$KEYSTORE_FILE" \
+            -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
+            -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+            -Pandroid.injected.signing.key.password="$KEY_PASSWORD" \
+            --no-build-cache \
+            --stacktrace
+
+    artifacts:
+      - android/app/build/outputs/apk/**/*.apk
+      - android/app/build/outputs/**/mapping.txt
