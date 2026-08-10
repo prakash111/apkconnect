@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { Card, Button, Banner, HelperText, SectionTitle } from '../../components/UI';
+import CodeEditor from '../../components/CodeEditor';
+import { Card, Button, Banner, HelperText, SectionTitle, Label } from '../../components/UI';
 import * as workflowApi from '../../api/workflow';
 import { colors, radius, spacing } from '../../theme/theme';
 
 export default function FirebaseConfigScreen() {
   const [fileName, setFileName] = useState('');
   const [fileUri, setFileUri] = useState('');
+  const [jsonText, setJsonText] = useState('');
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -28,8 +30,8 @@ export default function FirebaseConfigScreen() {
   };
 
   const onApply = async () => {
-    if (!fileUri) {
-      setError('Choose a google-services.json file first.');
+    if (!fileUri && !jsonText.trim()) {
+      setError('Choose a google-services.json file or paste JSON content.');
       return;
     }
     setLoading(true);
@@ -37,11 +39,24 @@ export default function FirebaseConfigScreen() {
     setMessage('');
     setAppliedData(null);
     try {
-      const res = await workflowApi.applyFirebaseConfig({
+      let uploadFileDescriptor = {
         uri: fileUri,
-        name: fileName,
+        name: fileName || 'google-services.json',
         type: 'application/json',
-      });
+      };
+
+      if (!fileUri && jsonText.trim()) {
+        const RNFS = require('react-native-fs');
+        const path = `${RNFS.CachesDirectoryPath}/google-services.json`;
+        await RNFS.writeFile(path, jsonText, 'utf8');
+        uploadFileDescriptor = {
+          uri: `file://${path}`,
+          name: 'google-services.json',
+          type: 'application/json',
+        };
+      }
+
+      const res = await workflowApi.applyFirebaseConfig(uploadFileDescriptor);
       if (res.status === 'success') {
         setMessage(res.message || 'Firebase values applied successfully.');
         setAppliedData({
@@ -69,11 +84,21 @@ export default function FirebaseConfigScreen() {
         <Banner type="error" message={error} />
         <Banner type="success" message={message} />
         <HelperText>
-          Upload your app's google-services.json. Matching values (API keys, app IDs, project
-          numbers) will be written into the project's strings.xml, same as the web version.
+          Upload your app's google-services.json or edit the JSON configuration below. Matching values (API keys, app IDs, project
+          numbers) will be written into the project's strings.xml.
         </HelperText>
         <Button title={fileName || 'Choose google-services.json'} variant="secondary" onPress={pickFile} />
-        <Button title="Apply to project" onPress={onApply} loading={loading} disabled={!fileUri} />
+        
+        <Label style={{ marginTop: spacing.sm }}>or Paste/Edit JSON Code:</Label>
+        <CodeEditor
+          value={jsonText}
+          onChangeText={setJsonText}
+          language="json"
+          placeholder={`{\n  "project_info": {\n    "project_number": "123456789",\n    "project_id": "my-app"\n  }\n}`}
+          style={{ height: 180, marginVertical: spacing.xs }}
+        />
+
+        <Button title="Apply to project" onPress={onApply} loading={loading} disabled={!fileUri && !jsonText.trim()} />
       </Card>
 
       {appliedData && (

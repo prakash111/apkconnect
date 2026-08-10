@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { Card, EmptyState, Button, Banner } from '../../components/UI';
+import { Card, EmptyState, Button, Banner, Input } from '../../components/UI';
 import { useProject } from '../../context/ProjectContext';
+import * as aiApi from '../../api/ai';
 import { colors, radius, spacing } from '../../theme/theme';
 
 const TOOLS: { key: string; title: string; subtitle: string; icon: string }[] = [
@@ -23,6 +24,10 @@ const TOOLS: { key: string; title: string; subtitle: string; icon: string }[] = 
 export default function WorkflowHomeScreen({ route, navigation }: any) {
   const { state, refreshState, hasProject } = useProject();
   const [successMsg, setSuccessMsg] = useState(route?.params?.message || '');
+  const [customPrompt, setCustomPrompt] = useState('');
+  const [promptLoading, setPromptLoading] = useState(false);
+  const [promptResponse, setPromptResponse] = useState('');
+  const [promptError, setPromptError] = useState('');
 
   useEffect(() => {
     if (route?.params?.message) {
@@ -35,6 +40,27 @@ export default function WorkflowHomeScreen({ route, navigation }: any) {
       refreshState();
     }, [refreshState]),
   );
+
+  const onSubmitPrompt = async () => {
+    if (!customPrompt.trim()) return;
+    setPromptLoading(true);
+    setPromptError('');
+    setPromptResponse('');
+    try {
+      const res = await aiApi.aiSubmitCustomPrompt(customPrompt.trim());
+      if (res.status === 'success') {
+        setPromptResponse(res.message || 'Request executed successfully within project context.');
+        setCustomPrompt('');
+        await refreshState();
+      } else {
+        setPromptError(res.message || 'Could not process request.');
+      }
+    } catch (e: any) {
+      setPromptError(e?.message || 'Could not process request.');
+    } finally {
+      setPromptLoading(false);
+    }
+  };
 
   if (!hasProject) {
     return (
@@ -60,6 +86,35 @@ export default function WorkflowHomeScreen({ route, navigation }: any) {
         {state?.signed_apk ? <Text style={styles.badgeGood}>✓ Signed APK ready</Text> : null}
       </Card>
 
+      {/* Command Prompt / Custom Request Interface */}
+      <Card style={styles.promptCard}>
+        <Text style={styles.promptTitle}>💻 Command Prompt & Custom Requests</Text>
+        <Text style={styles.promptSubtitle}>
+          Type your required code modifications or feature requests for this decompiled project:
+        </Text>
+        
+        {promptError ? <Banner type="error" message={promptError} /> : null}
+        {promptResponse ? <Banner type="success" message={promptResponse} /> : null}
+
+        <Input
+          value={customPrompt}
+          onChangeText={setCustomPrompt}
+          multiline
+          placeholder="e.g. Add a dark theme toggle, implement logging, or modify strings.xml…"
+          style={styles.promptInput}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+
+        <Button
+          title="Submit Request"
+          onPress={onSubmitPrompt}
+          loading={promptLoading}
+          disabled={!customPrompt.trim()}
+          style={styles.submitBtn}
+        />
+      </Card>
+
       <View style={styles.grid}>
         {TOOLS.map(tool => (
           <Pressable key={tool.key} style={styles.tile} onPress={() => navigation.navigate(tool.key)}>
@@ -79,6 +134,11 @@ const styles = StyleSheet.create({
   projectName: { color: colors.text, fontSize: 18, fontWeight: '800' },
   projectMeta: { color: colors.textMuted, fontSize: 12, marginTop: 4 },
   badgeGood: { color: colors.success, marginTop: 6, fontWeight: '600', fontSize: 12 },
+  promptCard: { backgroundColor: '#0F172A', borderColor: '#334155', borderWidth: 1 },
+  promptTitle: { color: '#F8FAFC', fontSize: 16, fontWeight: '700', marginBottom: 4 },
+  promptSubtitle: { color: '#94A3B8', fontSize: 12, marginBottom: spacing.sm, lineHeight: 16 },
+  promptInput: { minHeight: 80, color: '#F8FAFC', backgroundColor: '#1E293B', borderColor: '#334155' },
+  submitBtn: { marginTop: spacing.sm, backgroundColor: colors.primary },
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
   tile: {
     width: '48%',

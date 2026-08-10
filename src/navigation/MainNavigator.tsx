@@ -50,7 +50,7 @@ export default function MainNavigator() {
         })}>
         <Tab.Screen name="DashboardTab" component={DashboardScreen} options={{ title: 'Home' }} />
         <Tab.Screen name="ProjectsTab" component={ProjectsNavigator} options={{ title: 'Projects' }} />
-        <Tab.Screen name="WorkflowTab" component={WorkflowNavigator} options={{ title: 'Workflow' }} />
+        <Tab.Screen name="WorkflowTab" component={WorkflowNavigator} options={{ title: 'Studio' }} />
         <Tab.Screen name="SettingsTab" component={SettingsNavigator} options={{ title: 'Settings' }} />
         {isAdmin ? (
           <Tab.Screen name="AdminTab" component={AdminNavigator} options={{ title: 'Admin' }} />

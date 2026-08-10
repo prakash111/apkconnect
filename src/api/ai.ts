@@ -53,6 +53,11 @@ export async function aiGenerateIcon(ai_icon_prompt: string) {
   return apiCall('workflow_ai_generate_icon_ajax', { ai_icon_prompt });
 }
 
+/** Submit a custom command prompt / request for project modification within the project context. */
+export async function aiSubmitCustomPrompt(custom_prompt: string, workflow_file_path = '') {
+  return apiCall('workflow_ai_custom_prompt_ajax', { custom_prompt, workflow_file_path });
+}
+
 // --- Admin: global AI defaults ---
 
 export async function getGlobalAiSettings() {

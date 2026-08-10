@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     padding: spacing.sm,
     marginBottom: 8,
   },
-  offset: { color: colors.primary, fontFamily: 'monospace', fontSize: 12, fontWeight: '700' },
-  hex: { color: colors.text, fontFamily: 'monospace', fontSize: 12, marginTop: 4 },
-  ascii: { color: colors.textMuted, fontFamily: 'monospace', fontSize: 12, marginTop: 2 },
+  offset: { color: '#38BDF8', fontFamily: 'monospace', fontSize: 12, fontWeight: '700' },
+  hex: { color: '#F8FAFC', fontFamily: 'monospace', fontSize: 12, marginTop: 4 },
+  ascii: { color: '#CBD5E1', fontFamily: 'monospace', fontSize: 12, marginTop: 2 },
 });

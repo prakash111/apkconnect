@@ -16,14 +16,14 @@ import CookieManager from '@react-native-cookies/cookies';
  */
 
 const BASE_URL_KEY = 'apktool.baseUrl';
-const DEFAULT_BASE_URL = ''; // set on first run via ServerSetupScreen
+const DEFAULT_BASE_URL = 'https://apk.zoomnearby.com';
 
 let cachedBaseUrl: string | null = null;
 
 export async function getBaseUrl(): Promise<string> {
   if (cachedBaseUrl !== null) return cachedBaseUrl;
   const stored = await AsyncStorage.getItem(BASE_URL_KEY);
-  cachedBaseUrl = stored ?? DEFAULT_BASE_URL;
+  cachedBaseUrl = stored || DEFAULT_BASE_URL;
   return cachedBaseUrl;
 }
 

@@ -95,6 +95,27 @@ export default function FindReplaceScreen({ navigation }: any) {
     navigation.navigate('FileEditor', { filePath, lineNumber });
   };
 
+  const renderHighlightedSnippet = (snippet: string, query: string) => {
+    if (!query.trim() || !snippet) {
+      return <Text style={styles.snippetText} numberOfLines={1}>{snippet}</Text>;
+    }
+    const safeQuery = query.trim().replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+    const parts = snippet.split(new RegExp(`(${safeQuery})`, 'gi'));
+    return (
+      <Text style={styles.snippetText} numberOfLines={1}>
+        {parts.map((part, i) =>
+          part.toLowerCase() === query.trim().toLowerCase() ? (
+            <Text key={i} style={styles.highlightedMatch}>
+              {part}
+            </Text>
+          ) : (
+            <Text key={i}>{part}</Text>
+          )
+        )}
+      </Text>
+    );
+  };
+
   return (
     <View style={styles.flex}>
       <FlatList
@@ -182,9 +203,7 @@ export default function FindReplaceScreen({ navigation }: any) {
                       style={styles.snippetRow}
                       onPress={() => openInEditor(item.path, l.line)}>
                       <Text style={styles.lineBadge}>L{l.line}</Text>
-                      <Text style={styles.snippetText} numberOfLines={1}>
-                        {l.snippet}
-                      </Text>
+                      {renderHighlightedSnippet(l.snippet, find)}
                     </Pressable>
                   ))}
                 </View>
@@ -278,35 +297,44 @@ const styles = StyleSheet.create({
   binaryBadgeText: { color: colors.warning, fontSize: 11, fontWeight: '700' },
   snippetContainer: {
     marginTop: 6,
-    backgroundColor: colors.bg,
+    backgroundColor: '#0F172A',
+    borderColor: '#1E293B',
+    borderWidth: 1,
     borderRadius: radius.xs,
-    padding: 4,
+    padding: 6,
   },
   snippetRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 2,
+    paddingVertical: 3,
     paddingHorizontal: 4,
     gap: 6,
   },
   lineBadge: {
-    color: colors.warning,
+    color: '#A5B4FC',
     fontWeight: '700',
     fontSize: 10,
     fontFamily: 'monospace',
-    backgroundColor: 'rgba(245, 158, 11, 0.15)',
-    paddingHorizontal: 4,
+    backgroundColor: '#312E81',
+    paddingHorizontal: 5,
     paddingVertical: 1,
     borderRadius: 3,
   },
   snippetText: {
-    color: colors.textSubtle,
+    color: '#F8FAFC',
     fontFamily: 'monospace',
-    fontSize: 11,
+    fontSize: 12,
     flex: 1,
   },
+  highlightedMatch: {
+    backgroundColor: '#3730A3',
+    color: '#FEF08A',
+    fontWeight: '700',
+    borderRadius: 3,
+    paddingHorizontal: 3,
+  },
   offsetText: {
-    color: colors.textMuted,
+    color: '#38BDF8',
     fontSize: 11,
     fontFamily: 'monospace',
     marginTop: 4,

@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { colors, spacing } from '../theme/theme';
 
 export default function ServerSetupScreen({ navigation }: any) {
-  const [url, setUrl] = useState('');
+  const [url, setUrl] = useState('https://apk.zoomnearby.com');
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const { refreshServerConfigured } = useAuth();
@@ -15,6 +15,7 @@ export default function ServerSetupScreen({ navigation }: any) {
     (async () => {
       const stored = await getBaseUrl();
       if (stored) setUrl(stored);
+      else setUrl('https://apk.zoomnearby.com');
     })();
   }, []);
 
@@ -49,7 +50,7 @@ export default function ServerSetupScreen({ navigation }: any) {
         <Banner type="error" message={error} />
         <Label>Server URL</Label>
         <Input
-          placeholder="https://apk.example.com"
+          placeholder="https://apk.zoomnearby.com"
           value={url}
           onChangeText={setUrl}
           autoCapitalize="none"

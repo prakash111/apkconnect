@@ -91,15 +91,15 @@ export default function AdminBlogsScreen() {
           <SectionTitle>{editing.id ? 'Edit post' : 'New post'}</SectionTitle>
           <Banner type="error" message={error} />
           <Label>Title</Label>
-          <Input value={editing.title} onChangeText={v => setEditing({ ...editing, title: v })} />
+          <Input value={editing.title} onChangeText={v => setEditing({ ...editing, title: v })} style={styles.inputLight} />
           <Label>Excerpt</Label>
-          <Input value={editing.excerpt} onChangeText={v => setEditing({ ...editing, excerpt: v })} multiline />
+          <Input value={editing.excerpt} onChangeText={v => setEditing({ ...editing, excerpt: v })} multiline style={styles.inputLight} />
           <Label>Content</Label>
-          <Input value={editing.content} onChangeText={v => setEditing({ ...editing, content: v })} multiline style={{ minHeight: 200 }} />
+          <Input value={editing.content} onChangeText={v => setEditing({ ...editing, content: v })} multiline style={[styles.inputLight, { minHeight: 200 }]} />
           <Label>Category</Label>
-          <Input value={editing.category} onChangeText={v => setEditing({ ...editing, category: v })} />
+          <Input value={editing.category} onChangeText={v => setEditing({ ...editing, category: v })} style={styles.inputLight} />
           <Label>Tags (comma separated)</Label>
-          <Input value={editing.tags} onChangeText={v => setEditing({ ...editing, tags: v })} />
+          <Input value={editing.tags} onChangeText={v => setEditing({ ...editing, tags: v })} style={styles.inputLight} />
           <Button title="Save" onPress={onSave} loading={saving} />
           <Button title="Cancel" variant="ghost" onPress={() => setEditing(null)} />
         </Card>
@@ -154,4 +154,6 @@ const styles = StyleSheet.create({
   title: { color: colors.text, fontWeight: '700' },
   meta: { color: colors.textMuted, fontSize: 11, marginTop: 2 },
   delete: { color: colors.danger, fontWeight: '600', fontSize: 12 },
+  inputLight: { color: '#F8FAFC', backgroundColor: '#1E293B', borderColor: '#334155' },
+  inputLightText: { color: '#F8FAFC', backgroundColor: '#1E293B' },
 });

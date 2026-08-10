@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
+import { View, Text, StyleSheet, Modal, Pressable } from 'react-native';
 import { Screen, Card, SectionTitle, Button, Banner, HelperText } from '../../components/UI';
 import * as projectsApi from '../../api/projects';
 import { useProject } from '../../context/ProjectContext';
-import { colors, spacing } from '../../theme/theme';
+import { colors, radius, spacing } from '../../theme/theme';
 
 export default function NewProjectScreen({ navigation }: any) {
   const [fileName, setFileName] = useState('');
@@ -11,6 +11,8 @@ export default function NewProjectScreen({ navigation }: any) {
   const [fileType, setFileType] = useState('application/vnd.android.package-archive');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
   const { refreshState } = useProject();
 
   const pickApk = async () => {
@@ -44,23 +46,9 @@ export default function NewProjectScreen({ navigation }: any) {
       });
       if (res.status === 'success') {
         await refreshState();
-        const successMsg = res.message || 'APK uploaded and decompiled successfully.';
-        Alert.alert(
-          'Decompiled Successfully! 🎉',
-          successMsg,
-          [
-            {
-              text: 'Open Project',
-              onPress: () => {
-                navigation.replace('WorkflowTab', {
-                  screen: 'WorkflowHome',
-                  params: { message: successMsg }
-                });
-              }
-            }
-          ],
-          { cancelable: false }
-        );
+        const msg = res.message || 'APK uploaded and decompiled successfully.';
+        setSuccessMsg(msg);
+        setSuccessModalVisible(true);
       } else {
         setError(res.message || 'Decompile failed.');
       }
@@ -68,6 +56,22 @@ export default function NewProjectScreen({ navigation }: any) {
       setError(e?.message || 'Decompile failed.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOpenProject = () => {
+    setSuccessModalVisible(false);
+    // Route to Studio/Workflow tab and its home screen
+    if (navigation.getParent()) {
+      navigation.getParent().navigate('WorkflowTab', {
+        screen: 'WorkflowHome',
+        params: { message: successMsg }
+      });
+    } else {
+      navigation.navigate('WorkflowTab', {
+        screen: 'WorkflowHome',
+        params: { message: successMsg }
+      });
     }
   };
 
@@ -88,6 +92,31 @@ export default function NewProjectScreen({ navigation }: any) {
         ) : null}
         <Button title="Upload & Decompile" onPress={onDecompile} loading={loading} disabled={!fileUri} />
       </Card>
+
+      {/* Decompiled Successfully Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={successModalVisible}
+        onRequestClose={() => setSuccessModalVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Decompiled Successfully! 🎉</Text>
+            <Text style={styles.modalMessage}>{successMsg}</Text>
+            
+            <Button
+              title="OPEN PROJECT"
+              onPress={handleOpenProject}
+              style={styles.openProjectBtn}
+            />
+
+            {/* UX Enhancement Hint */}
+            <Text style={styles.uxHint}>
+              💡 For a better editor experience, please use the web browser.
+            </Text>
+          </View>
+        </View>
+      </Modal>
     </Screen>
   );
 }
@@ -100,4 +129,52 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   fileName: { color: colors.text },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.md,
+  },
+  modalContainer: {
+    width: '90%',
+    maxWidth: 400,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    borderColor: colors.border,
+    borderWidth: 1,
+    padding: spacing.lg,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 10,
+  },
+  modalTitle: {
+    color: colors.text,
+    fontSize: 20,
+    fontWeight: '800',
+    textAlign: 'center',
+    marginBottom: spacing.xs,
+  },
+  modalMessage: {
+    color: colors.textMuted,
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: spacing.md,
+  },
+  openProjectBtn: {
+    width: '100%',
+    backgroundColor: colors.primary,
+    marginTop: spacing.xs,
+  },
+  uxHint: {
+    color: '#94A3B8',
+    fontSize: 13,
+    textAlign: 'center',
+    marginTop: 14,
+    lineHeight: 18,
+  },
 });
+

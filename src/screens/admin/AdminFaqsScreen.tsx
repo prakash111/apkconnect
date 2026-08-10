@@ -91,16 +91,16 @@ export default function AdminFaqsScreen() {
           <SectionTitle>{editing.id ? 'Edit FAQ' : 'New FAQ'}</SectionTitle>
           <Banner type="error" message={error} />
           <Label>Question</Label>
-          <Input value={editing.question} onChangeText={v => setEditing({ ...editing, question: v })} />
+          <Input value={editing.question} onChangeText={v => setEditing({ ...editing, question: v })} style={styles.inputLight} />
           <Label>Answer</Label>
           <Input
             value={editing.answer}
             onChangeText={v => setEditing({ ...editing, answer: v })}
             multiline
-            style={{ minHeight: 140 }}
+            style={[styles.inputLight, { minHeight: 140 }]}
           />
           <Label>Category</Label>
-          <Input value={editing.category} onChangeText={v => setEditing({ ...editing, category: v })} />
+          <Input value={editing.category} onChangeText={v => setEditing({ ...editing, category: v })} style={styles.inputLight} />
           <Button title="Save" onPress={onSave} loading={saving} />
           <Button title="Cancel" variant="ghost" onPress={() => setEditing(null)} />
         </Card>
@@ -153,4 +153,5 @@ const styles = StyleSheet.create({
   rowMain: { flex: 1 },
   question: { color: colors.text, fontWeight: '700' },
   delete: { color: colors.danger, fontWeight: '600', fontSize: 12 },
+  inputLight: { color: '#F8FAFC', backgroundColor: '#1E293B', borderColor: '#334155' },
 });

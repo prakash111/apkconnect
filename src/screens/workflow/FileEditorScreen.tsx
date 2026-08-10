@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { pick, types } from 'react-native-document-picker';
+import CodeEditor from '../../components/CodeEditor';
 import { Input, Button, Banner, LoadingOverlay, HelperText } from '../../components/UI';
 import * as workflowApi from '../../api/workflow';
 import * as aiApi from '../../api/ai';
@@ -131,14 +132,11 @@ export default function FileEditorScreen({ navigation, route }: any) {
         <Banner type="error" message={error} />
         <Banner type="success" message={message} />
       </View>
-      <Input
+      <CodeEditor
         value={content}
         onChangeText={setContent}
-        multiline
-        style={styles.editor}
+        filePath={filePath}
         placeholder="File is empty"
-        autoCapitalize="none"
-        autoCorrect={false}
       />
       <View style={styles.actions}>
         <Button title="💾 Save File" onPress={onSave} loading={saving} style={{ flex: 1 }} />
