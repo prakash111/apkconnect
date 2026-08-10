@@ -224,7 +224,8 @@ export function CodeEditor({
         </View>
       </View>
     </View>
-}
+  );
+};
 
 export default CodeEditor;
 

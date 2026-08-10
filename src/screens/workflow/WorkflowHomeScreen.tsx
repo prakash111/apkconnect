@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { Card, EmptyState, Button, Banner, Input } from '../../components/UI';
 import { useProject } from '../../context/ProjectContext';
+import { AiResponseModal } from '../../components/AiResponseModal';
 import * as aiApi from '../../api/ai';
 import { colors, radius, spacing } from '../../theme/theme';
 
@@ -22,7 +23,16 @@ const TOOLS: { key: string; title: string; subtitle: string; icon: string }[] = 
 ];
 
 export default function WorkflowHomeScreen({ route, navigation }: any) {
-  const { state, refreshState, hasProject } = useProject();
+  const {
+    state,
+    refreshState,
+    hasProject,
+    recentAction,
+    setRecentAction,
+    showActionModal,
+    setShowActionModal,
+  } = useProject();
+
   const [successMsg, setSuccessMsg] = useState(route?.params?.message || '');
   const [customPrompt, setCustomPrompt] = useState('');
   const [promptLoading, setPromptLoading] = useState(false);
@@ -43,18 +53,25 @@ export default function WorkflowHomeScreen({ route, navigation }: any) {
 
   const onSubmitPrompt = async () => {
     if (!customPrompt.trim()) return;
+    const userText = customPrompt.trim();
     setPromptLoading(true);
     setPromptError('');
     setPromptResponse('');
     try {
-      const res = await aiApi.aiSubmitCustomPrompt(customPrompt.trim());
-      if (res.status === 'success') {
-        setPromptResponse(res.message || 'Request executed successfully within project context.');
-        setCustomPrompt('');
-        await refreshState();
-      } else {
-        setPromptError(res.message || 'Could not process request.');
-      }
+      const res = await aiApi.aiSubmitCustomPrompt(userText);
+      const actionMessage =
+        res.message || 'Request executed successfully within project context.';
+      
+      // Update global recent action & pop up the required steps modal
+      setRecentAction({
+        prompt: userText,
+        message: actionMessage,
+        timestamp: 'Just now',
+      });
+      setPromptResponse(actionMessage);
+      setCustomPrompt('');
+      setShowActionModal(true);
+      await refreshState();
     } catch (e: any) {
       setPromptError(e?.message || 'Could not process request.');
     } finally {
@@ -86,6 +103,28 @@ export default function WorkflowHomeScreen({ route, navigation }: any) {
         {state?.signed_apk ? <Text style={styles.badgeGood}>✓ Signed APK ready</Text> : null}
       </Card>
 
+      {/* Button to view required steps for recent actions */}
+      {recentAction ? (
+        <Card style={styles.recentActionCard}>
+          <View style={styles.recentActionHeader}>
+            <Text style={styles.recentActionTitle}>💡 Recent Action & Guidance</Text>
+            <Text style={styles.recentActionBadge}>READY</Text>
+          </View>
+          {recentAction.prompt ? (
+            <Text style={styles.recentActionPrompt} numberOfLines={2}>
+              "{recentAction.prompt}"
+            </Text>
+          ) : null}
+          <Button
+            title="📋 Show Required Steps for Recent Action"
+            onPress={() => setShowActionModal(true)}
+            variant="secondary"
+            style={styles.showStepsBtn}
+            textStyle={{ color: '#38BDF8', fontWeight: '800' }}
+          />
+        </Card>
+      ) : null}
+
       {/* Command Prompt / Custom Request Interface */}
       <Card style={styles.promptCard}>
         <Text style={styles.promptTitle}>💻 Command Prompt & Custom Requests</Text>
@@ -100,7 +139,7 @@ export default function WorkflowHomeScreen({ route, navigation }: any) {
           value={customPrompt}
           onChangeText={setCustomPrompt}
           multiline
-          placeholder="e.g. Add a dark theme toggle, implement logging, or modify strings.xml…"
+          placeholder="e.g. To change application name to 'SMS FAST' across the project…"
           style={styles.promptInput}
           autoCapitalize="none"
           autoCorrect={false}
@@ -124,6 +163,15 @@ export default function WorkflowHomeScreen({ route, navigation }: any) {
           </Pressable>
         ))}
       </View>
+
+      {/* Modal Popup displaying required steps */}
+      <AiResponseModal
+        visible={showActionModal}
+        onClose={() => setShowActionModal(false)}
+        userPrompt={recentAction?.prompt}
+        message={recentAction?.message || ''}
+        navigation={navigation}
+      />
     </ScrollView>
   );
 }
@@ -134,6 +182,44 @@ const styles = StyleSheet.create({
   projectName: { color: colors.text, fontSize: 18, fontWeight: '800' },
   projectMeta: { color: colors.textMuted, fontSize: 12, marginTop: 4 },
   badgeGood: { color: colors.success, marginTop: 6, fontWeight: '600', fontSize: 12 },
+  recentActionCard: {
+    backgroundColor: '#0F172A',
+    borderColor: '#38BDF8',
+    borderWidth: 1.5,
+    borderRadius: radius.md,
+  },
+  recentActionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  recentActionTitle: {
+    color: '#F8FAFC',
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  recentActionBadge: {
+    backgroundColor: '#0284C7',
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '800',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  recentActionPrompt: {
+    color: '#94A3B8',
+    fontSize: 12,
+    fontStyle: 'italic',
+    marginBottom: spacing.xs,
+  },
+  showStepsBtn: {
+    marginTop: spacing.xs,
+    backgroundColor: '#1E293B',
+    borderColor: '#38BDF8',
+    borderWidth: 1,
+  },
   promptCard: { backgroundColor: '#0F172A', borderColor: '#334155', borderWidth: 1 },
   promptTitle: { color: '#F8FAFC', fontSize: 16, fontWeight: '700', marginBottom: 4 },
   promptSubtitle: { color: '#94A3B8', fontSize: 12, marginBottom: spacing.sm, lineHeight: 16 },

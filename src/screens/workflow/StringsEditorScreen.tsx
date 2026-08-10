@@ -11,10 +11,13 @@ import {
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { Input, Button, Banner, LoadingOverlay, Label, SectionTitle, Card } from '../../components/UI';
+import { useProject } from '../../context/ProjectContext';
+import { AiResponseModal } from '../../components/AiResponseModal';
 import * as workflowApi from '../../api/workflow';
 import { colors, radius, spacing } from '../../theme/theme';
 
-export default function StringsEditorScreen() {
+export default function StringsEditorScreen({ navigation }: any) {
+  const { recentAction, showActionModal, setShowActionModal } = useProject();
   const [appName, setAppName] = useState('');
   const [values, setValues] = useState<Record<string, string>>({});
   const [initialValues, setInitialValues] = useState<Record<string, string>>({});
@@ -173,6 +176,15 @@ export default function StringsEditorScreen() {
                 onChangeText={setAppName}
                 placeholder="My Application"
               />
+              {recentAction ? (
+                <Button
+                  title="📋 Show Required Steps for Recent Action"
+                  onPress={() => setShowActionModal(true)}
+                  variant="secondary"
+                  style={{ marginTop: spacing.sm, borderColor: '#38BDF8', borderWidth: 1 }}
+                  textStyle={{ color: '#38BDF8', fontWeight: '800' }}
+                />
+              ) : null}
             </Card>
 
             {/* Locale & Search Header */}
@@ -313,6 +325,14 @@ export default function StringsEditorScreen() {
           </View>
         </View>
       </Modal>
+
+      <AiResponseModal
+        visible={showActionModal}
+        onClose={() => setShowActionModal(false)}
+        userPrompt={recentAction?.prompt}
+        message={recentAction?.message || ''}
+        navigation={navigation}
+      />
     </View>
   );
 }

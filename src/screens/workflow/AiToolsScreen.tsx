@@ -1,12 +1,21 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Card, Button, Banner, HelperText, SectionTitle } from '../../components/UI';
+import { AiResponseModal } from '../../components/AiResponseModal';
 import * as aiApi from '../../api/ai';
 import { useProject } from '../../context/ProjectContext';
 import { colors, spacing } from '../../theme/theme';
 
 export default function AiToolsScreen({ navigation }: any) {
-  const { state, refreshState } = useProject();
+  const {
+    state,
+    refreshState,
+    recentAction,
+    setRecentAction,
+    showActionModal,
+    setShowActionModal,
+  } = useProject();
+
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState<'diagnose' | 'apply' | null>(null);
@@ -21,7 +30,14 @@ export default function AiToolsScreen({ navigation }: any) {
       const res = await aiApi.aiFixBuildError();
       if (res.status === 'success') {
         await refreshState();
-        setMessage(res.message || 'Diagnosis complete.');
+        const msg = res.message || 'Diagnosis complete.';
+        setMessage(msg);
+        setRecentAction({
+          prompt: 'Diagnose last build failure',
+          message: msg,
+          timestamp: 'Just now',
+        });
+        setShowActionModal(true);
       } else {
         setError(res.message || 'Diagnosis failed.');
       }
@@ -53,6 +69,22 @@ export default function AiToolsScreen({ navigation }: any) {
 
   return (
     <View style={styles.flex}>
+      {/* Recent Action Steps Trigger */}
+      {recentAction ? (
+        <Card style={{ borderColor: '#38BDF8', borderWidth: 1 }}>
+          <SectionTitle>📋 Action Steps & Guidance</SectionTitle>
+          <HelperText>
+            View the detailed required steps and code changes for recent actions.
+          </HelperText>
+          <Button
+            title="📋 Show Required Steps for Recent Action"
+            onPress={() => setShowActionModal(true)}
+            variant="secondary"
+            textStyle={{ color: '#38BDF8', fontWeight: '800' }}
+          />
+        </Card>
+      ) : null}
+
       <Card>
         <SectionTitle>AI Build Error Fix</SectionTitle>
         <Banner type="error" message={error} />
@@ -100,6 +132,14 @@ export default function AiToolsScreen({ navigation }: any) {
           onPress={() => navigation.navigate('LogoIcon')}
         />
       </Card>
+
+      <AiResponseModal
+        visible={showActionModal}
+        onClose={() => setShowActionModal(false)}
+        userPrompt={recentAction?.prompt}
+        message={recentAction?.message || ''}
+        navigation={navigation}
+      />
     </View>
   );
 }
