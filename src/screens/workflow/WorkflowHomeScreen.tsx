@@ -60,7 +60,7 @@ export default function WorkflowHomeScreen({ route, navigation }: any) {
     try {
       const res = await aiApi.aiSubmitCustomPrompt(userText);
       const actionMessage =
-        res.message || 'Request executed successfully within project context.';
+        res.explanation || res.response || res.ai_response || res.guidance || res.text || res.message || 'Request executed successfully within project context.';
       
       // Update global recent action & pop up the required steps modal
       setRecentAction({
@@ -107,7 +107,7 @@ export default function WorkflowHomeScreen({ route, navigation }: any) {
       {recentAction ? (
         <Card style={styles.recentActionCard}>
           <View style={styles.recentActionHeader}>
-            <Text style={styles.recentActionTitle}>💡 Recent Action & Guidance</Text>
+            <Text style={styles.recentActionTitle}>💡 AI Recent Action & Guidance</Text>
             <Text style={styles.recentActionBadge}>READY</Text>
           </View>
           {recentAction.prompt ? (

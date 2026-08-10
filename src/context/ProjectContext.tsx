@@ -1,20 +1,16 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as projectsApi from '../api/projects';
 import { WorkflowState } from '../types';
 
 const POLL_INTERVAL_MS = 20000;
+const RECENT_ACTION_KEY = 'apktool.recentAction';
 
 export interface RecentAction {
   prompt?: string;
   message: string;
   timestamp?: string;
 }
-
-const DEFAULT_SAMPLE_ACTION: RecentAction = {
-  prompt: 'Change application name to "SMS FAST" across the project',
-  message: `To change the application name to "SMS FAST" across the project, you need to modify the \`app_name\` string entry in \`res/values/strings.xml\` (as well as any localized \`res/values-*/strings.xml\` files):\n\n\`\`\`xml\n<string name="app_name">SMS FAST</string>\n\`\`\`\n\nAdditionally, check \`AndroidManifest.xml\` to ensure the \`<application>\` tag uses \`android:label="@string/app_name"\` (or directly set \`android:label="SMS FAST"\` if it is hardcoded). Since "Project Context" is not a specific source file, no changes are required for this file.`,
-  timestamp: 'Just now',
-};
 
 interface ProjectContextValue {
   state: WorkflowState | null;
@@ -41,12 +37,37 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<WorkflowState | null>(null);
   const [newBuildAvailable, setNewBuildAvailable] = useState(false);
   const [newBuildFile, setNewBuildFile] = useState<string | null>(null);
-  const [recentAction, setRecentAction] = useState<RecentAction | null>(DEFAULT_SAMPLE_ACTION);
+  const [recentAction, setRecentActionState] = useState<RecentAction | null>(null);
   const [showActionModal, setShowActionModal] = useState(false);
 
   // Tracks the last signed_apk we've already surfaced to the user, so we only
   // announce genuinely *new* builds (not the one already on screen at mount).
   const lastSeenSignedApk = useRef<string | null | undefined>(undefined);
+
+  // Load persisted recent action on startup
+  useEffect(() => {
+    AsyncStorage.getItem(RECENT_ACTION_KEY)
+      .then(json => {
+        if (json) {
+          try {
+            const parsed = JSON.parse(json);
+            if (parsed && (parsed.prompt || parsed.message)) {
+              setRecentActionState(parsed);
+            }
+          } catch {}
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const setRecentAction = useCallback((action: RecentAction | null) => {
+    setRecentActionState(action);
+    if (action) {
+      AsyncStorage.setItem(RECENT_ACTION_KEY, JSON.stringify(action)).catch(() => {});
+    } else {
+      AsyncStorage.removeItem(RECENT_ACTION_KEY).catch(() => {});
+    }
+  }, []);
 
   const refreshState = useCallback(async (locale = 'values') => {
     const res = await projectsApi.getWorkflowState(locale);
@@ -106,6 +127,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
       newBuildFile,
       dismissNewBuild,
       recentAction,
+      setRecentAction,
       showActionModal,
     ],
   );

@@ -30,7 +30,8 @@ export default function AiToolsScreen({ navigation }: any) {
       const res = await aiApi.aiFixBuildError();
       if (res.status === 'success') {
         await refreshState();
-        const msg = res.message || 'Diagnosis complete.';
+        const msg =
+          res.explanation || res.response || res.ai_response || res.guidance || res.text || res.message || 'Diagnosis complete.';
         setMessage(msg);
         setRecentAction({
           prompt: 'Diagnose last build failure',
@@ -72,7 +73,7 @@ export default function AiToolsScreen({ navigation }: any) {
       {/* Recent Action Steps Trigger */}
       {recentAction ? (
         <Card style={{ borderColor: '#38BDF8', borderWidth: 1 }}>
-          <SectionTitle>📋 Action Steps & Guidance</SectionTitle>
+          <SectionTitle>📋 AI Action Steps & Guidance</SectionTitle>
           <HelperText>
             View the detailed required steps and code changes for recent actions.
           </HelperText>

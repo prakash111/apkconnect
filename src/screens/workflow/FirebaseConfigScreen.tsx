@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import CodeEditor from '../../components/CodeEditor';
-import { Card, Button, Banner, HelperText, SectionTitle, Label } from '../../components/UI';
+import { Card, Button, Banner, HelperText, SectionTitle } from '../../components/UI';
 import * as workflowApi from '../../api/workflow';
 import { colors, radius, spacing } from '../../theme/theme';
 
 export default function FirebaseConfigScreen() {
   const [fileName, setFileName] = useState('');
   const [fileUri, setFileUri] = useState('');
-  const [jsonText, setJsonText] = useState('');
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,7 +15,9 @@ export default function FirebaseConfigScreen() {
   const pickFile = async () => {
     setError('');
     try {
-      const [result] = await (require('react-native-document-picker')).pick({ type: [(require('react-native-document-picker')).types.allFiles] });
+      const [result] = await (require('react-native-document-picker')).pick({
+        type: [(require('react-native-document-picker')).types.allFiles],
+      });
       if (!result.name?.toLowerCase().endsWith('.json')) {
         setError('Please choose a google-services.json file.');
         return;
@@ -30,8 +30,8 @@ export default function FirebaseConfigScreen() {
   };
 
   const onApply = async () => {
-    if (!fileUri && !jsonText.trim()) {
-      setError('Choose a google-services.json file or paste JSON content.');
+    if (!fileUri) {
+      setError('Please choose a google-services.json file first.');
       return;
     }
     setLoading(true);
@@ -39,22 +39,11 @@ export default function FirebaseConfigScreen() {
     setMessage('');
     setAppliedData(null);
     try {
-      let uploadFileDescriptor = {
+      const uploadFileDescriptor = {
         uri: fileUri,
         name: fileName || 'google-services.json',
         type: 'application/json',
       };
-
-      if (!fileUri && jsonText.trim()) {
-        const RNFS = require('react-native-fs');
-        const path = `${RNFS.CachesDirectoryPath}/google-services.json`;
-        await RNFS.writeFile(path, jsonText, 'utf8');
-        uploadFileDescriptor = {
-          uri: `file://${path}`,
-          name: 'google-services.json',
-          type: 'application/json',
-        };
-      }
 
       const res = await workflowApi.applyFirebaseConfig(uploadFileDescriptor);
       if (res.status === 'success') {
@@ -84,21 +73,25 @@ export default function FirebaseConfigScreen() {
         <Banner type="error" message={error} />
         <Banner type="success" message={message} />
         <HelperText>
-          Upload your app's google-services.json or edit the JSON configuration below. Matching values (API keys, app IDs, project
-          numbers) will be written into the project's strings.xml.
+          Upload your app's google-services.json file. Matching values (API keys, app IDs, project numbers) will be written into the project's strings.xml.
         </HelperText>
-        <Button title={fileName || 'Choose google-services.json'} variant="secondary" onPress={pickFile} />
-        
-        <Label style={{ marginTop: spacing.sm }}>or Paste/Edit JSON Code:</Label>
-        <CodeEditor
-          value={jsonText}
-          onChangeText={setJsonText}
-          language="json"
-          placeholder={`{\n  "project_info": {\n    "project_number": "123456789",\n    "project_id": "my-app"\n  }\n}`}
-          style={{ height: 180, marginVertical: spacing.xs }}
-        />
 
-        <Button title="Apply to project" onPress={onApply} loading={loading} disabled={!fileUri && !jsonText.trim()} />
+        <View style={styles.uploadRow}>
+          <Button
+            title={fileName ? `Selected: ${fileName}` : 'Choose google-services.json'}
+            variant="secondary"
+            onPress={pickFile}
+            style={{ flex: 1 }}
+          />
+        </View>
+
+        <Button
+          title="Apply to project"
+          onPress={onApply}
+          loading={loading}
+          disabled={!fileUri}
+          style={{ marginTop: spacing.sm }}
+        />
       </Card>
 
       {appliedData && (
@@ -153,20 +146,23 @@ export default function FirebaseConfigScreen() {
 const styles = StyleSheet.create({
   flex: { flex: 1, backgroundColor: colors.bg },
   content: { padding: spacing.md },
+  uploadRow: {
+    marginVertical: spacing.xs,
+  },
   detailRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 4,
+    paddingVertical: 6,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
-  detailLabel: { color: colors.textMuted, fontSize: 12 },
-  detailVal: { color: colors.text, fontWeight: '700', fontSize: 13, fontFamily: 'monospace' },
+  detailLabel: { color: '#94A3B8', fontSize: 12, fontWeight: '600' },
+  detailVal: { color: '#E0E0E0', fontWeight: '700', fontSize: 13, fontFamily: 'monospace' },
   detailValHighlight: { color: colors.success, fontWeight: '800', fontSize: 13 },
-  updatesBox: { marginTop: spacing.sm, backgroundColor: colors.surfaceAlt, padding: spacing.xs, borderRadius: radius.xs },
-  updatesTitle: { color: colors.text, fontWeight: '700', fontSize: 12, marginBottom: 4 },
-  kvRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 2 },
-  kKey: { color: colors.primary, fontSize: 11, fontFamily: 'monospace', fontWeight: '700', width: 140 },
-  kVal: { color: colors.textSubtle, fontSize: 11, fontFamily: 'monospace', flex: 1 },
+  updatesBox: { marginTop: spacing.sm, backgroundColor: colors.surfaceAlt, padding: spacing.sm, borderRadius: radius.xs },
+  updatesTitle: { color: '#F8FAFC', fontWeight: '700', fontSize: 12, marginBottom: 6 },
+  kvRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 3 },
+  kKey: { color: '#38BDF8', fontSize: 12, fontFamily: 'monospace', fontWeight: '700', width: 140 },
+  kVal: { color: '#E0E0E0', fontSize: 12, fontFamily: 'monospace', flex: 1 },
 });

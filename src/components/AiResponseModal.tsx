@@ -23,7 +23,7 @@ export interface AiResponseModalProps {
   onClose: () => void;
   title?: string;
   userPrompt?: string;
-  message: string;
+  message?: string | any;
   navigation?: any;
 }
 
@@ -127,7 +127,13 @@ export function AiResponseModal({
 }: AiResponseModalProps) {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
-  const { steps, filePaths } = parseMessageToSteps(message);
+  const messageText = typeof message === 'string'
+    ? message
+    : (message && typeof message === 'object')
+    ? (message.explanation || message.response || message.ai_response || message.guidance || message.text || message.message || JSON.stringify(message))
+    : String(message || '');
+
+  const { steps, filePaths } = parseMessageToSteps(messageText);
 
   const handleCopy = (text: string, index: number) => {
     Clipboard.setString(text);
@@ -227,7 +233,7 @@ export function AiResponseModal({
             {/* Raw Message Accordion / Full Content View */}
             <View style={styles.rawBox}>
               <Text style={styles.rawTitle}>Full Response Text</Text>
-              <Text style={styles.rawText}>{message}</Text>
+              <Text style={styles.rawText}>{messageText || 'No full response text available.'}</Text>
             </View>
           </ScrollView>
 

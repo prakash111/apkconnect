@@ -16,6 +16,8 @@ interface CodeEditorProps {
   filePath?: string;
   placeholder?: string;
   editable?: boolean;
+  language?: string;
+  style?: any;
 }
 
 export function CodeEditor({
@@ -24,30 +26,31 @@ export function CodeEditor({
   filePath = '',
   placeholder = 'Type code here…',
   editable = true,
+  language,
+  style,
 }: CodeEditorProps) {
   // --- History Stack for Undo/Redo ---
   const [history, setHistory] = useState<string[]>([value || '']);
   const [historyIndex, setHistoryIndex] = useState<number>(0);
   const isInternalChange = useRef(false);
 
-  // Synchronize initial or external value changes
+  // Synchronize initial or external value changes (e.g. async file loading, AI fixes)
   useEffect(() => {
     if (!isInternalChange.current) {
       setHistory([value || '']);
       setHistoryIndex(0);
     }
     isInternalChange.current = false;
-  }, [filePath]);
+  }, [filePath, value]);
 
   const handleTextChange = (newText: string) => {
     isInternalChange.current = true;
     onChangeText(newText);
 
-    // Debounce or record history step
+    // Record history step
     const newHistory = history.slice(0, historyIndex + 1);
     if (newHistory[newHistory.length - 1] !== newText) {
       newHistory.push(newText);
-      // Limit history size to 50 entries
       if (newHistory.length > 50) newHistory.shift();
       setHistory(newHistory);
       setHistoryIndex(newHistory.length - 1);
@@ -76,7 +79,7 @@ export function CodeEditor({
   };
 
   // --- File Type & Language Mode Detection ---
-  const ext = filePath.split('.').pop()?.toLowerCase() || '';
+  const ext = language || filePath.split('.').pop()?.toLowerCase() || '';
   let langLabel = 'Plain Text';
   if (ext === 'xml') langLabel = 'XML';
   else if (ext === 'json') langLabel = 'JSON';
@@ -95,7 +98,6 @@ export function CodeEditor({
   // --- Simple Tokenizer / Highlighted Line Renderer ---
   const renderHighlightedLine = (line: string, index: number) => {
     if (ext === 'xml') {
-      // Basic XML syntax highlighting
       const tagMatch = line.match(/^(\s*)(<\/?[a-zA-Z0-9_-]+)(.*?)(\/?>)(.*)$/);
       if (tagMatch) {
         const [, indent, tag, attrs, close, rest] = tagMatch;
@@ -110,7 +112,6 @@ export function CodeEditor({
         );
       }
     } else if (ext === 'json') {
-      // Basic JSON syntax highlighting
       const kvMatch = line.match(/^(\s*)(".*?")(\s*:\s*)(.*)$/);
       if (kvMatch) {
         const [, indent, key, colon, val] = kvMatch;
@@ -124,7 +125,6 @@ export function CodeEditor({
         );
       }
     } else if (ext === 'smali') {
-      // Basic Smali syntax highlighting
       const smaliMatch = line.match(/^(\s*)(\.[a-zA-Z_-]+|const-[a-z0-9/]+|invoke-[a-z0-9/]+|return-[a-z0-9]+|move-[a-z0-9]+|goto|if-[a-z0-9]+)(.*)$/);
       if (smaliMatch) {
         const [, indent, op, rest] = smaliMatch;
@@ -146,7 +146,7 @@ export function CodeEditor({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
       {/* Editor Control Toolbar (Undo, Redo, Mode, Language & Line Badge) */}
       <View style={styles.toolbar}>
         <View style={styles.toolbarLeft}>
@@ -187,45 +187,53 @@ export function CodeEditor({
         </View>
       </View>
 
-      {/* Editor Main Layout (Gutter + Content) */}
-      <View style={styles.editorBody}>
-        {/* Left Gutter: Line Numbers */}
-        <ScrollView
-          style={styles.gutter}
-          showsVerticalScrollIndicator={false}
-          scrollEnabled={false}>
-          {lineNumbers.map(n => (
-            <Text key={n} style={styles.gutterText}>
-              {n}
-            </Text>
-          ))}
-        </ScrollView>
+      {/* Editor Body: Vertical Scroll Container */}
+      <ScrollView
+        style={styles.verticalScroll}
+        contentContainerStyle={styles.verticalScrollContent}
+        keyboardShouldPersistTaps="handled">
+        <View style={styles.editorRow}>
+          {/* Left Gutter: Line Numbers anchored to left edge */}
+          <View style={styles.gutter}>
+            {lineNumbers.map(n => (
+              <Text key={n} style={styles.gutterText}>
+                {n}
+              </Text>
+            ))}
+          </View>
 
-        {/* Right Pane: Code Area */}
-        <View style={styles.codePane}>
-          {viewMode === 'edit' ? (
-            <TextInput
-              value={value}
-              onChangeText={handleTextChange}
-              multiline
-              editable={editable}
-              placeholder={placeholder}
-              placeholderTextColor="#64748B"
-              autoCapitalize="none"
-              autoCorrect={false}
-              spellCheck={false}
-              style={styles.textInput}
-            />
-          ) : (
-            <ScrollView style={styles.highlightScrollView}>
-              {lines.map((line, idx) => renderHighlightedLine(line, idx))}
-            </ScrollView>
-          )}
+          {/* Right Pane: Code Area expanding to 100% remaining horizontal space with horizontal scroll */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={true}
+            style={styles.horizontalScroll}
+            contentContainerStyle={styles.horizontalScrollContent}
+            keyboardShouldPersistTaps="handled">
+            {viewMode === 'edit' ? (
+              <TextInput
+                value={value}
+                onChangeText={handleTextChange}
+                multiline
+                editable={editable}
+                placeholder={placeholder}
+                placeholderTextColor="#64748B"
+                autoCapitalize="none"
+                autoCorrect={false}
+                spellCheck={false}
+                scrollEnabled={false}
+                style={styles.textInput}
+              />
+            ) : (
+              <View style={styles.highlightContainer}>
+                {lines.map((line, idx) => renderHighlightedLine(line, idx))}
+              </View>
+            )}
+          </ScrollView>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
-};
+}
 
 export default CodeEditor;
 
@@ -312,12 +320,22 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
-  editorBody: {
+  verticalScroll: {
     flex: 1,
+    backgroundColor: '#070D19',
+  },
+  verticalScrollContent: {
+    flexGrow: 1,
+  },
+  editorRow: {
     flexDirection: 'row',
+    flex: 1,
+    minHeight: '100%',
   },
   gutter: {
-    width: 42,
+    width: 48,
+    flexGrow: 0,
+    flexShrink: 0,
     backgroundColor: '#0B1120',
     borderRightWidth: 1,
     borderRightColor: '#1E293B',
@@ -331,12 +349,15 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     textAlign: 'right',
   },
-  codePane: {
+  horizontalScroll: {
     flex: 1,
     backgroundColor: '#070D19',
   },
+  horizontalScrollContent: {
+    flexGrow: 1,
+    minWidth: '100%',
+  },
   textInput: {
-    flex: 1,
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
     fontSize: 13,
     lineHeight: 20,
@@ -344,11 +365,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 10,
     textAlignVertical: 'top',
+    alignSelf: 'flex-start',
+    minWidth: '100%',
   },
-  highlightScrollView: {
-    flex: 1,
+  highlightContainer: {
     paddingHorizontal: 10,
     paddingVertical: 10,
+    alignSelf: 'flex-start',
+    minWidth: '100%',
   },
   codeLineText: {
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
@@ -360,30 +384,30 @@ const styles = StyleSheet.create({
     color: '#334155',
   },
   synTag: {
-    color: '#C084FC', // XML tag purple
+    color: '#C084FC',
     fontWeight: '700',
   },
   synAttr: {
-    color: '#38BDF8', // XML attr cyan
+    color: '#38BDF8',
   },
   synText: {
     color: '#F8FAFC',
   },
   synJsonKey: {
-    color: '#F59E0B', // JSON key amber
+    color: '#F59E0B',
     fontWeight: '700',
   },
   synColon: {
     color: '#94A3B8',
   },
   synJsonVal: {
-    color: '#4ADE80', // JSON value green
+    color: '#4ADE80',
   },
   synSmaliOp: {
-    color: '#F43F5E', // Smali opcode pink
+    color: '#F43F5E',
     fontWeight: '700',
   },
   synSmaliReg: {
-    color: '#60A5FA', // Smali register blue
+    color: '#60A5FA',
   },
 });
