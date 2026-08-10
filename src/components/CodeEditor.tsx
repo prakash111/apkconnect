@@ -87,10 +87,14 @@ export function CodeEditor({
   else if (ext === 'java' || ext === 'kt') langLabel = 'Java/Kotlin';
   else if (ext === 'gradle') langLabel = 'Gradle';
 
-  // --- Line Numbers ---
+  // --- Line Numbers & Long Line Width Calculation ---
   const lines = value ? value.split('\n') : [''];
   const lineCount = lines.length;
   const lineNumbers = Array.from({ length: lineCount }, (_, i) => i + 1);
+
+  // Dynamic minWidth calculation based on maximum line character length
+  const maxLineLength = lines.reduce((max, line) => Math.max(max, line.length), 0);
+  const calculatedWidth = Math.max(400, Math.ceil(maxLineLength * 8.8 + 40));
 
   // --- View Modes: Edit Mode vs Syntax Highlighted Preview ---
   const [viewMode, setViewMode] = useState<'edit' | 'highlight'>('edit');
@@ -191,6 +195,7 @@ export function CodeEditor({
       <ScrollView
         style={styles.verticalScroll}
         contentContainerStyle={styles.verticalScrollContent}
+        nestedScrollEnabled={true}
         keyboardShouldPersistTaps="handled">
         <View style={styles.editorRow}>
           {/* Left Gutter: Line Numbers anchored to left edge */}
@@ -202,12 +207,15 @@ export function CodeEditor({
             ))}
           </View>
 
-          {/* Right Pane: Code Area expanding to 100% remaining horizontal space with horizontal scroll */}
+          {/* Right Pane: Code Area expanding horizontally with full pan gesture support */}
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={true}
+            nestedScrollEnabled={true}
+            directionalLockEnabled={true}
+            alwaysBounceHorizontal={true}
             style={styles.horizontalScroll}
-            contentContainerStyle={styles.horizontalScrollContent}
+            contentContainerStyle={[styles.horizontalScrollContent, { minWidth: calculatedWidth }]}
             keyboardShouldPersistTaps="handled">
             {viewMode === 'edit' ? (
               <TextInput
@@ -221,10 +229,10 @@ export function CodeEditor({
                 autoCorrect={false}
                 spellCheck={false}
                 scrollEnabled={false}
-                style={styles.textInput}
+                style={[styles.textInput, { minWidth: calculatedWidth }]}
               />
             ) : (
-              <View style={styles.highlightContainer}>
+              <View style={[styles.highlightContainer, { minWidth: calculatedWidth }]}>
                 {lines.map((line, idx) => renderHighlightedLine(line, idx))}
               </View>
             )}
@@ -355,7 +363,6 @@ const styles = StyleSheet.create({
   },
   horizontalScrollContent: {
     flexGrow: 1,
-    minWidth: '100%',
   },
   textInput: {
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
@@ -366,13 +373,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     textAlignVertical: 'top',
     alignSelf: 'flex-start',
-    minWidth: '100%',
   },
   highlightContainer: {
     paddingHorizontal: 10,
     paddingVertical: 10,
     alignSelf: 'flex-start',
-    minWidth: '100%',
   },
   codeLineText: {
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',

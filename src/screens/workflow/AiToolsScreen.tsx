@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Card, Button, Banner, HelperText, SectionTitle } from '../../components/UI';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { Card, Button, Banner, HelperText, SectionTitle, Input } from '../../components/UI';
 import { AiResponseModal } from '../../components/AiResponseModal';
 import * as aiApi from '../../api/ai';
 import { useProject } from '../../context/ProjectContext';
-import { colors, spacing } from '../../theme/theme';
+import { colors, radius, spacing } from '../../theme/theme';
 
 export default function AiToolsScreen({ navigation }: any) {
   const {
@@ -18,9 +18,45 @@ export default function AiToolsScreen({ navigation }: any) {
 
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  const [busy, setBusy] = useState<'diagnose' | 'apply' | null>(null);
+  const [busy, setBusy] = useState<'diagnose' | 'apply' | 'prompt' | null>(null);
+
+  // Command Prompt state
+  const [customPrompt, setCustomPrompt] = useState('');
+  const [promptResponse, setPromptResponse] = useState('');
+  const [promptError, setPromptError] = useState('');
 
   const fix = state?.ai_fix;
+
+  const onSubmitPrompt = async () => {
+    if (!customPrompt.trim()) return;
+    const userText = customPrompt.trim();
+    setBusy('prompt');
+    setPromptError('');
+    setPromptResponse('');
+    try {
+      const res = await aiApi.aiSubmitCustomPrompt(userText);
+      const actionMessage =
+        res.explanation || res.response || res.ai_response || res.guidance || res.text || res.message || 'Request executed successfully within project context.';
+
+      if (res.status === 'error' || res.out_of_scope) {
+        setPromptError(res.message || 'Request is out of scope.');
+      } else {
+        setRecentAction({
+          prompt: userText,
+          message: actionMessage,
+          timestamp: 'Just now',
+        });
+        setPromptResponse(actionMessage);
+        setCustomPrompt('');
+        setShowActionModal(true);
+        await refreshState();
+      }
+    } catch (e: any) {
+      setPromptError(e?.message || 'Could not process request.');
+    } finally {
+      setBusy(null);
+    }
+  };
 
   const onDiagnose = async () => {
     setBusy('diagnose');
@@ -69,7 +105,36 @@ export default function AiToolsScreen({ navigation }: any) {
   };
 
   return (
-    <View style={styles.flex}>
+    <ScrollView style={styles.flex} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      {/* Command Prompt & Custom Requests Input Block */}
+      <Card style={styles.promptCard}>
+        <Text style={styles.promptTitle}>💻 Command Prompt & Custom Requests</Text>
+        <Text style={styles.promptSubtitle}>
+          Type your required code modifications or feature requests for this decompiled project context:
+        </Text>
+        
+        {promptError ? <Banner type="error" message={promptError} /> : null}
+        {promptResponse ? <Banner type="success" message={promptResponse} /> : null}
+
+        <Input
+          value={customPrompt}
+          onChangeText={setCustomPrompt}
+          multiline
+          placeholder="e.g. Add dark theme toggle, modify strings.xml, or update Smali bytecode..."
+          style={styles.promptInput}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+
+        <Button
+          title="Submit Request"
+          onPress={onSubmitPrompt}
+          loading={busy === 'prompt'}
+          disabled={!customPrompt.trim()}
+          style={styles.submitBtn}
+        />
+      </Card>
+
       {/* Recent Action Steps Trigger */}
       {recentAction ? (
         <Card style={{ borderColor: '#38BDF8', borderWidth: 1 }}>
@@ -141,12 +206,18 @@ export default function AiToolsScreen({ navigation }: any) {
         message={recentAction?.message || ''}
         navigation={navigation}
       />
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: colors.bg, padding: spacing.md },
+  flex: { flex: 1, backgroundColor: colors.bg },
+  content: { padding: spacing.md, paddingBottom: spacing.xl },
+  promptCard: { backgroundColor: '#0F172A', borderColor: '#334155', borderWidth: 1 },
+  promptTitle: { color: '#F8FAFC', fontSize: 16, fontWeight: '700', marginBottom: 4 },
+  promptSubtitle: { color: '#94A3B8', fontSize: 12, marginBottom: spacing.sm, lineHeight: 16 },
+  promptInput: { minHeight: 80, color: '#F8FAFC', backgroundColor: '#1E293B', borderColor: '#334155' },
+  submitBtn: { marginTop: spacing.sm, backgroundColor: colors.primary },
   fixFile: { color: colors.text, fontWeight: '700', fontFamily: 'monospace', fontSize: 13 },
   fixExplanation: { color: colors.textMuted, marginTop: 6, marginBottom: spacing.sm, fontSize: 13 },
 });

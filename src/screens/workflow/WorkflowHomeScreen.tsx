@@ -34,10 +34,6 @@ export default function WorkflowHomeScreen({ route, navigation }: any) {
   } = useProject();
 
   const [successMsg, setSuccessMsg] = useState(route?.params?.message || '');
-  const [customPrompt, setCustomPrompt] = useState('');
-  const [promptLoading, setPromptLoading] = useState(false);
-  const [promptResponse, setPromptResponse] = useState('');
-  const [promptError, setPromptError] = useState('');
 
   useEffect(() => {
     if (route?.params?.message) {
@@ -50,34 +46,6 @@ export default function WorkflowHomeScreen({ route, navigation }: any) {
       refreshState();
     }, [refreshState]),
   );
-
-  const onSubmitPrompt = async () => {
-    if (!customPrompt.trim()) return;
-    const userText = customPrompt.trim();
-    setPromptLoading(true);
-    setPromptError('');
-    setPromptResponse('');
-    try {
-      const res = await aiApi.aiSubmitCustomPrompt(userText);
-      const actionMessage =
-        res.explanation || res.response || res.ai_response || res.guidance || res.text || res.message || 'Request executed successfully within project context.';
-      
-      // Update global recent action & pop up the required steps modal
-      setRecentAction({
-        prompt: userText,
-        message: actionMessage,
-        timestamp: 'Just now',
-      });
-      setPromptResponse(actionMessage);
-      setCustomPrompt('');
-      setShowActionModal(true);
-      await refreshState();
-    } catch (e: any) {
-      setPromptError(e?.message || 'Could not process request.');
-    } finally {
-      setPromptLoading(false);
-    }
-  };
 
   if (!hasProject) {
     return (
@@ -125,34 +93,7 @@ export default function WorkflowHomeScreen({ route, navigation }: any) {
         </Card>
       ) : null}
 
-      {/* Command Prompt / Custom Request Interface */}
-      <Card style={styles.promptCard}>
-        <Text style={styles.promptTitle}>💻 Command Prompt & Custom Requests</Text>
-        <Text style={styles.promptSubtitle}>
-          Type your required code modifications or feature requests for this decompiled project:
-        </Text>
-        
-        {promptError ? <Banner type="error" message={promptError} /> : null}
-        {promptResponse ? <Banner type="success" message={promptResponse} /> : null}
 
-        <Input
-          value={customPrompt}
-          onChangeText={setCustomPrompt}
-          multiline
-          placeholder="e.g. To change application name to 'SMS FAST' across the project…"
-          style={styles.promptInput}
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
-
-        <Button
-          title="Submit Request"
-          onPress={onSubmitPrompt}
-          loading={promptLoading}
-          disabled={!customPrompt.trim()}
-          style={styles.submitBtn}
-        />
-      </Card>
 
       <View style={styles.grid}>
         {TOOLS.map(tool => (
